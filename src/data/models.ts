@@ -54,13 +54,33 @@ export interface Outreach {
 }
 
 export type EpisodeStatus = "ACTIVE" | "CLOSED";
-export type StepStatus = "OPEN" | "DONE";
+export type StepStatus = "OPEN" | "DONE" | "SKIPPED";
+export type TOCStage = "admitted" | "discharged" | "interactive_contact" | "pcp_visit" | "follow_ups" | "closed";
 
 export interface EpisodeStep {
   key: string;
   label: string;
   status: StepStatus;
   due: string | null;
+  completedAt: string | null;
+  notes: string | null;
+}
+
+export interface FollowUpTask {
+  id: string;
+  label: string;
+  status: StepStatus;
+  due: string | null;
+  completedAt: string | null;
+  category: "scheduling" | "clinical" | "social" | "medication" | "documentation";
+}
+
+export interface WeeklyFollowUp {
+  week: number;
+  status: StepStatus;
+  due: string | null;
+  completedAt: string | null;
+  notes: string | null;
 }
 
 export interface Episode {
@@ -70,9 +90,13 @@ export interface Episode {
   startDate: string;
   dischargeDate: string;
   facility: string;
+  admitReason: string;
   sla48hDue: string;
   status: EpisodeStatus;
+  currentStage: TOCStage;
   steps: EpisodeStep[];
+  weeklyFollowUps: WeeklyFollowUp[];
+  followUpTasks: FollowUpTask[];
 }
 
 export interface Program {
