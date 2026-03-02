@@ -1,13 +1,32 @@
 import { useState, useMemo } from "react";
-import { episodes, patients, getPatientById } from "@/data/sampleData";
-import type { Patient } from "@/data/models";
+import { episodes, getPatientById } from "@/data/sampleData";
+import type { Patient, TOCStage } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Phone, Play, AlertTriangle, UserPlus } from "lucide-react";
+import { Play, Phone, AlertTriangle, CheckCircle2 } from "lucide-react";
+
+const STAGE_LABELS: Record<TOCStage, string> = {
+  admitted: "Admitted",
+  discharged: "Discharged",
+  interactive_contact: "IC Pending",
+  pcp_visit: "PCP Pending",
+  follow_ups: "Follow-ups",
+  closed: "Closed",
+};
+
+const STAGE_COLORS: Record<TOCStage, string> = {
+  admitted: "bg-muted text-muted-foreground",
+  discharged: "bg-warning/10 text-warning border-warning/30",
+  interactive_contact: "bg-destructive/10 text-destructive border-destructive/30",
+  pcp_visit: "bg-info/10 text-info border-info/30",
+  follow_ups: "bg-primary/10 text-primary border-primary/30",
+  closed: "bg-success/10 text-success border-success/30",
+};
 
 function slaRemaining(sla48hDue: string): { text: string; urgent: boolean } {
   const now = new Date("2026-03-02T12:00:00");
@@ -21,28 +40,34 @@ function slaRemaining(sla48hDue: string): { text: string; urgent: boolean } {
 export default function TOCHome() {
   const navigate = useNavigate();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [tab, setTab] = useState("uncontacted");
+  const [tab, setTab] = useState("all_active");
 
   const enrichedEpisodes = useMemo(() =>
-    episodes.map(ep => ({
-      ...ep,
-      patient: getPatientById(ep.patientId),
-      slaInfo: slaRemaining(ep.sla48hDue),
-      currentStep: ep.steps.find(s => s.status === "OPEN")?.label || "All Complete",
-      contactDone: ep.steps.find(s => s.key === "interactive_contact")?.status === "DONE",
-    })),
+    episodes.map(ep => {
+      const totalSteps = ep.steps.length + ep.weeklyFollowUps.length;
+      const doneSteps = ep.steps.filter(s => s.status === "DONE").length +
+        ep.weeklyFollowUps.filter(w => w.status === "DONE").length;
+      const openTasks = ep.followUpTasks.filter(t => t.status === "OPEN").length;
+      return {
+        ...ep,
+        patient: getPatientById(ep.patientId),
+        slaInfo: slaRemaining(ep.sla48hDue),
+        progressPct: Math.round((doneSteps / totalSteps) * 100),
+        openTasks,
+      };
+    }),
   []);
 
   const tabEpisodes = useMemo(() => {
     switch (tab) {
-      case "uncontacted": return enrichedEpisodes.filter(e => e.status === "ACTIVE" && !e.contactDone);
-      case "enrolled": return enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.contactDone);
+      case "needs_contact": return enrichedEpisodes.filter(e => e.status === "ACTIVE" && (e.currentStage === "discharged" || e.currentStage === "interactive_contact"));
+      case "in_followup": return enrichedEpisodes.filter(e => e.status === "ACTIVE" && (e.currentStage === "pcp_visit" || e.currentStage === "follow_ups"));
+      case "all_active": return enrichedEpisodes.filter(e => e.status === "ACTIVE");
       case "all": return enrichedEpisodes;
       default: return enrichedEpisodes;
     }
   }, [tab, enrichedEpisodes]);
 
-  // SLA heatstrip
   const onTime = enrichedEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
   const atRisk = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
   const overdue = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.text === "OVERDUE").length;
@@ -51,7 +76,7 @@ export default function TOCHome() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="p-5 pb-3 space-y-4 border-b">
-          <h1 className="text-xl font-bold">Transition of Care</h1>
+          <h1 className="text-xl font-bold">Transitions of Care</h1>
 
           {/* SLA Heatstrip */}
           <div className="flex gap-3">
@@ -71,8 +96,9 @@ export default function TOCHome() {
 
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList>
-              <TabsTrigger value="uncontacted">Discharged (Uncontacted)</TabsTrigger>
-              <TabsTrigger value="enrolled">Active Enrolled</TabsTrigger>
+              <TabsTrigger value="needs_contact">Needs Contact</TabsTrigger>
+              <TabsTrigger value="in_followup">In Follow-up</TabsTrigger>
+              <TabsTrigger value="all_active">All Active</TabsTrigger>
               <TabsTrigger value="all">All TOC</TabsTrigger>
             </TabsList>
           </Tabs>
@@ -83,10 +109,12 @@ export default function TOCHome() {
             <TableHeader>
               <TableRow>
                 <TableHead>Patient</TableHead>
+                <TableHead>Admit Reason</TableHead>
                 <TableHead>Facility</TableHead>
-                <TableHead>Discharge</TableHead>
-                <TableHead>SLA 48h</TableHead>
-                <TableHead>Current Step</TableHead>
+                <TableHead>Stage</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead>SLA</TableHead>
+                <TableHead>Tasks</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -95,20 +123,44 @@ export default function TOCHome() {
                 <TableRow key={ep.id}
                   className={`cursor-pointer ${selectedPatient?.id === ep.patientId ? "bg-primary/5" : ""}`}
                   onClick={() => ep.patient && setSelectedPatient(ep.patient)}>
-                  <TableCell className="font-medium">{ep.patient?.name || "Unknown"}</TableCell>
-                  <TableCell className="text-sm">{ep.facility}</TableCell>
-                  <TableCell className="text-sm">{ep.dischargeDate}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={ep.slaInfo.urgent ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-success/10 text-success border-success/30"}>
+                    <div>
+                      <span className="font-medium">{ep.patient?.name || "Unknown"}</span>
+                      <p className="text-xs text-muted-foreground">Discharged {ep.dischargeDate}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm">{ep.admitReason}</TableCell>
+                  <TableCell className="text-sm">{ep.facility}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={STAGE_COLORS[ep.currentStage]}>
+                      {STAGE_LABELS[ep.currentStage]}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 min-w-[100px]">
+                      <Progress value={ep.progressPct} className="h-2 flex-1" />
+                      <span className="text-xs text-muted-foreground w-8">{ep.progressPct}%</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={ep.slaInfo.urgent
+                      ? "bg-destructive/10 text-destructive border-destructive/30"
+                      : "bg-success/10 text-success border-success/30"}>
                       {ep.slaInfo.text}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm">{ep.currentStep}</TableCell>
+                  <TableCell>
+                    {ep.openTasks > 0 ? (
+                      <span className="text-sm font-medium">{ep.openTasks} open</span>
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 text-success" />
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                       <Button variant="default" size="sm" className="h-7 text-xs"
                         onClick={() => navigate(`/toc/episode/${ep.id}`)}>
-                        <Play className="h-3 w-3 mr-1" />Start
+                        <Play className="h-3 w-3 mr-1" />Open
                       </Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
