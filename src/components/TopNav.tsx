@@ -16,7 +16,7 @@ const navItems = [
 export function TopNav() {
   return (
     <header className="h-14 border-b bg-card flex items-center px-4 gap-1 shrink-0 overflow-x-auto">
-      <span className="text-lg font-bold tracking-tight text-primary mr-6 shrink-0">CareOps</span>
+      <span className="text-lg font-bold tracking-tight text-primary mr-6 shrink-0"><span className="text-lg font-bold tracking-tight text-primary mr-6 shrink-0">CareNow</span></span>
       <nav className="flex items-center gap-0.5">
         {navItems.map((item) => (
           <NavLink
