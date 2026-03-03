@@ -19,7 +19,7 @@ const toggleItem = (list: string[], v: string) =>
 
 const MOCK_TEAMMATES = ["Sarah M.", "David K.", "Angela R.", "Marcus T.", "Priya S."];
 
-type AssignStrategy = "even" | "by_practice" | "by_pcp" | "manual";
+type AssignStrategy = "even" | "by_payer" | "by_practice" | "by_pcp" | "by_partner" | "manual";
 
 export default function ChaseListBuilder() {
   const [openAWV, setOpenAWV] = useState(false);
@@ -226,8 +226,10 @@ export default function ChaseListBuilder() {
               >
                 {[
                   { value: "even" as const, icon: Split, label: "Split evenly", desc: `~${selectedTeammates.length > 0 ? Math.ceil(preview.length / selectedTeammates.length) : preview.length} patients each` },
+                  { value: "by_payer" as const, icon: Building2, label: "By payer", desc: "Each teammate handles specific payers" },
                   { value: "by_practice" as const, icon: Building2, label: "By practice", desc: "Each teammate handles specific practices" },
                   { value: "by_pcp" as const, icon: Users, label: "By PCP", desc: "Each teammate handles specific providers" },
+                  { value: "by_partner" as const, icon: Building2, label: "By partner", desc: "Each teammate handles specific partners/regions" },
                   { value: "manual" as const, icon: UserCheck, label: "Manual assignment", desc: "Assign individual patients yourself" },
                 ].map(opt => (
                   <label
