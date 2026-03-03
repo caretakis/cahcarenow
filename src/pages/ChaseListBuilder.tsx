@@ -8,11 +8,18 @@ import { useState, useMemo } from "react";
 import { patients } from "@/data/sampleData";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, Save, X } from "lucide-react";
+import { Upload, Save, X, Users, Split, Building2, UserCheck, Check } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "sonner";
 
 const toggleItem = (list: string[], v: string) =>
   list.includes(v) ? list.filter(r => r !== v) : [...list, v];
+
+const MOCK_TEAMMATES = ["Sarah M.", "David K.", "Angela R.", "Marcus T.", "Priya S."];
+
+type AssignStrategy = "even" | "by_practice" | "by_pcp" | "manual";
 
 export default function ChaseListBuilder() {
   const [openAWV, setOpenAWV] = useState(false);
@@ -22,6 +29,10 @@ export default function ChaseListBuilder() {
   const [selectedPractices, setSelectedPractices] = useState<string[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [listName, setListName] = useState("");
+  const [assignStrategy, setAssignStrategy] = useState<AssignStrategy>("even");
+  const [selectedTeammates, setSelectedTeammates] = useState<string[]>([]);
 
   const uniquePayers = useMemo(() => [...new Set(patients.map(p => p.payer))].sort(), []);
   const uniquePractices = useMemo(() => [...new Set(patients.map(p => p.practice))].sort(), []);
@@ -130,7 +141,9 @@ export default function ChaseListBuilder() {
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Preview ({preview.length} patients)</CardTitle>
-            <Button size="sm"><Save className="h-4 w-4 mr-2" />Save & Assign</Button>
+            <Button size="sm" onClick={() => setShowAssignDialog(true)} disabled={preview.length === 0}>
+              <Save className="h-4 w-4 mr-2" />Save & Assign
+            </Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -158,6 +171,97 @@ export default function ChaseListBuilder() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Save & Assign Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Save & Assign Chase List</DialogTitle>
+            <DialogDescription>
+              {preview.length} patients matched. Choose a name, teammates, and how to distribute.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <div>
+              <Label className="text-sm">List Name</Label>
+              <Input
+                value={listName}
+                onChange={e => setListName(e.target.value)}
+                placeholder="e.g. Q1 AWV Outreach — Humana"
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm">Assign To</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1.5">
+                {MOCK_TEAMMATES.map(name => {
+                  const selected = selectedTeammates.includes(name);
+                  return (
+                    <button
+                      key={name}
+                      onClick={() => setSelectedTeammates(prev => toggleItem(prev, name))}
+                      className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:bg-accent"
+                      }`}
+                    >
+                      <UserCheck className="h-4 w-4" />
+                      <span className="flex-1 text-left">{name}</span>
+                      {selected && <Check className="h-3.5 w-3.5" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <Label className="text-sm">Assignment Strategy</Label>
+              <RadioGroup
+                value={assignStrategy}
+                onValueChange={(v) => setAssignStrategy(v as AssignStrategy)}
+                className="mt-2 space-y-2"
+              >
+                {[
+                  { value: "even" as const, icon: Split, label: "Split evenly", desc: `~${selectedTeammates.length > 0 ? Math.ceil(preview.length / selectedTeammates.length) : preview.length} patients each` },
+                  { value: "by_practice" as const, icon: Building2, label: "By practice", desc: "Each teammate handles specific practices" },
+                  { value: "by_pcp" as const, icon: Users, label: "By PCP", desc: "Each teammate handles specific providers" },
+                  { value: "manual" as const, icon: UserCheck, label: "Manual assignment", desc: "Assign individual patients yourself" },
+                ].map(opt => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-start gap-3 rounded-md border p-3 cursor-pointer transition-colors ${
+                      assignStrategy === opt.value ? "border-primary bg-primary/5" : "border-border hover:bg-accent/50"
+                    }`}
+                  >
+                    <RadioGroupItem value={opt.value} className="mt-0.5" />
+                    <opt.icon className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">{opt.label}</div>
+                      <div className="text-xs text-muted-foreground">{opt.desc}</div>
+                    </div>
+                  </label>
+                ))}
+              </RadioGroup>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAssignDialog(false)}>Cancel</Button>
+            <Button
+              disabled={!listName.trim() || selectedTeammates.length === 0}
+              onClick={() => {
+                toast.success(`Chase list "${listName}" saved and assigned to ${selectedTeammates.length} teammate(s)`);
+                setShowAssignDialog(false);
+              }}
+            >
+              <Save className="h-4 w-4 mr-2" />Save & Assign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
