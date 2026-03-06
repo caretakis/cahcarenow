@@ -95,20 +95,20 @@ export default function ChaseListRun() {
                 <p className="text-xs text-muted-foreground">{list.stats.total - list.stats.remaining} of {list.stats.total} patients worked · {list.stats.scheduled} scheduled</p>
               </div>
               <div className="text-right">
-                <span className="text-2xl font-bold text-primary">{completedPct}%</span>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Worked</p>
+                <span className="text-2xl font-bold text-primary">{list.stats.total - list.stats.remaining}</span>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">of {list.stats.total} worked</p>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground w-16">Worked</span>
                 <Progress value={completedPct} className="h-2 flex-1" />
-                <span className="text-xs font-medium w-8 text-right">{completedPct}%</span>
+                <span className="text-xs font-medium w-20 text-right">{list.stats.total - list.stats.remaining} / {list.stats.total}</span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-muted-foreground w-16">Scheduled</span>
                 <Progress value={scheduledPct} className="h-2 flex-1 [&>div]:bg-chart-2" />
-                <span className="text-xs font-medium w-8 text-right">{scheduledPct}%</span>
+                <span className="text-xs font-medium w-20 text-right">{list.stats.scheduled} / {list.stats.total}</span>
               </div>
             </div>
           </div>
