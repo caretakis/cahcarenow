@@ -98,9 +98,12 @@ export default function WorkQueuesHome() {
 
   return (
     <div className="p-6 lg:p-8 space-y-8 max-w-[1400px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
-        <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
+          <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       <TopKPIBar items={kpis} />
