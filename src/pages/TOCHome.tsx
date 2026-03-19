@@ -147,8 +147,10 @@ export default function TOCHome() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="p-5 pb-3 space-y-4 border-b">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-bold">Transitions of Care</h1>
+            <div className="flex items-center gap-3">
+              <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[160px] h-8 text-sm">
                 <SelectValue />
