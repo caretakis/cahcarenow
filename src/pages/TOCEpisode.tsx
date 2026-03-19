@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "sonner";
 import { useState } from "react";
 import {
   CheckCircle2, Circle, AlertTriangle, Plus, Phone, Calendar,
@@ -368,24 +370,60 @@ function StepRow({ step, isCurrent, onAction }: { step: EpisodeStep; isCurrent: 
 
 function TaskRow({ task }: { task: FollowUpTask }) {
   const isDone = task.status === "DONE";
+  const [showReassign, setShowReassign] = useState(false);
+
+  const TEAM_MEMBERS = [
+    { name: "Lisa Thompson", role: "RN" },
+    { name: "Karen Wells", role: "RN" },
+    { name: "Sarah Mitchell", role: "CC" },
+    { name: "Mike Rodriguez", role: "CC" },
+    { name: "Jessica Park", role: "CC" },
+    { name: "Amy Chen", role: "RN" },
+  ];
+
   return (
-    <div className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-muted/50">
-      {isDone ? (
-        <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
-      ) : (
-        <Checkbox className="shrink-0" />
-      )}
-      <div className="flex items-center gap-2 text-muted-foreground shrink-0">
-        {CATEGORY_ICONS[task.category]}
+    <>
+      <div className="flex items-center gap-3 py-2 px-2 rounded-md hover:bg-muted/50 group">
+        {isDone ? (
+          <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+        ) : (
+          <Checkbox className="shrink-0" />
+        )}
+        <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+          {CATEGORY_ICONS[task.category]}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className={`text-sm ${isDone ? "text-muted-foreground line-through" : ""}`}>{task.label}</p>
+        </div>
+        {!isDone && (
+          <Popover open={showReassign} onOpenChange={setShowReassign}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <UserCog className="h-3 w-3" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-1" align="end">
+              <p className="text-xs font-medium text-muted-foreground px-2 py-1.5">Reassign to</p>
+              {TEAM_MEMBERS.map(m => (
+                <button key={m.name}
+                  className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-muted flex items-center justify-between"
+                  onClick={() => {
+                    toast.success(`Task reassigned to ${m.name}`);
+                    setShowReassign(false);
+                  }}>
+                  <span>{m.name}</span>
+                  <span className="text-xs text-muted-foreground">{m.role}</span>
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        )}
+        {task.due && (
+          <span className="text-xs text-muted-foreground shrink-0">
+            {isDone ? new Date(task.completedAt!).toLocaleDateString() : `Due ${new Date(task.due).toLocaleDateString()}`}
+          </span>
+        )}
       </div>
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm ${isDone ? "text-muted-foreground line-through" : ""}`}>{task.label}</p>
-      </div>
-      {task.due && (
-        <span className="text-xs text-muted-foreground shrink-0">
-          {isDone ? new Date(task.completedAt!).toLocaleDateString() : `Due ${new Date(task.due).toLocaleDateString()}`}
-        </span>
-      )}
-    </div>
+    </>
   );
 }
