@@ -68,8 +68,18 @@ function slaRemaining(sla48hDue: string): { text: string; urgent: boolean } {
 
 export default function TOCHome() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [tab, setTab] = useState("all_active");
+  const initialTab = searchParams.get("tab") || "all_active";
+  const [tab, setTab] = useState(initialTab);
+
+  useEffect(() => {
+    const paramTab = searchParams.get("tab");
+    if (paramTab) {
+      setTab(paramTab);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);

@@ -196,7 +196,13 @@ export default function WorkQueuesHome() {
             <Card
               key={q.id}
               className="hover:shadow-md transition-shadow cursor-pointer group"
-              onClick={() => navigate(`/queues/${q.id}`)}
+              onClick={() => {
+                if (q.id === "toc_discharged_uncontacted") {
+                  navigate("/toc?tab=needs_contact");
+                } else {
+                  navigate(`/queues/${q.id}`);
+                }
+              }}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
