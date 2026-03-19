@@ -1,11 +1,13 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { queueDefinitions, needs, patients, getPatientNeeds } from "@/data/sampleData";
 import { TopKPIBar } from "@/components/TopKPIBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, CheckCircle2, Zap } from "lucide-react";
+import type { Patient } from "@/data/models";
 
 const iconMap: Record<string, any> = {
   calendar: Calendar,
