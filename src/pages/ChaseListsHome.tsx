@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Plus, ArrowRight } from "lucide-react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { Progress } from "@/components/ui/progress";
 
 export default function ChaseListsHome() {
