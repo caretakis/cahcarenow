@@ -325,6 +325,14 @@ export default function TOCEpisode() {
           </Card>
         </div>
       </div>
+
+      {/* Reassign Dialog */}
+      <TOCReassignDialog
+        open={showReassign}
+        onOpenChange={setShowReassign}
+        episode={episode}
+        patientName={patient.name}
+      />
     </div>
   );
 }
