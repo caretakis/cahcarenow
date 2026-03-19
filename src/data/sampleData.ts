@@ -187,6 +187,8 @@ export const episodes: Episode[] = [
     id: "e_3004", patientId: "p_1008", type: "TOC", startDate: "2026-02-22",
     dischargeDate: "2026-02-25", facility: "University Hospital", admitReason: "Diabetic ketoacidosis",
     sla48hDue: "2026-02-27T17:00:00", status: "ACTIVE", currentStage: "follow_ups",
+    assignedNurse: "Karen Wells", assignedCareCoordinator: "Mike Rodriguez",
+    notificationSource: "hie_feed",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-22T03:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-25T12:00:00", notes: "Discharged to home, insulin adjusted" },
