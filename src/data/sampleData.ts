@@ -59,7 +59,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Arvada, CO", payer: "Humana",
     practice: "Peak Primary Care", provider: "Dr. Patel", riskTier: "very_high",
     rafOpportunity: 0.73, hccCount: 10, lastAWV: "2024-05-10", nextAppointment: "2026-03-06",
-    flags: ["complex_care_candidate"],
+    nextVisitType: "PCP Follow-up", flags: ["complex_care_candidate"],
   },
   {
     id: "p_1009", name: "Susan Taylor", dob: "1955-08-18", phone: "555-0212",
