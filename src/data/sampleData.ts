@@ -45,7 +45,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Thornton, CO", payer: "Medicare",
     practice: "Mountain View Clinic", provider: "Dr. Gupta", riskTier: "high",
     rafOpportunity: 0.56, hccCount: 7, lastAWV: "2024-08-05", nextAppointment: "2026-03-08",
-    flags: ["frequent_ed"],
+    nextVisitType: "Specialist Referral", flags: ["frequent_ed"],
   },
   {
     id: "p_1007", name: "Patricia Davis", dob: "1956-04-11", phone: "555-0190",
