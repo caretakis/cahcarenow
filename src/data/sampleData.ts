@@ -52,7 +52,7 @@ export const patients: Patient[] = [
     preferredContact: "text", address: "Westminster, CO", payer: "Aetna",
     practice: "Mountain View Clinic", provider: "Dr. Gupta", riskTier: "low",
     rafOpportunity: 0.08, hccCount: 1, lastAWV: "2025-09-22", nextAppointment: "2026-04-22",
-    flags: [],
+    nextVisitType: "Routine", flags: [],
   },
   {
     id: "p_1008", name: "Charles Wilson", dob: "1942-01-05", phone: "555-0201",
