@@ -104,6 +104,14 @@ export default function TOCEpisode() {
           <p className="text-sm text-muted-foreground mt-1">
             {episode.facility} · {episode.admitReason} · Discharged {episode.dischargeDate}
           </p>
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><Rss className="h-3 w-3" />{SOURCE_LABELS[episode.notificationSource]}</span>
+            <span>RN: {episode.assignedNurse}</span>
+            <span>CC: {episode.assignedCareCoordinator}</span>
+            <Button variant="ghost" size="sm" className="h-5 text-xs px-1.5" onClick={() => setShowReassign(true)}>
+              <UserCog className="h-3 w-3 mr-1" />Reassign
+            </Button>
+          </div>
         </div>
         <div className="text-right space-y-1">
           <div className="text-xs text-muted-foreground">48h SLA</div>
