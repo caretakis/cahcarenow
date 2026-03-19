@@ -17,7 +17,7 @@ export const patients: Patient[] = [
     preferredContact: "text", address: "Aurora, CO", payer: "Aetna",
     practice: "Peak Primary Care", provider: "Dr. Patel", riskTier: "very_high",
     rafOpportunity: 0.67, hccCount: 9, lastAWV: null, nextAppointment: "2026-03-05",
-    flags: ["newly_attributed", "complex_care_candidate"],
+    nextVisitType: "PCP Follow-up", flags: ["newly_attributed", "complex_care_candidate"],
   },
   {
     id: "p_1003", name: "Dorothy Williams", dob: "1944-07-22", phone: "555-0134",
