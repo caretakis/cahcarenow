@@ -10,7 +10,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Denver, CO", payer: "Humana",
     practice: "Sunrise Family Med", provider: "Dr. Chen", riskTier: "high",
     rafOpportunity: 0.42, hccCount: 6, lastAWV: "2024-02-10", nextAppointment: null,
-    flags: ["frequent_ed"],
+    nextVisitType: null, flags: ["frequent_ed"],
   },
   {
     id: "p_1002", name: "James Carter", dob: "1949-11-02", phone: "555-0199",
