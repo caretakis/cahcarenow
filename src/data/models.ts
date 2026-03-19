@@ -95,6 +95,9 @@ export interface Episode {
   sla48hDue: string;
   status: EpisodeStatus;
   currentStage: TOCStage;
+  assignedNurse: string;
+  assignedCareCoordinator: string;
+  notificationSource: NotificationSource;
   steps: EpisodeStep[];
   weeklyFollowUps: WeeklyFollowUp[];
   followUpTasks: FollowUpTask[];
