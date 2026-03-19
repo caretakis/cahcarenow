@@ -13,8 +13,9 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import {
   CheckCircle2, Circle, AlertTriangle, Plus, Phone, Calendar,
-  Pill, FileText, Users, ArrowLeft, Clock
+  Pill, FileText, Users, ArrowLeft, Clock, UserCog, Rss
 } from "lucide-react";
+import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { useNavigate } from "react-router-dom";
 
 const STAGE_ORDER = ["admitted", "discharged", "interactive_contact", "pcp_visit", "follow_ups", "closed"] as const;
