@@ -104,6 +104,12 @@ export default function TOCHome() {
   const tabEpisodes = useMemo(() => {
     let filtered = enrichedEpisodes;
 
+    // ViewingAs filter — match by nurse or care coordinator name
+    const memberName = getTeamMemberName(viewingAs);
+    if (memberName) {
+      filtered = filtered.filter(e => e.assignedNurse === memberName || e.assignedCareCoordinator === memberName);
+    }
+
     // Tab filter
     switch (tab) {
       case "admitted":
@@ -128,7 +134,7 @@ export default function TOCHome() {
     }
 
     return filtered;
-  }, [tab, statusFilter, enrichedEpisodes]);
+  }, [tab, statusFilter, viewingAs, enrichedEpisodes]);
 
   const onTime = enrichedEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
   const atRisk = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
