@@ -31,7 +31,7 @@ export const patients: Patient[] = [
     preferredContact: "portal", address: "Boulder, CO", payer: "UnitedHealthcare",
     practice: "Peak Primary Care", provider: "Dr. Patel", riskTier: "low",
     rafOpportunity: 0.12, hccCount: 2, lastAWV: "2025-06-20", nextAppointment: "2026-05-20",
-    flags: [],
+    nextVisitType: "Routine", flags: [],
   },
   {
     id: "p_1005", name: "Linda Martinez", dob: "1951-12-30", phone: "555-0178",
