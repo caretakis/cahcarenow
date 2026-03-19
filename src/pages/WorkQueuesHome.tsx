@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { queueDefinitions, needs, patients, getPatientNeeds } from "@/data/sampleData";
 import { TopKPIBar } from "@/components/TopKPIBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
