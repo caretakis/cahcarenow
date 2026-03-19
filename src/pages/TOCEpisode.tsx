@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { episodes, getPatientById, getPatientOutreach } from "@/data/sampleData";
-import type { EpisodeStep, WeeklyFollowUp, FollowUpTask } from "@/data/models";
+import type { EpisodeStep, WeeklyFollowUp, FollowUpTask, NotificationSource } from "@/data/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,9 @@ import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import {
   CheckCircle2, Circle, AlertTriangle, Plus, Phone, Calendar,
-  Pill, FileText, Users, ArrowLeft, Clock
+  Pill, FileText, Users, ArrowLeft, Clock, UserCog, Rss
 } from "lucide-react";
+import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { useNavigate } from "react-router-dom";
 
 const STAGE_ORDER = ["admitted", "discharged", "interactive_contact", "pcp_visit", "follow_ups", "closed"] as const;
@@ -56,10 +57,15 @@ export default function TOCEpisode() {
   const patient = episode ? getPatientById(episode.patientId) : undefined;
   const outreach = episode ? getPatientOutreach(episode.patientId) : [];
   const [showAssessment, setShowAssessment] = useState(false);
+  const [showReassign, setShowReassign] = useState(false);
   const [symptoms, setSymptoms] = useState("");
   const [medsChanged, setMedsChanged] = useState("");
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [socialNeeds, setSocialNeeds] = useState("");
+
+  const SOURCE_LABELS: Record<NotificationSource, string> = {
+    hie_feed: "HIE Feed", wellsky: "WellSky", hospital_portal: "Hospital Portal", manual: "Manual",
+  };
 
   if (!episode || !patient) return <div className="p-8 text-muted-foreground">Episode not found</div>;
 
@@ -98,6 +104,14 @@ export default function TOCEpisode() {
           <p className="text-sm text-muted-foreground mt-1">
             {episode.facility} · {episode.admitReason} · Discharged {episode.dischargeDate}
           </p>
+          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1"><Rss className="h-3 w-3" />{SOURCE_LABELS[episode.notificationSource]}</span>
+            <span>RN: {episode.assignedNurse}</span>
+            <span>CC: {episode.assignedCareCoordinator}</span>
+            <Button variant="ghost" size="sm" className="h-5 text-xs px-1.5" onClick={() => setShowReassign(true)}>
+              <UserCog className="h-3 w-3 mr-1" />Reassign
+            </Button>
+          </div>
         </div>
         <div className="text-right space-y-1">
           <div className="text-xs text-muted-foreground">48h SLA</div>
@@ -311,6 +325,14 @@ export default function TOCEpisode() {
           </Card>
         </div>
       </div>
+
+      {/* Reassign Dialog */}
+      <TOCReassignDialog
+        open={showReassign}
+        onOpenChange={setShowReassign}
+        episode={episode}
+        patientName={patient.name}
+      />
     </div>
   );
 }

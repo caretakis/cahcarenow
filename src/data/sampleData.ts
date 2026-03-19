@@ -112,6 +112,8 @@ export const episodes: Episode[] = [
     id: "e_3001", patientId: "p_1002", type: "TOC", startDate: "2026-02-24",
     dischargeDate: "2026-02-26", facility: "University Hospital", admitReason: "CHF exacerbation",
     sla48hDue: "2026-02-28T17:00:00", status: "ACTIVE", currentStage: "interactive_contact",
+    assignedNurse: "Lisa Thompson", assignedCareCoordinator: "Sarah Mitchell",
+    notificationSource: "hie_feed",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-24T08:00:00", notes: "ADT feed received" },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-26T14:00:00", notes: "Discharged to home" },
@@ -135,6 +137,8 @@ export const episodes: Episode[] = [
     id: "e_3002", patientId: "p_1003", type: "TOC", startDate: "2026-02-20",
     dischargeDate: "2026-02-22", facility: "St. Mary's Medical Center", admitReason: "Pneumonia",
     sla48hDue: "2026-02-24T17:00:00", status: "ACTIVE", currentStage: "pcp_visit",
+    assignedNurse: "Lisa Thompson", assignedCareCoordinator: "Mike Rodriguez",
+    notificationSource: "wellsky",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-20T10:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-22T11:00:00", notes: "Discharged to home with O2" },
@@ -159,6 +163,8 @@ export const episodes: Episode[] = [
     id: "e_3003", patientId: "p_1006", type: "TOC", startDate: "2026-02-26",
     dischargeDate: "2026-02-28", facility: "General Hospital", admitReason: "COPD exacerbation",
     sla48hDue: "2026-03-02T17:00:00", status: "ACTIVE", currentStage: "discharged",
+    assignedNurse: "Karen Wells", assignedCareCoordinator: "Sarah Mitchell",
+    notificationSource: "hospital_portal",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-26T06:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-28T15:00:00", notes: "Discharged to home" },
@@ -181,6 +187,8 @@ export const episodes: Episode[] = [
     id: "e_3004", patientId: "p_1008", type: "TOC", startDate: "2026-02-22",
     dischargeDate: "2026-02-25", facility: "University Hospital", admitReason: "Diabetic ketoacidosis",
     sla48hDue: "2026-02-27T17:00:00", status: "ACTIVE", currentStage: "follow_ups",
+    assignedNurse: "Karen Wells", assignedCareCoordinator: "Mike Rodriguez",
+    notificationSource: "hie_feed",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-22T03:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-25T12:00:00", notes: "Discharged to home, insulin adjusted" },
