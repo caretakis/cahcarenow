@@ -53,7 +53,8 @@ export interface Outreach {
   relatedNeedIds: string[];
 }
 
-export type EpisodeStatus = "ACTIVE" | "CLOSED";
+export type EpisodeStatus = "ACTIVE" | "CLOSED" | "NOT_ELIGIBLE";
+export type NotificationSource = "hie_feed" | "wellsky" | "hospital_portal" | "manual";
 export type StepStatus = "OPEN" | "DONE" | "SKIPPED";
 export type TOCStage = "admitted" | "discharged" | "interactive_contact" | "pcp_visit" | "follow_ups" | "closed";
 
