@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Phone, Pill, AlertTriangle, RefreshCw } from "lucide-react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 
 const riskColors: Record<string, string> = {
   on_track: "bg-success/10 text-success border-success/30",
