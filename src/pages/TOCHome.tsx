@@ -160,7 +160,7 @@ export default function TOCHome() {
                   <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </div>
           </div>
 
           {/* SLA Heatstrip */}

@@ -13,9 +13,12 @@ export default function ProgramsHome() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1200px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Programs</h1>
-        <p className="text-muted-foreground mt-1">Protocol-driven longitudinal care programs</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Programs</h1>
+          <p className="text-muted-foreground mt-1">Protocol-driven longitudinal care programs</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -19,6 +19,7 @@ const iconMap: Record<string, any> = {
 
 export default function WorkQueuesHome() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
 
   // Build per-queue stats
   const queueStats = useMemo(() => {

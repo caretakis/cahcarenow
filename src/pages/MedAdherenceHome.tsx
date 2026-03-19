@@ -50,7 +50,10 @@ export default function MedAdherenceHome() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="p-5 pb-3 space-y-4 border-b">
-          <h1 className="text-xl font-bold">Med Adherence</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">Med Adherence</h1>
+            <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
+          </div>
           <TopKPIBar items={kpis} />
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList>

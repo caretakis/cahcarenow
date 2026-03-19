@@ -23,7 +23,7 @@ export default function ChaseListsHome() {
           <Plus className="h-4 w-4 mr-2" />
           Build New List
         </Button>
-      </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
 
       <div className="space-y-4">
         {chaseLists.map(list => {
