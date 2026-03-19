@@ -19,6 +19,7 @@ export interface Patient {
   hccCount: number;
   lastAWV: string | null;
   nextAppointment: string | null;
+  nextVisitType: string | null;
   flags: PatientFlag[];
 }
 

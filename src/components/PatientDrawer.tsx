@@ -72,6 +72,11 @@ export function PatientDrawer({ patient, onClose }: PatientDrawerProps) {
           <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
             <p>📞 {patient.phone} · Prefers {patient.preferredContact}</p>
             <p>RAF Opp: +{patient.rafOpportunity} · HCCs: {patient.hccCount}</p>
+            {patient.nextAppointment ? (
+              <p>📅 Next visit: {patient.nextAppointment}{patient.nextVisitType ? ` · ${patient.nextVisitType}` : ""}</p>
+            ) : (
+              <p className="text-destructive">📅 No upcoming visit scheduled</p>
+            )}
           </div>
         </div>
 
