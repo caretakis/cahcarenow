@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { programs, programEnrollments, patients, getPatientById } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
