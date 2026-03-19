@@ -9,6 +9,7 @@ import { ArrowRight, Users } from "lucide-react";
 
 export default function ProgramsHome() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1200px] mx-auto">
