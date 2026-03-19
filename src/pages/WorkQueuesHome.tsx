@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
-import { ViewingAsSelector } from "@/components/ViewingAsSelector";
-import { queueDefinitions, needs, patients, getPatientNeeds } from "@/data/sampleData";
+import { ViewingAsSelector, TEAM_MEMBERS } from "@/components/ViewingAsSelector";
+import { needs, patients, episodes, medAdherenceRecords, programEnrollments } from "@/data/sampleData";
 import { TopKPIBar } from "@/components/TopKPIBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, CheckCircle2, Zap } from "lucide-react";
+import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, Zap } from "lucide-react";
 import type { Patient } from "@/data/models";
+
+const TODAY = "2026-03-19";
 
 const iconMap: Record<string, any> = {
   calendar: Calendar,
@@ -21,30 +23,80 @@ export default function WorkQueuesHome() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
 
-  // Build per-queue stats
+  // Derive real queue stats from data
   const queueStats = useMemo(() => {
-    return queueDefinitions.map(q => {
-      // Get all open/in-progress needs
-      const openNeeds = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
-      const completedNeeds = needs.filter(n => n.status === "COMPLETED");
-      const overdueNeeds = openNeeds.filter(n => n.dueDate && n.dueDate < "2026-03-03");
-      const dueTodayNeeds = openNeeds.filter(n => n.dueDate && n.dueDate <= "2026-03-03");
-      const totalNeeds = openNeeds.length + completedNeeds.length;
-      const completionPct = totalNeeds > 0 ? Math.round((completedNeeds.length / totalNeeds) * 100) : 0;
+    // AWV + Quality: needs of type AWV or QUALITY_GAP
+    const awvQualityOpen = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && (n.status === "OPEN" || n.status === "IN_PROGRESS"));
+    const awvQualityCompleted = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && n.status === "COMPLETED");
+    const awvQualityOverdue = awvQualityOpen.filter(n => n.dueDate && n.dueDate < TODAY);
+    const awvQualityTotal = awvQualityOpen.length + awvQualityCompleted.length;
 
-      return {
-        ...q,
-        openCount: openNeeds.length,
-        overdueCount: overdueNeeds.length,
-        dueTodayCount: dueTodayNeeds.length,
-        completedCount: completedNeeds.length,
-        completionPct,
-      };
-    });
+    // TOC: discharged + not yet contacted
+    const tocActive = episodes.filter(e => e.status === "ACTIVE" && (e.currentStage === "discharged" || e.currentStage === "interactive_contact"));
+    const tocOverdue = tocActive.filter(e => e.sla48hDue < TODAY + "T00:00:00");
+
+    // Med Adherence: at_risk or overdue
+    const medAtRisk = medAdherenceRecords.filter(r => r.riskLevel === "at_risk" || r.riskLevel === "overdue");
+    const medOverdue = medAdherenceRecords.filter(r => r.riskLevel === "overdue");
+
+    // Programs: overdue checkpoints
+    const progOverdue = programEnrollments.filter(e => e.status === "active" && e.checkpointStatuses.some(c => c.status === "OPEN" && c.nextDue && c.nextDue < TODAY));
+    const progTotal = programEnrollments.filter(e => e.status === "active");
+
+    return [
+      {
+        id: "scheduling_awv_quality",
+        title: "Scheduling: AWV + Quality",
+        description: "Patients due for AWV or with open quality gaps, ranked by impact",
+        roles: ["office_staff", "central_non_clinical"],
+        icon: "calendar",
+        count: [...new Set(awvQualityOpen.map(n => n.patientId))].length,
+        urgentCount: awvQualityOverdue.length,
+        overdueCount: awvQualityOverdue.length,
+        completionPct: awvQualityTotal > 0 ? Math.round((awvQualityCompleted.length / awvQualityTotal) * 100) : 0,
+        path: "/queues/scheduling_awv_quality",
+      },
+      {
+        id: "toc_discharged_uncontacted",
+        title: "TOC: Discharged (Uncontacted)",
+        description: "Recently discharged patients needing 48h interactive contact",
+        roles: ["central_clinical"],
+        icon: "clock",
+        count: tocActive.length,
+        urgentCount: tocOverdue.length,
+        overdueCount: tocOverdue.length,
+        completionPct: episodes.length > 0 ? Math.round((episodes.filter(e => e.status === "CLOSED" || e.currentStage === "follow_ups" || e.currentStage === "closed").length / episodes.length) * 100) : 0,
+        path: "/toc?tab=needs_contact",
+      },
+      {
+        id: "med_adherence_at_risk",
+        title: "Med Adherence: At Risk",
+        description: "Patients with medication adherence gaps or overdue refills",
+        roles: ["central_non_clinical", "central_clinical"],
+        icon: "pill",
+        count: medAtRisk.length,
+        urgentCount: medOverdue.length,
+        overdueCount: medOverdue.length,
+        completionPct: medAdherenceRecords.length > 0 ? Math.round((medAdherenceRecords.filter(r => r.riskLevel === "on_track").length / medAdherenceRecords.length) * 100) : 0,
+        path: "/med-adherence",
+      },
+      {
+        id: "program_overdue",
+        title: "Programs: Overdue Checkpoints",
+        description: "Patients with overdue program checkpoints needing attention",
+        roles: ["central_clinical"],
+        icon: "clipboard",
+        count: progOverdue.length,
+        urgentCount: progOverdue.length,
+        overdueCount: progOverdue.length,
+        completionPct: progTotal.length > 0 ? Math.round(((progTotal.length - progOverdue.length) / progTotal.length) * 100) : 0,
+        path: "/programs",
+      },
+    ];
   }, []);
 
   const totalOpen = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
-  const totalOverdue = needs.filter(n => n.dueDate && n.dueDate < "2026-03-03" && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
+  const totalOverdue = needs.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
   const totalCompleted = needs.filter(n => n.status === "COMPLETED").length;
   const totalAll = totalOpen + totalCompleted;
   const overallPct = totalAll > 0 ? Math.round((totalCompleted / totalAll) * 100) : 0;
@@ -57,18 +109,16 @@ export default function WorkQueuesHome() {
   ];
 
   // Priority actions: open needs sorted by urgency then impact
-  const TODAY = "2026-03-19";
   const priorityActions = useMemo(() => {
     const openNeeds = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
     return openNeeds
       .map(n => {
         const patient = patients.find(p => p.id === n.patientId);
         const isOverdue = n.dueDate && n.dueDate < TODAY;
-        const isDueSoon = n.dueDate && !isOverdue && n.dueDate <= "2026-03-26"; // within a week
+        const isDueSoon = n.dueDate && !isOverdue && n.dueDate <= "2026-03-26";
         return { ...n, patient, isOverdue, isDueSoon };
       })
       .sort((a, b) => {
-        // Overdue first, then due soon, then by impact
         if (a.isOverdue && !b.isOverdue) return -1;
         if (!a.isOverdue && b.isOverdue) return 1;
         if (a.isDueSoon && !b.isDueSoon) return -1;
@@ -201,13 +251,7 @@ export default function WorkQueuesHome() {
             <Card
               key={q.id}
               className="hover:shadow-md transition-shadow cursor-pointer group"
-              onClick={() => {
-                if (q.id === "toc_discharged_uncontacted") {
-                  navigate("/toc?tab=needs_contact");
-                } else {
-                  navigate(`/queues/${q.id}`);
-                }
-              }}
+              onClick={() => navigate(q.path)}
             >
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
@@ -235,7 +279,7 @@ export default function WorkQueuesHome() {
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-1.5">
                     <span className="font-semibold">{q.count}</span>
-                    <span className="text-muted-foreground">patients</span>
+                    <span className="text-muted-foreground">{q.id === "toc_discharged_uncontacted" ? "episodes" : "patients"}</span>
                   </div>
                   {q.overdueCount > 0 && (
                     <div className="flex items-center gap-1 text-destructive">
@@ -244,17 +288,9 @@ export default function WorkQueuesHome() {
                     </div>
                   )}
                   {q.urgentCount > 0 && (
-                    <div className="flex items-center gap-1">
-                      <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 text-xs">
-                        {q.urgentCount} urgent
-                      </Badge>
-                    </div>
-                  )}
-                  {q.dueTodayCount > 0 && (
-                    <div className="flex items-center gap-1 text-warning">
-                      <Clock className="h-3.5 w-3.5" />
-                      <span className="text-xs font-medium">{q.dueTodayCount} due today</span>
-                    </div>
+                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 text-xs">
+                      {q.urgentCount} urgent
+                    </Badge>
                   )}
                 </div>
 
