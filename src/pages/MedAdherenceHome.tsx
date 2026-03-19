@@ -27,6 +27,7 @@ const confidenceColors: Record<string, string> = {
 export default function MedAdherenceHome() {
   const [tab, setTab] = useState("at_risk");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [viewingAs, setViewingAs] = useState("me");
 
   const records = useMemo(() => {
     const enriched = medAdherenceRecords.map(r => ({ ...r, patient: getPatientById(r.patientId) }));
