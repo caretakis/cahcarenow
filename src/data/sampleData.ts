@@ -73,7 +73,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Littleton, CO", payer: "Medicare",
     practice: "Mountain View Clinic", provider: "Dr. Gupta", riskTier: "high",
     rafOpportunity: 0.49, hccCount: 5, lastAWV: null, nextAppointment: "2026-03-15",
-    flags: ["frequent_ed"],
+    nextVisitType: "AWV", flags: ["frequent_ed"],
   },
 ];
 
