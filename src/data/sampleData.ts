@@ -66,7 +66,7 @@ export const patients: Patient[] = [
     preferredContact: "portal", address: "Broomfield, CO", payer: "UnitedHealthcare",
     practice: "Sunrise Family Med", provider: "Dr. Tran", riskTier: "medium",
     rafOpportunity: 0.28, hccCount: 3, lastAWV: "2025-04-10", nextAppointment: null,
-    flags: ["newly_attributed"],
+    nextVisitType: null, flags: ["newly_attributed"],
   },
   {
     id: "p_1010", name: "Richard Anderson", dob: "1952-02-14", phone: "555-0223",
