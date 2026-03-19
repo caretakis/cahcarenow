@@ -10,13 +10,18 @@ export const TEAM_MEMBERS = [
   { id: "james_park", name: "James Park" },
 ];
 
+/** Resolve the display name for a ViewingAs ID */
+export function getTeamMemberName(id: string): string | null {
+  if (id === "me") return null;
+  return TEAM_MEMBERS.find(m => m.id === id)?.name ?? null;
+}
+
 interface ViewingAsSelectorProps {
   value: string;
   onChange: (value: string) => void;
 }
 
 export function ViewingAsSelector({ value, onChange }: ViewingAsSelectorProps) {
-  const selected = TEAM_MEMBERS.find(m => m.id === value);
   const isCovering = value !== "me";
 
   return (
