@@ -112,6 +112,8 @@ export const episodes: Episode[] = [
     id: "e_3001", patientId: "p_1002", type: "TOC", startDate: "2026-02-24",
     dischargeDate: "2026-02-26", facility: "University Hospital", admitReason: "CHF exacerbation",
     sla48hDue: "2026-02-28T17:00:00", status: "ACTIVE", currentStage: "interactive_contact",
+    assignedNurse: "Lisa Thompson", assignedCareCoordinator: "Sarah Mitchell",
+    notificationSource: "hie_feed",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-24T08:00:00", notes: "ADT feed received" },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-26T14:00:00", notes: "Discharged to home" },
