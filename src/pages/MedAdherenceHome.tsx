@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Phone, Pill, AlertTriangle, RefreshCw } from "lucide-react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 
 const riskColors: Record<string, string> = {
   on_track: "bg-success/10 text-success border-success/30",
@@ -26,6 +27,7 @@ const confidenceColors: Record<string, string> = {
 export default function MedAdherenceHome() {
   const [tab, setTab] = useState("at_risk");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [viewingAs, setViewingAs] = useState("me");
 
   const records = useMemo(() => {
     const enriched = medAdherenceRecords.map(r => ({ ...r, patient: getPatientById(r.patientId) }));
@@ -48,7 +50,10 @@ export default function MedAdherenceHome() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="p-5 pb-3 space-y-4 border-b">
-          <h1 className="text-xl font-bold">Med Adherence</h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold">Med Adherence</h1>
+            <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
+          </div>
           <TopKPIBar items={kpis} />
           <Tabs value={tab} onValueChange={setTab}>
             <TabsList>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { queueDefinitions, needs, patients, getPatientNeeds } from "@/data/sampleData";
 import { TopKPIBar } from "@/components/TopKPIBar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ const iconMap: Record<string, any> = {
 
 export default function WorkQueuesHome() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
 
   // Build per-queue stats
   const queueStats = useMemo(() => {
@@ -97,9 +99,12 @@ export default function WorkQueuesHome() {
 
   return (
     <div className="p-6 lg:p-8 space-y-8 max-w-[1400px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
-        <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
+          <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       <TopKPIBar items={kpis} />

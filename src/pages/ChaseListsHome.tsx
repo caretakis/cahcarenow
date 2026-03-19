@@ -1,25 +1,31 @@
+import { useState } from "react";
 import { chaseLists } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Plus, ArrowRight } from "lucide-react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { Progress } from "@/components/ui/progress";
 
 export default function ChaseListsHome() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1200px] mx-auto">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Chase Lists</h1>
           <p className="text-muted-foreground mt-1">Manage and work reusable patient lists</p>
         </div>
-        <Button onClick={() => navigate("/lists/builder")}>
-          <Plus className="h-4 w-4 mr-2" />
-          Build New List
-        </Button>
+        <div className="flex items-center gap-3">
+          <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
+          <Button onClick={() => navigate("/lists/builder")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Build New List
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">

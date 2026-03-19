@@ -11,6 +11,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -81,6 +82,7 @@ export default function TOCHome() {
   }, [searchParams, setSearchParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
+  const [viewingAs, setViewingAs] = useState("me");
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
 
   const enrichedEpisodes = useMemo(() =>
@@ -145,18 +147,21 @@ export default function TOCHome() {
     <div className="flex h-[calc(100vh-3.5rem)]">
       <div className="flex-1 flex flex-col min-w-0">
         <div className="p-5 pb-3 space-y-4 border-b">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-bold">Transitions of Care</h1>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[160px] h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {STATUS_OPTIONS.map(opt => (
-                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-3">
+              <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[160px] h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* SLA Heatstrip */}

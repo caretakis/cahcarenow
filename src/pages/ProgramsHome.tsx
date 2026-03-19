@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { programs, programEnrollments, patients, getPatientById } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,12 +9,16 @@ import { ArrowRight, Users } from "lucide-react";
 
 export default function ProgramsHome() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1200px] mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Programs</h1>
-        <p className="text-muted-foreground mt-1">Protocol-driven longitudinal care programs</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Programs</h1>
+          <p className="text-muted-foreground mt-1">Protocol-driven longitudinal care programs</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
