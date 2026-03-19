@@ -136,9 +136,15 @@ export default function TOCHome() {
     return filtered;
   }, [tab, statusFilter, viewingAs, enrichedEpisodes]);
 
-  const onTime = enrichedEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
-  const atRisk = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
-  const overdue = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.text === "OVERDUE").length;
+  const viewingEpisodes = useMemo(() => {
+    const memberName = getTeamMemberName(viewingAs);
+    if (!memberName) return enrichedEpisodes;
+    return enrichedEpisodes.filter(e => e.assignedNurse === memberName || e.assignedCareCoordinator === memberName);
+  }, [viewingAs, enrichedEpisodes]);
+
+  const onTime = viewingEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
+  const atRisk = viewingEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
+  const overdue = viewingEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.text === "OVERDUE").length;
 
   const canMarkNotEligible = (stage: TOCStage) => stage === "admitted" || stage === "discharged";
 
