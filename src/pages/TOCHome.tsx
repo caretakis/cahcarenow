@@ -11,7 +11,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
-import { ViewingAsSelector } from "@/components/ViewingAsSelector";
+import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -104,6 +104,12 @@ export default function TOCHome() {
   const tabEpisodes = useMemo(() => {
     let filtered = enrichedEpisodes;
 
+    // ViewingAs filter — match by nurse or care coordinator name
+    const memberName = getTeamMemberName(viewingAs);
+    if (memberName) {
+      filtered = filtered.filter(e => e.assignedNurse === memberName || e.assignedCareCoordinator === memberName);
+    }
+
     // Tab filter
     switch (tab) {
       case "admitted":
@@ -128,11 +134,17 @@ export default function TOCHome() {
     }
 
     return filtered;
-  }, [tab, statusFilter, enrichedEpisodes]);
+  }, [tab, statusFilter, viewingAs, enrichedEpisodes]);
 
-  const onTime = enrichedEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
-  const atRisk = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
-  const overdue = enrichedEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.text === "OVERDUE").length;
+  const viewingEpisodes = useMemo(() => {
+    const memberName = getTeamMemberName(viewingAs);
+    if (!memberName) return enrichedEpisodes;
+    return enrichedEpisodes.filter(e => e.assignedNurse === memberName || e.assignedCareCoordinator === memberName);
+  }, [viewingAs, enrichedEpisodes]);
+
+  const onTime = viewingEpisodes.filter(e => e.status === "ACTIVE" && !e.slaInfo.urgent).length;
+  const atRisk = viewingEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.urgent && e.slaInfo.text !== "OVERDUE").length;
+  const overdue = viewingEpisodes.filter(e => e.status === "ACTIVE" && e.slaInfo.text === "OVERDUE").length;
 
   const canMarkNotEligible = (stage: TOCStage) => stage === "admitted" || stage === "discharged";
 
