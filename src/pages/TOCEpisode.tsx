@@ -57,10 +57,15 @@ export default function TOCEpisode() {
   const patient = episode ? getPatientById(episode.patientId) : undefined;
   const outreach = episode ? getPatientOutreach(episode.patientId) : [];
   const [showAssessment, setShowAssessment] = useState(false);
+  const [showReassign, setShowReassign] = useState(false);
   const [symptoms, setSymptoms] = useState("");
   const [medsChanged, setMedsChanged] = useState("");
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [socialNeeds, setSocialNeeds] = useState("");
+
+  const SOURCE_LABELS: Record<NotificationSource, string> = {
+    hie_feed: "HIE Feed", wellsky: "WellSky", hospital_portal: "Hospital Portal", manual: "Manual",
+  };
 
   if (!episode || !patient) return <div className="p-8 text-muted-foreground">Episode not found</div>;
 
