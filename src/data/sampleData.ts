@@ -38,7 +38,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Centennial, CO", payer: "Humana",
     practice: "Sunrise Family Med", provider: "Dr. Tran", riskTier: "medium",
     rafOpportunity: 0.35, hccCount: 4, lastAWV: "2025-01-15", nextAppointment: "2026-03-12",
-    flags: [],
+    nextVisitType: "AWV", flags: [],
   },
   {
     id: "p_1006", name: "William Brown", dob: "1947-07-19", phone: "555-0189",
