@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { episodes, getPatientById, getPatientOutreach } from "@/data/sampleData";
-import type { EpisodeStep, WeeklyFollowUp, FollowUpTask } from "@/data/models";
+import type { EpisodeStep, WeeklyFollowUp, FollowUpTask, NotificationSource } from "@/data/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
