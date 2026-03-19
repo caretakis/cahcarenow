@@ -82,6 +82,7 @@ export default function TOCHome() {
   }, [searchParams, setSearchParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
+  const [viewingAs, setViewingAs] = useState("me");
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
 
   const enrichedEpisodes = useMemo(() =>
