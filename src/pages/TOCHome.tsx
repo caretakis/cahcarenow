@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { episodes, getPatientById } from "@/data/sampleData";
 import type { Patient, TOCStage, EpisodeStatus, NotificationSource } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
@@ -8,7 +9,6 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import {
@@ -67,8 +67,18 @@ function slaRemaining(sla48hDue: string): { text: string; urgent: boolean } {
 
 export default function TOCHome() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [tab, setTab] = useState("all_active");
+  const initialTab = searchParams.get("tab") || "all_active";
+  const [tab, setTab] = useState(initialTab);
+
+  useEffect(() => {
+    const paramTab = searchParams.get("tab");
+    if (paramTab) {
+      setTab(paramTab);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
