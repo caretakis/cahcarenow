@@ -163,6 +163,8 @@ export const episodes: Episode[] = [
     id: "e_3003", patientId: "p_1006", type: "TOC", startDate: "2026-02-26",
     dischargeDate: "2026-02-28", facility: "General Hospital", admitReason: "COPD exacerbation",
     sla48hDue: "2026-03-02T17:00:00", status: "ACTIVE", currentStage: "discharged",
+    assignedNurse: "Karen Wells", assignedCareCoordinator: "Sarah Mitchell",
+    notificationSource: "hospital_portal",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-26T06:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-28T15:00:00", notes: "Discharged to home" },
