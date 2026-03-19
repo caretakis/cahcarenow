@@ -24,7 +24,7 @@ export const patients: Patient[] = [
     preferredContact: "call", address: "Lakewood, CO", payer: "Medicare",
     practice: "Sunrise Family Med", provider: "Dr. Chen", riskTier: "very_high",
     rafOpportunity: 0.81, hccCount: 11, lastAWV: "2024-11-15", nextAppointment: "2026-03-10",
-    flags: ["complex_care_candidate", "frequent_ed"],
+    nextVisitType: "AWV", flags: ["complex_care_candidate", "frequent_ed"],
   },
   {
     id: "p_1004", name: "Robert Johnson", dob: "1960-09-08", phone: "555-0167",
