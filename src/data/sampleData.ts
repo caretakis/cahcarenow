@@ -137,6 +137,8 @@ export const episodes: Episode[] = [
     id: "e_3002", patientId: "p_1003", type: "TOC", startDate: "2026-02-20",
     dischargeDate: "2026-02-22", facility: "St. Mary's Medical Center", admitReason: "Pneumonia",
     sla48hDue: "2026-02-24T17:00:00", status: "ACTIVE", currentStage: "pcp_visit",
+    assignedNurse: "Lisa Thompson", assignedCareCoordinator: "Mike Rodriguez",
+    notificationSource: "wellsky",
     steps: [
       { key: "admitted", label: "Admitted", status: "DONE", due: null, completedAt: "2026-02-20T10:00:00", notes: null },
       { key: "discharged", label: "Discharged", status: "DONE", due: null, completedAt: "2026-02-22T11:00:00", notes: "Discharged to home with O2" },
