@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { chaseLists, patients, getPatientNeeds, getPatientOutreach } from "@/data/sampleData";
 import type { Patient, ChaseList } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
@@ -34,7 +35,17 @@ export default function ChaseListsPage() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
-  const [selectedListId, setSelectedListId] = useState<string | null>(chaseLists[0]?.id ?? null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialList = searchParams.get("list") || chaseLists[0]?.id || null;
+  const [selectedListId, setSelectedListId] = useState<string | null>(initialList);
+
+  useEffect(() => {
+    const paramList = searchParams.get("list");
+    if (paramList && paramList !== selectedListId) {
+      setSelectedListId(paramList);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams]);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
