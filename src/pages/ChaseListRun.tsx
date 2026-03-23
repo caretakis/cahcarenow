@@ -21,6 +21,8 @@ export default function ChaseListRun() {
   const { listId } = useParams();
   const list = chaseLists.find(l => l.id === listId);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
