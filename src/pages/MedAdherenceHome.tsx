@@ -98,7 +98,7 @@ export default function MedAdherenceHome() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => r.patient && setCallPatient(r.patient)}><Phone className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><Pill className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><RefreshCw className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
