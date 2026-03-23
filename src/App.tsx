@@ -36,9 +36,8 @@ const App = () => (
               <Route path="/" element={<ManagerDashboard />} />
               <Route path="/queues" element={<WorkQueuesHome />} />
               <Route path="/queues/:queueId" element={<WorkQueue />} />
-              <Route path="/lists" element={<ChaseListsHome />} />
+              <Route path="/lists" element={<ChaseListsPage />} />
               <Route path="/lists/builder" element={<ChaseListBuilder />} />
-              <Route path="/lists/:listId" element={<ChaseListRun />} />
               <Route path="/toc" element={<TOCHome />} />
               <Route path="/toc/episode/:episodeId" element={<TOCEpisode />} />
               <Route path="/programs" element={<ProgramsHome />} />
