@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { episodes, getPatientById } from "@/data/sampleData";
+import { episodes, getPatientById, patients } from "@/data/sampleData";
 import type { Patient, TOCStage, EpisodeStatus, NotificationSource } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
 import { Badge } from "@/components/ui/badge";
@@ -9,13 +9,18 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss, Plus, ShieldCheck, LogOut } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 const STAGE_LABELS: Record<TOCStage, string> = {
