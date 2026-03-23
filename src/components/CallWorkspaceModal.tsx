@@ -227,7 +227,7 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
         </AnimatePresence>
 
         {phase === "logging" && (
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="flex flex-row justify-end gap-2">
             <Button variant="outline" onClick={resetAndClose}>Cancel</Button>
             <Button variant="secondary" onClick={handleLogAndClose} disabled={!outcome}>Log & Close</Button>
             {onLogAndNext && (
