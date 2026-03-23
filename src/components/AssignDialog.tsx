@@ -45,7 +45,7 @@ export function AssignDialog({ patient, onClose }: AssignDialogProps) {
               <SelectTrigger><SelectValue placeholder="Select team member…" /></SelectTrigger>
               <SelectContent>
                 {TEAM_MEMBERS.filter(m => m.id !== "me").map(m => (
-                  <SelectItem key={m.id} value={m.id}>{m.name} — {m.role}</SelectItem>
+                  <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
