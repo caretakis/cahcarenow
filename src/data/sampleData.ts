@@ -349,7 +349,7 @@ export const chaseLists: ChaseList[] = [
     id: "cl_1", name: "Q1 AWV Outreach — Humana", createdBy: "Sarah M.", createdAt: "2026-02-15",
     criteria: { payer: "Humana", needType: "AWV", status: "OPEN" },
     patientIds: ["p_1001", "p_1005", "p_1008"],
-    stats: { total: 3, remaining: 2, attempted: 1, connected: 1, scheduled: 0 },
+    stats: { total: 3, remaining: 1, attempted: 1, connected: 1, scheduled: 0 },
   },
   {
     id: "cl_2", name: "High-Risk Quality Gaps", createdBy: "Mike R.", createdAt: "2026-02-20",
