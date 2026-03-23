@@ -142,6 +142,7 @@ export default function PatientPage() {
           </Card>
         )}
       </div>
+      <CallWorkspaceModal open={callModalOpen} onOpenChange={setCallModalOpen} patient={patient} />
     </div>
   );
 }

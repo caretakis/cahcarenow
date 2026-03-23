@@ -292,6 +292,9 @@ export default function ChaseListsPage() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
     </div>
   );
 }
