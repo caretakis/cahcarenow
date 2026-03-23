@@ -7,9 +7,8 @@ import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/AppLayout";
 import WorkQueuesHome from "@/pages/WorkQueuesHome";
 import WorkQueue from "@/pages/WorkQueue";
-import ChaseListsHome from "@/pages/ChaseListsHome";
+import ChaseListsPage from "@/pages/ChaseListsPage";
 import ChaseListBuilder from "@/pages/ChaseListBuilder";
-import ChaseListRun from "@/pages/ChaseListRun";
 import TOCHome from "@/pages/TOCHome";
 import TOCEpisode from "@/pages/TOCEpisode";
 import ProgramsHome from "@/pages/ProgramsHome";
@@ -37,9 +36,8 @@ const App = () => (
               <Route path="/" element={<ManagerDashboard />} />
               <Route path="/queues" element={<WorkQueuesHome />} />
               <Route path="/queues/:queueId" element={<WorkQueue />} />
-              <Route path="/lists" element={<ChaseListsHome />} />
+              <Route path="/lists" element={<ChaseListsPage />} />
               <Route path="/lists/builder" element={<ChaseListBuilder />} />
-              <Route path="/lists/:listId" element={<ChaseListRun />} />
               <Route path="/toc" element={<TOCHome />} />
               <Route path="/toc/episode/:episodeId" element={<TOCEpisode />} />
               <Route path="/programs" element={<ProgramsHome />} />
