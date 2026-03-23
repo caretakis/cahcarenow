@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
 
 type SortKey = "risk" | "raf" | "gaps";
 type SortDir = "asc" | "desc";
