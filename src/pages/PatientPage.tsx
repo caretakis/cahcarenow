@@ -25,6 +25,8 @@ export default function PatientPage() {
 
   if (!patient) return <div className="p-8 text-muted-foreground">Patient not found</div>;
 
+  const [callModalOpen, setCallModalOpen] = useState(false);
+
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
 
   return (
