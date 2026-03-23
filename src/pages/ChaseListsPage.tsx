@@ -10,6 +10,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { cn } from "@/lib/utils";

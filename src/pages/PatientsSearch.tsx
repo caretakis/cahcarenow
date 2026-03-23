@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Search, Phone, Calendar } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 
 const riskColors: Record<string, string> = {

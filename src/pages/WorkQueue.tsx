@@ -156,6 +156,9 @@ export default function WorkQueue() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
     </div>
   );
 }
