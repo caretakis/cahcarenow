@@ -10,11 +10,16 @@ import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List } from "lucide-react";
+import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List, CalendarIcon } from "lucide-react";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 type SortKey = "risk" | "raf" | "gaps";
 type SortDir = "asc" | "desc";
@@ -50,6 +55,10 @@ export default function ChaseListsPage() {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleVisitType, setScheduleVisitType] = useState("");
+  const [scheduleNotes, setScheduleNotes] = useState("");
 
   const selectedList = chaseLists.find(l => l.id === selectedListId) ?? null;
 
@@ -272,7 +281,7 @@ export default function ChaseListsPage() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setSchedulePatient(p); setScheduleDate(""); setScheduleVisitType(""); setScheduleNotes(""); }}><Calendar className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -322,6 +331,58 @@ export default function ChaseListsPage() {
           }}
         />
       )}
+
+      {/* Schedule Dialog */}
+      <Dialog open={!!schedulePatient} onOpenChange={o => !o && setSchedulePatient(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              Schedule — {schedulePatient?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
+              <p>{schedulePatient?.phone} · {schedulePatient?.practice} · {schedulePatient?.provider}</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Visit Type</Label>
+              <Select value={scheduleVisitType} onValueChange={setScheduleVisitType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select visit type…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["AWV", "Follow-up", "New Patient", "Telehealth", "Lab/Screening", "Specialist Referral"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Date & Time</Label>
+              <Input type="datetime-local" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <Textarea value={scheduleNotes} onChange={e => setScheduleNotes(e.target.value)} placeholder="Scheduling notes…" className="h-20" />
+            </div>
+          </div>
+          <DialogFooter className="flex flex-row justify-end gap-2">
+            <Button variant="outline" onClick={() => setSchedulePatient(null)}>Cancel</Button>
+            <Button
+              disabled={!scheduleVisitType || !scheduleDate}
+              onClick={() => {
+                toast.success(`${scheduleVisitType} scheduled for ${schedulePatient?.name}`, {
+                  description: new Date(scheduleDate).toLocaleString(),
+                });
+                setSchedulePatient(null);
+              }}
+            >
+              Confirm Schedule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
