@@ -443,6 +443,9 @@ export default function TOCHome() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
     </div>
   );
 }
