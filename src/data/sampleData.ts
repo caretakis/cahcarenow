@@ -79,21 +79,21 @@ export const patients: Patient[] = [
 
 // ── Needs ──
 export const needs: Need[] = [
-  { id: "n_2001", patientId: "p_1001", type: "AWV", subtype: "AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 82, source: "claims", details: { reason: "AWV overdue > 12 months" } },
-  { id: "n_2002", patientId: "p_1001", type: "QUALITY_GAP", subtype: "breast_cancer_screening", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-04-15", impactScore: 55, source: "claims", details: { measure: "BCS", lastDone: "2022-09-01" } },
-  { id: "n_2003", patientId: "p_1001", type: "HCC_RECAPTURE", subtype: "diabetes", status: "IN_PROGRESS", ownerRole: "central_clinical", dueDate: "2026-06-30", impactScore: 68, source: "model", details: { hcc: "E11.9", rafDelta: "0.18" } },
-  { id: "n_2004", patientId: "p_1002", type: "AWV", subtype: "AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-15", impactScore: 95, source: "claims", details: { reason: "No AWV on record" } },
-  { id: "n_2005", patientId: "p_1002", type: "TOC_STEP", subtype: "interactive_contact", status: "OPEN", ownerRole: "central_clinical", dueDate: "2026-02-28", impactScore: 90, source: "adt", details: { step: "Interactive Contact due" } },
-  { id: "n_2006", patientId: "p_1003", type: "QUALITY_GAP", subtype: "A1C_test", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-03-20", impactScore: 72, source: "claims", details: { measure: "A1C", lastDone: "2025-06-01" } },
-  { id: "n_2007", patientId: "p_1003", type: "HCC_RECAPTURE", subtype: "ckd", status: "OPEN", ownerRole: "central_clinical", dueDate: "2026-04-30", impactScore: 85, source: "model", details: { hcc: "N18.3", rafDelta: "0.32" } },
-  { id: "n_2008", patientId: "p_1005", type: "AWV", subtype: "AWV", status: "SCHEDULED", ownerRole: "office_staff", dueDate: "2026-03-12", impactScore: 45, source: "claims", details: { reason: "AWV due this month" } },
-  { id: "n_2009", patientId: "p_1006", type: "QUALITY_GAP", subtype: "colorectal_screening", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-04-01", impactScore: 60, source: "claims", details: { measure: "COL", lastDone: "2018-03-15" } },
-  { id: "n_2010", patientId: "p_1006", type: "AWV", subtype: "AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 75, source: "claims", details: { reason: "AWV overdue > 6 months" } },
-  { id: "n_2011", patientId: "p_1008", type: "AWV", subtype: "AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-15", impactScore: 88, source: "claims", details: { reason: "AWV overdue > 9 months" } },
-  { id: "n_2012", patientId: "p_1008", type: "QUALITY_GAP", subtype: "diabetic_eye_exam", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-04-30", impactScore: 50, source: "claims", details: { measure: "EED", lastDone: "2024-01-20" } },
-  { id: "n_2013", patientId: "p_1010", type: "AWV", subtype: "AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 78, source: "claims", details: { reason: "No AWV on record" } },
-  { id: "n_2014", patientId: "p_1010", type: "MED_ADHERENCE", subtype: "statin", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-03-10", impactScore: 65, source: "surescripts", details: { drug: "Atorvastatin", pdc: "0.62" } },
-  { id: "n_2015", patientId: "p_1009", type: "QUALITY_GAP", subtype: "mammogram", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-05-01", impactScore: 48, source: "claims", details: { measure: "BCS", lastDone: "2023-11-01" } },
+  { id: "n_2001", patientId: "p_1001", type: "AWV", subtype: "Schedule AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 82, source: "claims", details: { reason: "AWV overdue > 12 months" } },
+  { id: "n_2002", patientId: "p_1001", type: "QUALITY_GAP", subtype: "Schedule mammogram", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-04-15", impactScore: 55, source: "claims", details: { measure: "BCS", lastDone: "2022-09-01" } },
+  { id: "n_2003", patientId: "p_1001", type: "HCC_RECAPTURE", subtype: "Schedule diabetes review", status: "IN_PROGRESS", ownerRole: "central_clinical", dueDate: "2026-06-30", impactScore: 68, source: "model", details: { hcc: "E11.9", rafDelta: "0.18" } },
+  { id: "n_2004", patientId: "p_1002", type: "AWV", subtype: "Schedule AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-15", impactScore: 95, source: "claims", details: { reason: "No AWV on record" } },
+  { id: "n_2005", patientId: "p_1002", type: "TOC_STEP", subtype: "Perform interactive contact", status: "OPEN", ownerRole: "central_clinical", dueDate: "2026-02-28", impactScore: 90, source: "adt", details: { step: "Interactive Contact due" } },
+  { id: "n_2006", patientId: "p_1003", type: "QUALITY_GAP", subtype: "Schedule A1c test", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-03-20", impactScore: 72, source: "claims", details: { measure: "A1C", lastDone: "2025-06-01" } },
+  { id: "n_2007", patientId: "p_1003", type: "HCC_RECAPTURE", subtype: "Schedule nephrology visit", status: "OPEN", ownerRole: "central_clinical", dueDate: "2026-04-30", impactScore: 85, source: "model", details: { hcc: "N18.3", rafDelta: "0.32" } },
+  { id: "n_2008", patientId: "p_1005", type: "AWV", subtype: "Schedule AWV", status: "SCHEDULED", ownerRole: "office_staff", dueDate: "2026-03-12", impactScore: 45, source: "claims", details: { reason: "AWV due this month" } },
+  { id: "n_2009", patientId: "p_1006", type: "QUALITY_GAP", subtype: "Schedule colonoscopy", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-04-01", impactScore: 60, source: "claims", details: { measure: "COL", lastDone: "2018-03-15" } },
+  { id: "n_2010", patientId: "p_1006", type: "AWV", subtype: "Schedule AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 75, source: "claims", details: { reason: "AWV overdue > 6 months" } },
+  { id: "n_2011", patientId: "p_1008", type: "AWV", subtype: "Schedule AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-15", impactScore: 88, source: "claims", details: { reason: "AWV overdue > 9 months" } },
+  { id: "n_2012", patientId: "p_1008", type: "QUALITY_GAP", subtype: "Schedule diabetic eye exam", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-04-30", impactScore: 50, source: "claims", details: { measure: "EED", lastDone: "2024-01-20" } },
+  { id: "n_2013", patientId: "p_1010", type: "AWV", subtype: "Schedule AWV", status: "OPEN", ownerRole: "office_staff", dueDate: "2026-03-31", impactScore: 78, source: "claims", details: { reason: "No AWV on record" } },
+  { id: "n_2014", patientId: "p_1010", type: "MED_ADHERENCE", subtype: "Refill statin", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-03-10", impactScore: 65, source: "surescripts", details: { drug: "Atorvastatin", pdc: "0.62" } },
+  { id: "n_2015", patientId: "p_1009", type: "QUALITY_GAP", subtype: "Schedule mammogram", status: "OPEN", ownerRole: "central_non_clinical", dueDate: "2026-05-01", impactScore: 48, source: "claims", details: { measure: "BCS", lastDone: "2023-11-01" } },
 ];
 
 // ── Outreach ──
