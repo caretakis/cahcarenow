@@ -98,6 +98,8 @@ export default function ProgramPanel() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
+      <EscalateDialog patient={escalatePatient} onClose={() => setEscalatePatient(null)} />
     </div>
   );
 }
