@@ -257,7 +257,9 @@ export default function TOCHome() {
                   <TableCell>
                     <div>
                       <span className="font-medium">{ep.patient?.name || "Unknown"}</span>
-                      <p className="text-xs text-muted-foreground">Discharged {ep.dischargeDate}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {ep.currentStage === "admitted" ? `Admitted ${ep.startDate}` : `Discharged ${ep.dischargeDate}`}
+                      </p>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm">{ep.admitReason}</TableCell>
