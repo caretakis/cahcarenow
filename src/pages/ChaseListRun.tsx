@@ -171,6 +171,10 @@ export default function ChaseListRun() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
     </div>
   );
 }
