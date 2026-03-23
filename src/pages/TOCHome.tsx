@@ -313,6 +313,20 @@ export default function TOCHome() {
                         onClick={() => navigate(`/toc/episode/${ep.id}`)}>
                         <Play className="h-3 w-3 mr-1" />Open
                       </Button>
+                      {ep.currentStage === "admitted" && ep.status !== "NOT_ELIGIBLE" && (
+                        <>
+                          <Button variant="outline" size="icon" className="h-7 w-7 text-success border-success/30 hover:bg-success/10"
+                            title="Verify still admitted"
+                            onClick={() => handleVerifyStatus(ep.id, ep.patient?.name || "Patient")}>
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="outline" size="icon" className="h-7 w-7 text-warning border-warning/30 hover:bg-warning/10"
+                            title="Mark as discharged"
+                            onClick={() => setDischargeEpisodeId(ep.id)}>
+                            <LogOut className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
                       <Button variant="ghost" size="icon" className="h-7 w-7"
                         title="Reassign"
                         onClick={() => setReassignEpisodeId(ep.id)}>
