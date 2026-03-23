@@ -54,7 +54,7 @@ export default function WorkQueuesHome() {
         urgentCount: awvQualityOverdue.length,
         overdueCount: awvQualityOverdue.length,
         completionPct: awvQualityTotal > 0 ? Math.round((awvQualityCompleted.length / awvQualityTotal) * 100) : 0,
-        path: "/queues/scheduling_awv_quality",
+        path: "/lists?list=cl_1",
       },
       {
         id: "toc_discharged_uncontacted",
