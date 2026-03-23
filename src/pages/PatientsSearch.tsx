@@ -96,6 +96,7 @@ export default function PatientsSearch() {
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
     </div>
   );
 }
