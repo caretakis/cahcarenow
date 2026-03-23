@@ -94,7 +94,7 @@ export default function TOCHome() {
       return {
         ...ep,
         patient: getPatientById(ep.patientId),
-        slaInfo: slaRemaining(ep.sla48hDue),
+        slaInfo: ep.currentStage === "admitted" ? { text: "N/A", urgent: false } : slaRemaining(ep.sla48hDue),
         progressPct: Math.round((doneSteps / totalSteps) * 100),
         openTasks,
       };
