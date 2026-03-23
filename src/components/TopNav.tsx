@@ -38,6 +38,9 @@ export function TopNav() {
           </NavLink>
         ))}
       </nav>
+      <div className="ml-auto shrink-0">
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
