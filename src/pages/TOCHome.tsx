@@ -89,6 +89,11 @@ export default function TOCHome() {
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
   const [viewingAs, setViewingAs] = useState("me");
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
+  const [dischargeEpisodeId, setDischargeEpisodeId] = useState<string | null>(null);
+  const [showAddTOC, setShowAddTOC] = useState(false);
+  const [newTocPatient, setNewTocPatient] = useState("");
+  const [newTocFacility, setNewTocFacility] = useState("");
+  const [newTocReason, setNewTocReason] = useState("");
 
   const enrichedEpisodes = useMemo(() =>
     episodes.map(ep => {
