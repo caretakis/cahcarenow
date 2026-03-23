@@ -74,7 +74,7 @@ export default function TOCEpisode() {
   const toggleRedFlag = (f: string) => setRedFlags(prev => prev.includes(f) ? prev.filter(r => r !== f) : [...prev, f]);
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
   const currentStageIdx = getStageIndex(episode.currentStage);
-  const sla = slaStatus(episode.sla48hDue);
+  const sla = episode.currentStage === "admitted" ? { text: "N/A", color: "muted" as const } : slaStatus(episode.sla48hDue);
 
   // Progress calculation
   const totalSteps = episode.steps.length + episode.weeklyFollowUps.length;
