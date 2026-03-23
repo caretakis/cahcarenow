@@ -16,6 +16,8 @@ export default function ProgramPanel() {
   const { programId } = useParams();
   const program = programs.find(p => p.id === programId);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
+  const [escalatePatient, setEscalatePatient] = useState<Patient | null>(null);
 
   const enrolled = useMemo(() =>
     programEnrollments
