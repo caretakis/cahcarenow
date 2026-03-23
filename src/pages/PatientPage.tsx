@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Phone, Calendar, AlertTriangle } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
