@@ -18,6 +18,7 @@ import PatientsSearch from "@/pages/PatientsSearch";
 import PatientPage from "@/pages/PatientPage";
 import SiteDashboard from "@/pages/SiteDashboard";
 import CentralDashboard from "@/pages/CentralDashboard";
+import ManagerDashboard from "@/pages/ManagerDashboard";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
