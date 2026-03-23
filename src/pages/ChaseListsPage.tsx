@@ -331,6 +331,58 @@ export default function ChaseListsPage() {
           }}
         />
       )}
+
+      {/* Schedule Dialog */}
+      <Dialog open={!!schedulePatient} onOpenChange={o => !o && setSchedulePatient(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              Schedule — {schedulePatient?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="text-sm text-muted-foreground bg-muted/50 rounded-md p-3">
+              <p>{schedulePatient?.phone} · {schedulePatient?.practice} · {schedulePatient?.provider}</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Visit Type</Label>
+              <Select value={scheduleVisitType} onValueChange={setScheduleVisitType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select visit type…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {["AWV", "Follow-up", "New Patient", "Telehealth", "Lab/Screening", "Specialist Referral"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Date & Time</Label>
+              <Input type="datetime-local" value={scheduleDate} onChange={e => setScheduleDate(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <Textarea value={scheduleNotes} onChange={e => setScheduleNotes(e.target.value)} placeholder="Scheduling notes…" className="h-20" />
+            </div>
+          </div>
+          <DialogFooter className="flex flex-row justify-end gap-2">
+            <Button variant="outline" onClick={() => setSchedulePatient(null)}>Cancel</Button>
+            <Button
+              disabled={!scheduleVisitType || !scheduleDate}
+              onClick={() => {
+                toast.success(`${scheduleVisitType} scheduled for ${schedulePatient?.name}`, {
+                  description: new Date(scheduleDate).toLocaleString(),
+                });
+                setSchedulePatient(null);
+              }}
+            >
+              Confirm Schedule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
