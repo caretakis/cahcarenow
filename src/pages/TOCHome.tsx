@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { episodes, getPatientById } from "@/data/sampleData";
+import { episodes, getPatientById, patients } from "@/data/sampleData";
 import type { Patient, TOCStage, EpisodeStatus, NotificationSource } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
 import { Badge } from "@/components/ui/badge";
@@ -9,13 +9,18 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss, Plus, ShieldCheck, LogOut } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 const STAGE_LABELS: Record<TOCStage, string> = {
@@ -84,6 +89,11 @@ export default function TOCHome() {
   const [reassignEpisodeId, setReassignEpisodeId] = useState<string | null>(null);
   const [viewingAs, setViewingAs] = useState("me");
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
+  const [dischargeEpisodeId, setDischargeEpisodeId] = useState<string | null>(null);
+  const [showAddTOC, setShowAddTOC] = useState(false);
+  const [newTocPatient, setNewTocPatient] = useState("");
+  const [newTocFacility, setNewTocFacility] = useState("");
+  const [newTocReason, setNewTocReason] = useState("");
 
   const enrichedEpisodes = useMemo(() =>
     episodes.map(ep => {
@@ -153,6 +163,23 @@ export default function TOCHome() {
     setNotEligibleEpisodeId(null);
   };
 
+  const handleVerifyStatus = (epId: string, patientName: string) => {
+    toast.success(`Verified ${patientName} is still admitted`, { description: `Last verified: ${new Date().toLocaleString()}` });
+  };
+
+  const handleMarkDischarged = () => {
+    toast.success("Patient marked as discharged — SLA clock started");
+    setDischargeEpisodeId(null);
+  };
+
+  const handleAddTOC = () => {
+    toast.success("Manual TOC episode created", { description: `${newTocPatient} at ${newTocFacility}` });
+    setShowAddTOC(false);
+    setNewTocPatient("");
+    setNewTocFacility("");
+    setNewTocReason("");
+  };
+
   const reassignEpisode = reassignEpisodeId ? enrichedEpisodes.find(e => e.id === reassignEpisodeId) : null;
 
   return (
@@ -161,7 +188,10 @@ export default function TOCHome() {
         <div className="p-5 pb-3 space-y-4 border-b">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-bold">Transitions of Care</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setShowAddTOC(true)}>
+                <Plus className="h-3.5 w-3.5 mr-1" />Add TOC
+              </Button>
               <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[160px] h-8 text-sm">
@@ -260,11 +290,15 @@ export default function TOCHome() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={ep.slaInfo.urgent
-                      ? "bg-destructive/10 text-destructive border-destructive/30"
-                      : "bg-success/10 text-success border-success/30"}>
-                      {ep.slaInfo.text}
-                    </Badge>
+                    {ep.currentStage === "admitted" ? (
+                      <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                    ) : (
+                      <Badge variant="outline" className={ep.slaInfo.urgent
+                        ? "bg-destructive/10 text-destructive border-destructive/30"
+                        : "bg-success/10 text-success border-success/30"}>
+                        {ep.slaInfo.text}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     {ep.openTasks > 0 ? (
@@ -279,6 +313,20 @@ export default function TOCHome() {
                         onClick={() => navigate(`/toc/episode/${ep.id}`)}>
                         <Play className="h-3 w-3 mr-1" />Open
                       </Button>
+                      {ep.currentStage === "admitted" && ep.status !== "NOT_ELIGIBLE" && (
+                        <>
+                          <Button variant="outline" size="icon" className="h-7 w-7 text-success border-success/30 hover:bg-success/10"
+                            title="Verify still admitted"
+                            onClick={() => handleVerifyStatus(ep.id, ep.patient?.name || "Patient")}>
+                            <ShieldCheck className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button variant="outline" size="icon" className="h-7 w-7 text-warning border-warning/30 hover:bg-warning/10"
+                            title="Mark as discharged"
+                            onClick={() => setDischargeEpisodeId(ep.id)}>
+                            <LogOut className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      )}
                       <Button variant="ghost" size="icon" className="h-7 w-7"
                         title="Reassign"
                         onClick={() => setReassignEpisodeId(ep.id)}>
@@ -340,6 +388,57 @@ export default function TOCHome() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Discharge Confirmation */}
+      <AlertDialog open={!!dischargeEpisodeId} onOpenChange={(open) => !open && setDischargeEpisodeId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark as Discharged</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will move the patient from "Admitted" to "Discharged" and start the 48-hour SLA clock for interactive contact. Make sure you've confirmed the discharge with the facility.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleMarkDischarged}>Mark Discharged</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add Manual TOC Dialog */}
+      <Dialog open={showAddTOC} onOpenChange={setShowAddTOC}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Manual TOC Episode</DialogTitle>
+            <DialogDescription>Create a TOC for a patient not picked up by ADT feeds.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label className="text-sm">Patient</Label>
+              <Select value={newTocPatient} onValueChange={setNewTocPatient}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select patient…" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name} — {p.practice}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Facility</Label>
+              <Input className="mt-1" placeholder="e.g. Denver Health" value={newTocFacility} onChange={e => setNewTocFacility(e.target.value)} />
+            </div>
+            <div>
+              <Label className="text-sm">Admit Reason</Label>
+              <Input className="mt-1" placeholder="e.g. CHF exacerbation" value={newTocReason} onChange={e => setNewTocReason(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddTOC(false)}>Cancel</Button>
+            <Button onClick={handleAddTOC} disabled={!newTocPatient || !newTocFacility}>Create Episode</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -74,7 +74,7 @@ export default function TOCEpisode() {
   const toggleRedFlag = (f: string) => setRedFlags(prev => prev.includes(f) ? prev.filter(r => r !== f) : [...prev, f]);
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
   const currentStageIdx = getStageIndex(episode.currentStage);
-  const sla = slaStatus(episode.sla48hDue);
+  const sla = episode.currentStage === "admitted" ? { text: "N/A", color: "muted" as const } : slaStatus(episode.sla48hDue);
 
   // Progress calculation
   const totalSteps = episode.steps.length + episode.weeklyFollowUps.length;
@@ -104,7 +104,7 @@ export default function TOCEpisode() {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {episode.facility} · {episode.admitReason} · Discharged {episode.dischargeDate}
+            {episode.facility} · {episode.admitReason}{episode.dischargeDate ? ` · Discharged ${episode.dischargeDate}` : " · Currently admitted"}
           </p>
           <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><Rss className="h-3 w-3" />{SOURCE_LABELS[episode.notificationSource]}</span>
@@ -118,11 +118,12 @@ export default function TOCEpisode() {
         <div className="text-right space-y-1">
           <div className="text-xs text-muted-foreground">48h SLA</div>
           <Badge variant="outline" className={
+            sla.color === "muted" ? "bg-muted text-muted-foreground" :
             sla.color === "destructive" ? "bg-destructive/10 text-destructive border-destructive/30" :
             sla.color === "warning" ? "bg-warning/10 text-warning border-warning/30" :
             "bg-success/10 text-success border-success/30"
           }>
-            <Clock className="h-3 w-3 mr-1" />{sla.text}
+            {sla.color !== "muted" && <Clock className="h-3 w-3 mr-1" />}{sla.text}
           </Badge>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-xs text-muted-foreground">{progressPct}%</span>
