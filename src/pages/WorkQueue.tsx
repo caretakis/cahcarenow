@@ -26,6 +26,7 @@ export default function WorkQueue() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [riskFilters, setRiskFilters] = useState<string[]>([]);
   const [practiceFilters, setPracticeFilters] = useState<string[]>([]);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
 
   const practices = useMemo(() => [...new Set(patients.map(p => p.practice))], []);
 
