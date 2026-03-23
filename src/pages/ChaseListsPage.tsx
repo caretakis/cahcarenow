@@ -301,7 +301,11 @@ export default function ChaseListsPage() {
 
       {/* Patient Drawer */}
       {selectedPatient && (
-        <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
+        <PatientDrawer
+          patient={selectedPatient}
+          onClose={() => setSelectedPatient(null)}
+          onStartCall={(patient) => setCallPatient(patient)}
+        />
       )}
       {callPatient && (
         <CallWorkspaceModal
