@@ -9,7 +9,7 @@ const navItems = [
   { label: "Programs", path: "/programs", icon: Layers },
   { label: "Med Adherence", path: "/med-adherence", icon: Pill },
   { label: "Patients", path: "/patients", icon: Users },
-  { label: "Dashboards", path: "/dashboards/site", icon: BarChart3 },
+  { label: "Dashboards", path: "/dashboards/manager", icon: BarChart3 },
   { label: "Admin", path: "/admin", icon: Settings },
 ];
 

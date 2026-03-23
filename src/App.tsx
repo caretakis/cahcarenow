@@ -18,6 +18,7 @@ import PatientsSearch from "@/pages/PatientsSearch";
 import PatientPage from "@/pages/PatientPage";
 import SiteDashboard from "@/pages/SiteDashboard";
 import CentralDashboard from "@/pages/CentralDashboard";
+import ManagerDashboard from "@/pages/ManagerDashboard";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/med-adherence" element={<MedAdherenceHome />} />
             <Route path="/patients" element={<PatientsSearch />} />
             <Route path="/patients/:patientId" element={<PatientPage />} />
+            <Route path="/dashboards/manager" element={<ManagerDashboard />} />
             <Route path="/dashboards/site" element={<SiteDashboard />} />
             <Route path="/dashboards/central" element={<CentralDashboard />} />
             <Route path="/admin" element={<Admin />} />
