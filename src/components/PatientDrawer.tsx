@@ -32,9 +32,10 @@ const flagLabels: Record<string, string> = {
 interface PatientDrawerProps {
   patient: Patient;
   onClose: () => void;
+  onStartCall?: (patient: Patient) => void;
 }
 
-export function PatientDrawer({ patient, onClose }: PatientDrawerProps) {
+export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerProps) {
   const [note, setNote] = useState("");
   const [callModalOpen, setCallModalOpen] = useState(false);
   const patientNeeds = getPatientNeeds(patient.id);
