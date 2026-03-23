@@ -388,6 +388,57 @@ export default function TOCHome() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Discharge Confirmation */}
+      <AlertDialog open={!!dischargeEpisodeId} onOpenChange={(open) => !open && setDischargeEpisodeId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark as Discharged</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will move the patient from "Admitted" to "Discharged" and start the 48-hour SLA clock for interactive contact. Make sure you've confirmed the discharge with the facility.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleMarkDischarged}>Mark Discharged</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add Manual TOC Dialog */}
+      <Dialog open={showAddTOC} onOpenChange={setShowAddTOC}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Manual TOC Episode</DialogTitle>
+            <DialogDescription>Create a TOC for a patient not picked up by ADT feeds.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <Label className="text-sm">Patient</Label>
+              <Select value={newTocPatient} onValueChange={setNewTocPatient}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select patient…" /></SelectTrigger>
+                <SelectContent>
+                  {patients.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.name} — {p.practice}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-sm">Facility</Label>
+              <Input className="mt-1" placeholder="e.g. Denver Health" value={newTocFacility} onChange={e => setNewTocFacility(e.target.value)} />
+            </div>
+            <div>
+              <Label className="text-sm">Admit Reason</Label>
+              <Input className="mt-1" placeholder="e.g. CHF exacerbation" value={newTocReason} onChange={e => setNewTocReason(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddTOC(false)}>Cancel</Button>
+            <Button onClick={handleAddTOC} disabled={!newTocPatient || !newTocFacility}>Create Episode</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
