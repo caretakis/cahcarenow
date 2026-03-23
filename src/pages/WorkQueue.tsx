@@ -11,6 +11,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Search, Phone, Calendar, Clock, UserPlus } from "lucide-react";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
+import { SnoozeDialog } from "@/components/SnoozeDialog";
+import { AssignDialog } from "@/components/AssignDialog";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
@@ -27,6 +30,9 @@ export default function WorkQueue() {
   const [riskFilters, setRiskFilters] = useState<string[]>([]);
   const [practiceFilters, setPracticeFilters] = useState<string[]>([]);
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
+  const [snoozePatient, setSnoozePatient] = useState<Patient | null>(null);
+  const [assignPatient, setAssignPatient] = useState<Patient | null>(null);
 
   const practices = useMemo(() => [...new Set(patients.map(p => p.practice))], []);
 
@@ -140,9 +146,9 @@ export default function WorkQueue() {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Clock className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><UserPlus className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSchedulePatient(p)}><Calendar className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSnoozePatient(p)}><Clock className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setAssignPatient(p)}><UserPlus className="h-3.5 w-3.5" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -159,6 +165,9 @@ export default function WorkQueue() {
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
+      <SnoozeDialog patient={snoozePatient} onClose={() => setSnoozePatient(null)} />
+      <AssignDialog patient={assignPatient} onClose={() => setAssignPatient(null)} />
     </div>
   );
 }

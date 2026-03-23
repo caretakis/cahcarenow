@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Search, Phone, Calendar } from "lucide-react";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
 import { useNavigate } from "react-router-dom";
 
 const riskColors: Record<string, string> = {
@@ -22,6 +23,7 @@ export default function PatientsSearch() {
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
 
   const filtered = useMemo(() => {
     if (!search) return patients;
@@ -76,7 +78,7 @@ export default function PatientsSearch() {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSchedulePatient(p)}><Calendar className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="sm" className="h-8 text-xs"
                           onClick={() => navigate(`/patients/${p.id}`)}>View</Button>
                       </div>
@@ -94,6 +96,7 @@ export default function PatientsSearch() {
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
     </div>
   );
 }

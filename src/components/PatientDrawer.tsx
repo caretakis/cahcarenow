@@ -6,6 +6,11 @@ import { useState } from "react";
 import type { Patient } from "@/data/models";
 import { getPatientNeeds, getPatientOutreach } from "@/data/sampleData";
 import { CallWorkspaceModal } from "./CallWorkspaceModal";
+import { ScheduleDialog } from "./ScheduleDialog";
+import { SnoozeDialog } from "./SnoozeDialog";
+import { AssignDialog } from "./AssignDialog";
+import { EscalateDialog } from "./EscalateDialog";
+import { toast } from "sonner";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
@@ -38,12 +43,21 @@ interface PatientDrawerProps {
 export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerProps) {
   const [note, setNote] = useState("");
   const [callModalOpen, setCallModalOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [snoozeOpen, setSnoozeOpen] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [escalateOpen, setEscalateOpen] = useState(false);
   const patientNeeds = getPatientNeeds(patient.id);
   const patientOutreach = getPatientOutreach(patient.id);
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
 
   const openNeeds = patientNeeds.filter(n => n.status !== "COMPLETED" && n.status !== "NOT_APPLICABLE");
   const topDrivers = openNeeds.sort((a, b) => b.impactScore - a.impactScore).slice(0, 3);
+
+  const handleSaveNote = () => {
+    toast.success("Note saved", { description: `Note added for ${patient.name}` });
+    setNote("");
+  };
 
   return (
     <>
@@ -139,7 +153,7 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
           <div className="p-4">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Quick Note</h3>
             <Textarea placeholder="Add a note..." value={note} onChange={e => setNote(e.target.value)} className="h-20 text-sm" />
-            <Button size="sm" className="mt-2" disabled={!note.trim()}>Save Note</Button>
+            <Button size="sm" className="mt-2" disabled={!note.trim()} onClick={handleSaveNote}>Save Note</Button>
           </div>
         </div>
 
@@ -153,21 +167,25 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
           >
             <Phone className="h-4 w-4" /><span className="text-[10px]">Call</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2">
+          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setScheduleOpen(true)}>
             <Calendar className="h-4 w-4" /><span className="text-[10px]">Schedule</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2">
+          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setAssignOpen(true)}>
             <UserPlus className="h-4 w-4" /><span className="text-[10px]">Assign</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2">
+          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setSnoozeOpen(true)}>
             <Clock className="h-4 w-4" /><span className="text-[10px]">Snooze</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2">
+          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setEscalateOpen(true)}>
             <AlertTriangle className="h-4 w-4" /><span className="text-[10px]">Escalate</span>
           </Button>
         </div>
       </aside>
       {!onStartCall && <CallWorkspaceModal open={callModalOpen} onOpenChange={setCallModalOpen} patient={patient} />}
+      <ScheduleDialog patient={scheduleOpen ? patient : null} onClose={() => setScheduleOpen(false)} />
+      <SnoozeDialog patient={snoozeOpen ? patient : null} onClose={() => setSnoozeOpen(false)} />
+      <AssignDialog patient={assignOpen ? patient : null} onClose={() => setAssignOpen(false)} />
+      <EscalateDialog patient={escalateOpen ? patient : null} onClose={() => setEscalateOpen(false)} />
     </>
   );
 }

@@ -8,11 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { CheckCircle, Calendar, Plus, AlertTriangle } from "lucide-react";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
+import { EscalateDialog } from "@/components/EscalateDialog";
+import { toast } from "sonner";
 
 export default function ProgramPanel() {
   const { programId } = useParams();
   const program = programs.find(p => p.id === programId);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
+  const [escalatePatient, setEscalatePatient] = useState<Patient | null>(null);
 
   const enrolled = useMemo(() =>
     programEnrollments
@@ -59,10 +64,14 @@ export default function ProgramPanel() {
                     <TableCell className="text-sm">{nextCP?.nextDue || "—"}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1" onClick={ev => ev.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-7 text-xs"><CheckCircle className="h-3 w-3 mr-1" />Complete</Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><Calendar className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><Plus className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => {
+                          toast.success(`Checkpoint marked complete for ${e.patient?.name}`);
+                        }}><CheckCircle className="h-3 w-3 mr-1" />Complete</Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => e.patient && setSchedulePatient(e.patient)}><Calendar className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => {
+                          toast.success(`Note added for ${e.patient?.name}`, { description: "Open patient drawer to add details" });
+                        }}><Plus className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => e.patient && setEscalatePatient(e.patient)}><AlertTriangle className="h-3.5 w-3.5" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -89,6 +98,8 @@ export default function ProgramPanel() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
+      <EscalateDialog patient={escalatePatient} onClose={() => setEscalatePatient(null)} />
     </div>
   );
 }

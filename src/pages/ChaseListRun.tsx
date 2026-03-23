@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
 
 type SortKey = "risk" | "raf" | "gaps";
 type SortDir = "asc" | "desc";
@@ -19,6 +21,8 @@ export default function ChaseListRun() {
   const { listId } = useParams();
   const list = chaseLists.find(l => l.id === listId);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
@@ -153,8 +157,8 @@ export default function ChaseListRun() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSchedulePatient(p)}><Calendar className="h-3.5 w-3.5" /></Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -167,6 +171,10 @@ export default function ChaseListRun() {
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
     </div>
   );
 }
