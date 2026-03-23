@@ -145,7 +145,12 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
 
         {/* CTA buttons */}
         <div className="p-3 border-t bg-card grid grid-cols-5 gap-1.5">
-          <Button variant="default" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setCallModalOpen(true)}>
+          <Button
+            variant="default"
+            size="sm"
+            className="flex flex-col items-center gap-0.5 h-auto py-2"
+            onClick={() => (onStartCall ? onStartCall(patient) : setCallModalOpen(true))}
+          >
             <Phone className="h-4 w-4" /><span className="text-[10px]">Call</span>
           </Button>
           <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2">
@@ -162,7 +167,7 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
           </Button>
         </div>
       </aside>
-      <CallWorkspaceModal open={callModalOpen} onOpenChange={setCallModalOpen} patient={patient} />
+      {!onStartCall && <CallWorkspaceModal open={callModalOpen} onOpenChange={setCallModalOpen} patient={patient} />}
     </>
   );
 }
