@@ -21,6 +21,7 @@ export default function PatientsSearch() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
 
   const filtered = useMemo(() => {
     if (!search) return patients;
