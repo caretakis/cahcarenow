@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Search, Phone, Calendar, Clock, UserPlus } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
