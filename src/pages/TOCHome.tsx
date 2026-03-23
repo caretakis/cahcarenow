@@ -188,7 +188,10 @@ export default function TOCHome() {
         <div className="p-5 pb-3 space-y-4 border-b">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-bold">Transitions of Care</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setShowAddTOC(true)}>
+                <Plus className="h-3.5 w-3.5 mr-1" />Add TOC
+              </Button>
               <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[160px] h-8 text-sm">
