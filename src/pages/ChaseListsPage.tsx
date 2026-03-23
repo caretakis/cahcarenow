@@ -10,11 +10,16 @@ import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List } from "lucide-react";
+import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List, CalendarIcon } from "lucide-react";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 type SortKey = "risk" | "raf" | "gaps";
 type SortDir = "asc" | "desc";
