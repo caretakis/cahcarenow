@@ -164,7 +164,22 @@ export default function ChaseListsPage() {
                 <p className="text-sm text-muted-foreground">Created by {selectedList.createdBy} · {selectedList.createdAt}</p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1" />Export</Button>
+                <Button variant="outline" size="sm" onClick={() => {
+                  const header = "Name,Provider,Risk,RAF Opp,Open Gaps,Status\n";
+                  const rows = listPatients.map(p => {
+                    const gapCount = getPatientNeeds(p.id).filter(n => n.status !== "COMPLETED").length;
+                    const status = getPatientStatus(p.id, selectedList);
+                    return `"${p.name}","${p.provider}","${p.riskTier}",${p.rafOpportunity},${gapCount},"${status}"`;
+                  }).join("\n");
+                  const blob = new Blob([header + rows], { type: "text/csv" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${selectedList.name.replace(/\s+/g, "_")}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                  toast.success("Chase list exported as CSV");
+                }}><Download className="h-4 w-4 mr-1" />Export</Button>
               </div>
             </div>
 
