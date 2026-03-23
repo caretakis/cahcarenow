@@ -165,6 +165,9 @@ export default function WorkQueue() {
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
+      <ScheduleDialog patient={schedulePatient} onClose={() => setSchedulePatient(null)} />
+      <SnoozeDialog patient={snoozePatient} onClose={() => setSnoozePatient(null)} />
+      <AssignDialog patient={assignPatient} onClose={() => setAssignPatient(null)} />
     </div>
   );
 }
