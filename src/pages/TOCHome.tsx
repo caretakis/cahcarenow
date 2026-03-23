@@ -290,11 +290,15 @@ export default function TOCHome() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={ep.slaInfo.urgent
-                      ? "bg-destructive/10 text-destructive border-destructive/30"
-                      : "bg-success/10 text-success border-success/30"}>
-                      {ep.slaInfo.text}
-                    </Badge>
+                    {ep.currentStage === "admitted" ? (
+                      <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                    ) : (
+                      <Badge variant="outline" className={ep.slaInfo.urgent
+                        ? "bg-destructive/10 text-destructive border-destructive/30"
+                        : "bg-success/10 text-success border-success/30"}>
+                        {ep.slaInfo.text}
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     {ep.openTasks > 0 ? (
