@@ -284,10 +284,11 @@ export default function TOCHome() {
                         onClick={() => setReassignEpisodeId(ep.id)}>
                         <UserCog className="h-3.5 w-3.5" />
                       </Button>
-                      {canMarkNotEligible(ep.currentStage) && ep.status !== "NOT_ELIGIBLE" && (
-                        <Button variant="outline" size="sm" className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+                      {ep.status !== "NOT_ELIGIBLE" && (
+                        <Button variant="outline" size="icon" className="h-7 w-7 text-destructive border-destructive/30 hover:bg-destructive/10"
+                          title="Mark Not Eligible"
                           onClick={() => setNotEligibleEpisodeId(ep.id)}>
-                          <Ban className="h-3 w-3 mr-1" />Not Eligible
+                          <Ban className="h-3.5 w-3.5" />
                         </Button>
                       )}
                       <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
