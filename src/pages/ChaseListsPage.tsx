@@ -156,7 +156,6 @@ export default function ChaseListsPage() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm"><Download className="h-4 w-4 mr-1" />Export</Button>
-                <Button variant="outline" size="sm"><CheckCircle className="h-4 w-4 mr-1" />Mark Reviewed</Button>
               </div>
             </div>
 
