@@ -32,7 +32,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<WorkQueuesHome />} />
+            <Route path="/" element={<ManagerDashboard />} />
+            <Route path="/queues" element={<WorkQueuesHome />} />
             <Route path="/queues/:queueId" element={<WorkQueue />} />
             <Route path="/lists" element={<ChaseListsHome />} />
             <Route path="/lists/builder" element={<ChaseListBuilder />} />

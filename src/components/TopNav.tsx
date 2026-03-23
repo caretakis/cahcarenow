@@ -3,13 +3,13 @@ import { cn } from "@/lib/utils";
 import { LayoutGrid, List, ArrowRightLeft, Layers, Pill, Users, BarChart3, Settings } from "lucide-react";
 
 const navItems = [
-  { label: "Work Queues", path: "/", icon: LayoutGrid },
+  { label: "Dashboards", path: "/dashboards/manager", icon: BarChart3 },
+  { label: "Work Queues", path: "/queues", icon: LayoutGrid },
   { label: "Chase Lists", path: "/lists", icon: List },
   { label: "TOC", path: "/toc", icon: ArrowRightLeft },
   { label: "Programs", path: "/programs", icon: Layers },
   { label: "Med Adherence", path: "/med-adherence", icon: Pill },
   { label: "Patients", path: "/patients", icon: Users },
-  { label: "Dashboards", path: "/dashboards/manager", icon: BarChart3 },
   { label: "Admin", path: "/admin", icon: Settings },
 ];
 
