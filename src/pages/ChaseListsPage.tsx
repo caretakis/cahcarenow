@@ -55,6 +55,10 @@ export default function ChaseListsPage() {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleVisitType, setScheduleVisitType] = useState("");
+  const [scheduleNotes, setScheduleNotes] = useState("");
 
   const selectedList = chaseLists.find(l => l.id === selectedListId) ?? null;
 
