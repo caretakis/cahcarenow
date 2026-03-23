@@ -157,7 +157,85 @@ export default function WorkQueuesHome() {
         <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
-      <TopKPIBar items={kpis} />
+      {/* Overall Progress Banner */}
+      <Card className="bg-primary/5 border-primary/20">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-6">
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold">Today's Progress</span>
+                  <span className="text-2xl font-bold text-primary">{overallPct}%</span>
+                </div>
+                <span className="text-sm text-muted-foreground">{totalCompleted} of {totalAll} gaps closed</span>
+              </div>
+              <Progress value={overallPct} className="h-3" />
+            </div>
+            <div className="hidden md:flex items-center gap-6 text-sm border-l border-border pl-6">
+              <div className="text-center">
+                <p className="text-xl font-bold">{totalOpen}</p>
+                <p className="text-xs text-muted-foreground">Open</p>
+              </div>
+              <div className="text-center">
+                <p className={`text-xl font-bold ${totalOverdue > 0 ? "text-destructive" : ""}`}>{totalOverdue}</p>
+                <p className="text-xs text-muted-foreground">Overdue</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-success">{totalCompleted}</p>
+                <p className="text-xs text-muted-foreground">Done</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Queue Overview Cards */}
+      <div className="grid sm:grid-cols-2 gap-5">
+        {queueStats.map(q => {
+          const Icon = iconMap[q.icon] || ClipboardList;
+          return (
+            <Card
+              key={q.id}
+              className="hover:shadow-md transition-shadow cursor-pointer group"
+              onClick={() => navigate(q.path)}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-base">{q.title}</CardTitle>
+                    <p className="text-xs text-muted-foreground mt-0.5">{q.description}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="font-medium">{q.completionPct}%</span>
+                  </div>
+                  <Progress value={q.completionPct} className="h-2" />
+                </div>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-semibold">{q.count}</span>
+                    <span className="text-muted-foreground">{q.id === "toc_discharged_uncontacted" ? "episodes" : "patients"}</span>
+                  </div>
+                  {q.overdueCount > 0 && (
+                    <div className="flex items-center gap-1 text-destructive">
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      <span className="font-medium">{q.overdueCount} overdue</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
       {/* Priority Actions */}
       <Card>
@@ -242,71 +320,6 @@ export default function WorkQueuesHome() {
           )}
         </CardContent>
       </Card>
-
-      {/* Queue Overview Cards */}
-      <div className="grid sm:grid-cols-2 gap-5">
-        {queueStats.map(q => {
-          const Icon = iconMap[q.icon] || ClipboardList;
-          return (
-            <Card
-              key={q.id}
-              className="hover:shadow-md transition-shadow cursor-pointer group"
-              onClick={() => navigate(q.path)}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base">{q.title}</CardTitle>
-                    <p className="text-xs text-muted-foreground mt-0.5">{q.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {/* Progress bar */}
-                <div>
-                  <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-medium">{q.completionPct}%</span>
-                  </div>
-                  <Progress value={q.completionPct} className="h-2" />
-                </div>
-
-                {/* Stats row */}
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold">{q.count}</span>
-                    <span className="text-muted-foreground">{q.id === "toc_discharged_uncontacted" ? "episodes" : "patients"}</span>
-                  </div>
-                  {q.overdueCount > 0 && (
-                    <div className="flex items-center gap-1 text-destructive">
-                      <AlertTriangle className="h-3.5 w-3.5" />
-                      <span className="font-medium">{q.overdueCount} overdue</span>
-                    </div>
-                  )}
-                  {q.urgentCount > 0 && (
-                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/30 text-xs">
-                      {q.urgentCount} urgent
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Roles */}
-                <div className="flex gap-1">
-                  {q.roles.map(r => (
-                    <span key={r} className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                      {r.replace(/_/g, " ")}
-                    </span>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
     </div>
   );
 }
