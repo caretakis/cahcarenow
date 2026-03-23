@@ -304,7 +304,20 @@ export default function ChaseListsPage() {
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
       )}
       {callPatient && (
-        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+        <CallWorkspaceModal
+          open={!!callPatient}
+          onOpenChange={o => !o && setCallPatient(null)}
+          patient={callPatient}
+          onLogAndNext={() => {
+            const idx = listPatients.findIndex(p => p.id === callPatient.id);
+            const next = listPatients[idx + 1];
+            if (next) {
+              setCallPatient(next);
+            } else {
+              setCallPatient(null);
+            }
+          }}
+        />
       )}
     </div>
   );
