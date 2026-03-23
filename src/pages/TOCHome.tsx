@@ -92,6 +92,7 @@ export default function TOCHome() {
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
   const [dischargeEpisodeId, setDischargeEpisodeId] = useState<string | null>(null);
   const [showAddTOC, setShowAddTOC] = useState(false);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [newTocPatient, setNewTocPatient] = useState("");
   const [newTocFacility, setNewTocFacility] = useState("");
   const [newTocReason, setNewTocReason] = useState("");
