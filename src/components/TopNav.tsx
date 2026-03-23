@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { LayoutGrid, List, ArrowRightLeft, Layers, Pill, Users, BarChart3, Settings } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { label: "Dashboards", path: "/dashboards/manager", icon: BarChart3 },
