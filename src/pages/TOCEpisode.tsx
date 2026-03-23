@@ -104,7 +104,7 @@ export default function TOCEpisode() {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
-            {episode.facility} · {episode.admitReason} · Discharged {episode.dischargeDate}
+            {episode.facility} · {episode.admitReason}{episode.dischargeDate ? ` · Discharged ${episode.dischargeDate}` : " · Currently admitted"}
           </p>
           <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1"><Rss className="h-3 w-3" />{SOURCE_LABELS[episode.notificationSource]}</span>
