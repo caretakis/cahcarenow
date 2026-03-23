@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Phone, Calendar, AlertTriangle } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
@@ -15,6 +17,7 @@ const riskColors: Record<string, string> = {
 
 export default function PatientPage() {
   const { patientId } = useParams();
+  const [callModalOpen, setCallModalOpen] = useState(false);
   const patient = patientId ? getPatientById(patientId) : undefined;
   const needs = patient ? getPatientNeeds(patient.id) : [];
   const outreach = patient ? getPatientOutreach(patient.id) : [];
@@ -43,7 +46,7 @@ export default function PatientPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm"><Phone className="h-4 w-4 mr-1" />Call</Button>
+          <Button size="sm" onClick={() => setCallModalOpen(true)}><Phone className="h-4 w-4 mr-1" />Call</Button>
           <Button size="sm" variant="outline"><Calendar className="h-4 w-4 mr-1" />Schedule</Button>
         </div>
       </div>
@@ -138,6 +141,7 @@ export default function PatientPage() {
           </Card>
         )}
       </div>
+      <CallWorkspaceModal open={callModalOpen} onOpenChange={setCallModalOpen} patient={patient} />
     </div>
   );
 }

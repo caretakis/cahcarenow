@@ -10,6 +10,7 @@ import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ function getPatientStatus(patientId: string, list: ChaseList): StatusFilter {
 export default function ChaseListsPage() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [selectedListId, setSelectedListId] = useState<string | null>(chaseLists[0]?.id ?? null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
@@ -259,7 +261,7 @@ export default function ChaseListsPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                          <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="h-3.5 w-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
                         </div>
                       </TableCell>
@@ -289,6 +291,9 @@ export default function ChaseListsPage() {
       {/* Patient Drawer */}
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
+      )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
     </div>
   );

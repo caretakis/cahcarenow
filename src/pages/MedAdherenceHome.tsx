@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Phone, Pill, AlertTriangle, RefreshCw } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 
 const riskColors: Record<string, string> = {
@@ -28,6 +29,7 @@ export default function MedAdherenceHome() {
   const [tab, setTab] = useState("at_risk");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [viewingAs, setViewingAs] = useState("me");
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
 
   const records = useMemo(() => {
     const enriched = medAdherenceRecords.map(r => ({ ...r, patient: getPatientById(r.patientId) }));
@@ -96,7 +98,7 @@ export default function MedAdherenceHome() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => r.patient && setCallPatient(r.patient)}><Phone className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><Pill className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><RefreshCw className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
@@ -110,6 +112,9 @@ export default function MedAdherenceHome() {
       </div>
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
+      )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
     </div>
   );

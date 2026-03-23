@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss, Plus, ShieldCheck, LogOut } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -91,6 +92,7 @@ export default function TOCHome() {
   const [notEligibleEpisodeId, setNotEligibleEpisodeId] = useState<string | null>(null);
   const [dischargeEpisodeId, setDischargeEpisodeId] = useState<string | null>(null);
   const [showAddTOC, setShowAddTOC] = useState(false);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [newTocPatient, setNewTocPatient] = useState("");
   const [newTocFacility, setNewTocFacility] = useState("");
   const [newTocReason, setNewTocReason] = useState("");
@@ -341,7 +343,7 @@ export default function TOCHome() {
                           <Ban className="h-3.5 w-3.5" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><Phone className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => ep.patient && setCallPatient(ep.patient)}><Phone className="h-3.5 w-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
                     </div>
                   </TableCell>
@@ -441,6 +443,9 @@ export default function TOCHome() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
+      )}
     </div>
   );
 }

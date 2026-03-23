@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Search, Phone, Calendar, Clock, UserPlus } from "lucide-react";
+import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
@@ -25,6 +26,7 @@ export default function WorkQueue() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [riskFilters, setRiskFilters] = useState<string[]>([]);
   const [practiceFilters, setPracticeFilters] = useState<string[]>([]);
+  const [callPatient, setCallPatient] = useState<Patient | null>(null);
 
   const practices = useMemo(() => [...new Set(patients.map(p => p.practice))], []);
 
@@ -137,7 +139,7 @@ export default function WorkQueue() {
                     <TableCell className="text-sm">{topNeed?.dueDate || "—"}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1" onClick={e => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCallPatient(p)}><Phone className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8"><Calendar className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8"><Clock className="h-3.5 w-3.5" /></Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8"><UserPlus className="h-3.5 w-3.5" /></Button>
@@ -153,6 +155,9 @@ export default function WorkQueue() {
 
       {selectedPatient && (
         <PatientDrawer patient={selectedPatient} onClose={() => setSelectedPatient(null)} />
+      )}
+      {callPatient && (
+        <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
     </div>
   );
