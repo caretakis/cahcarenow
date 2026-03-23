@@ -126,14 +126,7 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-  h1, h2, h3, h4 {
-    font-family: 'DM Sans', system-ui, sans-serif;
-    font-weight: 700;
-  }
-  code, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
