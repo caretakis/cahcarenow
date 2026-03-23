@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { CheckCircle, Calendar, Plus, AlertTriangle } from "lucide-react";
+import { ScheduleDialog } from "@/components/ScheduleDialog";
+import { EscalateDialog } from "@/components/EscalateDialog";
+import { toast } from "sonner";
 
 export default function ProgramPanel() {
   const { programId } = useParams();
