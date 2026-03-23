@@ -47,7 +47,7 @@ export default function PatientPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm"><Phone className="h-4 w-4 mr-1" />Call</Button>
+          <Button size="sm" onClick={() => setCallModalOpen(true)}><Phone className="h-4 w-4 mr-1" />Call</Button>
           <Button size="sm" variant="outline"><Calendar className="h-4 w-4 mr-1" />Schedule</Button>
         </div>
       </div>
