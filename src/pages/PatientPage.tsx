@@ -17,6 +17,7 @@ const riskColors: Record<string, string> = {
 
 export default function PatientPage() {
   const { patientId } = useParams();
+  const [callModalOpen, setCallModalOpen] = useState(false);
   const patient = patientId ? getPatientById(patientId) : undefined;
   const needs = patient ? getPatientNeeds(patient.id) : [];
   const outreach = patient ? getPatientOutreach(patient.id) : [];
@@ -24,8 +25,6 @@ export default function PatientPage() {
   const medAdherence = patient ? getPatientMedAdherence(patient.id) : [];
 
   if (!patient) return <div className="p-8 text-muted-foreground">Patient not found</div>;
-
-  const [callModalOpen, setCallModalOpen] = useState(false);
 
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
 
