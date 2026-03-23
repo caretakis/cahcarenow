@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/AppLayout";
 import WorkQueuesHome from "@/pages/WorkQueuesHome";
 import WorkQueue from "@/pages/WorkQueue";
@@ -26,34 +27,36 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<ManagerDashboard />} />
-            <Route path="/queues" element={<WorkQueuesHome />} />
-            <Route path="/queues/:queueId" element={<WorkQueue />} />
-            <Route path="/lists" element={<ChaseListsHome />} />
-            <Route path="/lists/builder" element={<ChaseListBuilder />} />
-            <Route path="/lists/:listId" element={<ChaseListRun />} />
-            <Route path="/toc" element={<TOCHome />} />
-            <Route path="/toc/episode/:episodeId" element={<TOCEpisode />} />
-            <Route path="/programs" element={<ProgramsHome />} />
-            <Route path="/programs/:programId" element={<ProgramPanel />} />
-            <Route path="/med-adherence" element={<MedAdherenceHome />} />
-            <Route path="/patients" element={<PatientsSearch />} />
-            <Route path="/patients/:patientId" element={<PatientPage />} />
-            <Route path="/dashboards/manager" element={<ManagerDashboard />} />
-            <Route path="/dashboards/site" element={<SiteDashboard />} />
-            <Route path="/dashboards/central" element={<CentralDashboard />} />
-            <Route path="/admin" element={<Admin />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<ManagerDashboard />} />
+              <Route path="/queues" element={<WorkQueuesHome />} />
+              <Route path="/queues/:queueId" element={<WorkQueue />} />
+              <Route path="/lists" element={<ChaseListsHome />} />
+              <Route path="/lists/builder" element={<ChaseListBuilder />} />
+              <Route path="/lists/:listId" element={<ChaseListRun />} />
+              <Route path="/toc" element={<TOCHome />} />
+              <Route path="/toc/episode/:episodeId" element={<TOCEpisode />} />
+              <Route path="/programs" element={<ProgramsHome />} />
+              <Route path="/programs/:programId" element={<ProgramPanel />} />
+              <Route path="/med-adherence" element={<MedAdherenceHome />} />
+              <Route path="/patients" element={<PatientsSearch />} />
+              <Route path="/patients/:patientId" element={<PatientPage />} />
+              <Route path="/dashboards/manager" element={<ManagerDashboard />} />
+              <Route path="/dashboards/site" element={<SiteDashboard />} />
+              <Route path="/dashboards/central" element={<CentralDashboard />} />
+              <Route path="/admin" element={<Admin />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
