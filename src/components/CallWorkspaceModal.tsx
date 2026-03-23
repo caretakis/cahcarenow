@@ -213,10 +213,12 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label>Follow-up Date</Label>
-                <Input type="date" value={followUpDate} onChange={e => setFollowUpDate(e.target.value)} />
-              </div>
+              {outcome !== "scheduled" && (
+                <div className="space-y-2">
+                  <Label>Follow-up Date</Label>
+                  <Input type="date" value={followUpDate} onChange={e => setFollowUpDate(e.target.value)} />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Notes</Label>
