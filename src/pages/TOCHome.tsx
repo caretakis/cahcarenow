@@ -163,6 +163,23 @@ export default function TOCHome() {
     setNotEligibleEpisodeId(null);
   };
 
+  const handleVerifyStatus = (epId: string, patientName: string) => {
+    toast.success(`Verified ${patientName} is still admitted`, { description: `Last verified: ${new Date().toLocaleString()}` });
+  };
+
+  const handleMarkDischarged = () => {
+    toast.success("Patient marked as discharged — SLA clock started");
+    setDischargeEpisodeId(null);
+  };
+
+  const handleAddTOC = () => {
+    toast.success("Manual TOC episode created", { description: `${newTocPatient} at ${newTocFacility}` });
+    setShowAddTOC(false);
+    setNewTocPatient("");
+    setNewTocFacility("");
+    setNewTocReason("");
+  };
+
   const reassignEpisode = reassignEpisodeId ? enrichedEpisodes.find(e => e.id === reassignEpisodeId) : null;
 
   return (
