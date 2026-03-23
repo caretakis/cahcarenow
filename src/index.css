@@ -4,6 +4,67 @@
 
 @layer base {
   :root {
+    /* ── "Modern clinical luxury" dark-first palette ── */
+    --background: 218 35% 7%;           /* #0f1623 */
+    --foreground: 210 33% 95%;          /* #f0f4f8 */
+
+    --card: 216 30% 13%;               /* #16202e */
+    --card-foreground: 210 33% 95%;
+
+    --popover: 216 30% 13%;
+    --popover-foreground: 210 33% 95%;
+
+    --primary: 213 100% 62%;            /* #3b9eff */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 216 25% 16%;
+    --secondary-foreground: 210 33% 95%;
+
+    --muted: 216 20% 18%;
+    --muted-foreground: 210 15% 53%;    /* #8899aa */
+
+    --accent: 166 100% 42%;             /* #00d4aa */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;           /* #ef4444 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 216 20% 18%;
+    --input: 216 20% 20%;
+    --ring: 213 100% 62%;
+
+    --radius: 0.625rem;
+
+    --sidebar-background: 216 30% 13%;
+    --sidebar-foreground: 210 15% 75%;
+    --sidebar-primary: 213 100% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 25% 18%;
+    --sidebar-accent-foreground: 210 15% 80%;
+    --sidebar-border: 216 20% 18%;
+    --sidebar-ring: 213 100% 62%;
+
+    --success: 166 100% 42%;            /* #00d4aa */
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;              /* #f59e0b */
+    --warning-foreground: 0 0% 100%;
+    --info: 213 100% 62%;               /* #3b9eff */
+    --info-foreground: 0 0% 100%;
+    --purple: 258 73% 76%;              /* #a78bfa */
+    --purple-foreground: 0 0% 100%;
+
+    /* ── Glass tokens ── */
+    --glass-bg: rgba(255,255,255,0.06);
+    --glass-border: rgba(255,255,255,0.10);
+    --glass-highlight: rgba(255,255,255,0.14);
+
+    /* ── Table row alternation ── */
+    --table-row-even: 216 30% 10%;      /* #1a2535 */
+    --table-row-odd: 216 30% 13%;       /* #16202e */
+  }
+
+  /* Light mode override — keep a polished light variant */
+  .light {
     --background: 210 20% 98%;
     --foreground: 215 25% 15%;
 
@@ -13,7 +74,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    --primary: 173 58% 39%;
+    --primary: 213 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 20% 95%;
@@ -22,7 +83,7 @@
     --muted: 210 15% 93%;
     --muted-foreground: 215 12% 50%;
 
-    --accent: 37 90% 55%;
+    --accent: 166 100% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
@@ -30,71 +91,32 @@
 
     --border: 214 20% 90%;
     --input: 214 20% 90%;
-    --ring: 173 58% 39%;
-
-    --radius: 0.625rem;
+    --ring: 213 100% 50%;
 
     --sidebar-background: 210 25% 97%;
     --sidebar-foreground: 215 20% 30%;
-    --sidebar-primary: 173 58% 39%;
+    --sidebar-primary: 213 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 173 40% 93%;
-    --sidebar-accent-foreground: 173 58% 25%;
+    --sidebar-accent: 210 30% 93%;
+    --sidebar-accent-foreground: 213 60% 35%;
     --sidebar-border: 214 20% 90%;
-    --sidebar-ring: 173 58% 39%;
+    --sidebar-ring: 213 100% 50%;
 
-    --success: 152 60% 40%;
+    --success: 166 100% 32%;
     --success-foreground: 0 0% 100%;
-    --warning: 37 90% 55%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --info: 210 80% 55%;
+    --info: 213 100% 50%;
     --info-foreground: 0 0% 100%;
-  }
+    --purple: 258 73% 66%;
+    --purple-foreground: 0 0% 100%;
 
-  .dark {
-    --background: 215 25% 8%;
-    --foreground: 210 20% 95%;
+    --glass-bg: rgba(255,255,255,0.70);
+    --glass-border: rgba(0,0,0,0.08);
+    --glass-highlight: rgba(255,255,255,0.90);
 
-    --card: 215 25% 11%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 215 25% 11%;
-    --popover-foreground: 210 20% 95%;
-
-    --primary: 173 58% 45%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 215 20% 18%;
-    --secondary-foreground: 210 20% 95%;
-
-    --muted: 215 15% 20%;
-    --muted-foreground: 215 12% 60%;
-
-    --accent: 37 90% 55%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 20% 20%;
-    --input: 215 20% 20%;
-    --ring: 173 58% 45%;
-
-    --sidebar-background: 215 25% 10%;
-    --sidebar-foreground: 210 15% 80%;
-    --sidebar-primary: 173 58% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 20% 16%;
-    --sidebar-accent-foreground: 210 15% 80%;
-    --sidebar-border: 215 20% 20%;
-    --sidebar-ring: 173 58% 45%;
-
-    --success: 152 60% 40%;
-    --success-foreground: 0 0% 100%;
-    --warning: 37 90% 55%;
-    --warning-foreground: 0 0% 100%;
-    --info: 210 80% 55%;
-    --info-foreground: 0 0% 100%;
+    --table-row-even: 210 20% 97%;
+    --table-row-odd: 0 0% 100%;
   }
 }
 
@@ -104,6 +126,64 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-family: 'Inter', system-ui, sans-serif;
   }
+  h1, h2, h3, h4 {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 700;
+  }
+  code, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  /* ── Glass card ── */
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    @apply rounded-lg transition-all duration-200;
+  }
+  .glass-card:hover {
+    background: var(--glass-highlight);
+    transform: scale(1.01);
+    box-shadow: 0 0 30px rgba(59, 158, 255, 0.08);
+  }
+
+  /* ── Glass pill (for badges) ── */
+  .glass-pill {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    @apply rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  /* ── Table row striping ── */
+  .table-row-striped:nth-child(even) {
+    background: hsl(var(--table-row-even));
+  }
+  .table-row-striped:nth-child(odd) {
+    background: hsl(var(--table-row-odd));
+  }
+
+  /* ── Pulse animation for critical badges ── */
+  .badge-pulse {
+    animation: badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* ── Row hover reveal ── */
+  .row-hover-reveal .row-action {
+    @apply opacity-0 transition-opacity duration-150;
+  }
+  .row-hover-reveal:hover .row-action {
+    @apply opacity-100;
+  }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
