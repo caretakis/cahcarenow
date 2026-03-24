@@ -237,7 +237,7 @@ export default function ManagerDashboard() {
               {riskDistribution.map(r => {
                 const pct = Math.round((r.count / totalPatients) * 100);
                 return (
-                  <div key={r.tier}>
+                  <div key={r.tier} className="cursor-pointer hover:bg-muted/30 rounded-lg p-1 -m-1 transition-colors" onClick={() => handleRiskClick(r.tier)}>
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="font-medium">{r.tier}</span>
                       <span className="text-muted-foreground">{r.count} patients ({pct}%)</span>

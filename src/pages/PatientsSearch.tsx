@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { patients, getPatientNeeds } from "@/data/sampleData";
 import type { Patient } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
@@ -20,15 +21,21 @@ const riskColors: Record<string, string> = {
 
 export default function PatientsSearch() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const riskFilter = searchParams.get("risk");
   const [search, setSearch] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [schedulePatient, setSchedulePatient] = useState<Patient | null>(null);
 
   const filtered = useMemo(() => {
-    if (!search) return patients;
-    return patients.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.id.includes(search));
-  }, [search]);
+    let result = patients;
+    if (riskFilter) {
+      result = result.filter(p => p.riskTier === riskFilter);
+    }
+    if (!search) return result;
+    return result.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.id.includes(search));
+  }, [search, riskFilter]);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)]">
