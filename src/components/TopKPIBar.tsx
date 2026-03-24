@@ -5,6 +5,7 @@ interface KPIItem {
   value: string | number;
   sublabel?: string;
   urgent?: boolean;
+  onClick?: () => void;
 }
 
 interface TopKPIBarProps {
@@ -15,7 +16,11 @@ export function TopKPIBar({ items }: TopKPIBarProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
       {items.map((item, i) => (
-        <Card key={i} className="p-4">
+        <Card
+          key={i}
+          className={`p-4 ${item.onClick ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}`}
+          onClick={item.onClick}
+        >
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{item.label}</p>
           <p className={`text-2xl font-bold mt-1 ${item.urgent ? "text-destructive" : "text-foreground"}`}>
             {item.value}

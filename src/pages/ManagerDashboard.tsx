@@ -13,6 +13,7 @@ import {
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertTriangle, Clock, Users, TrendingUp, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Derive manager-level metrics from sample data
 const totalPatients = patients.length;
@@ -43,6 +44,13 @@ const teamProductivity = [
 ];
 
 // Gap closure by type
+const GAP_TYPE_TO_LIST: Record<string, string> = {
+  "AWV": "awv-due",
+  "Quality": "quality-gaps",
+  "HCC": "hcc-recapture",
+  "Med Adh.": "med-adherence",
+};
+
 const gapsByType = [
   { type: "AWV", open: needs.filter(n => n.type === "AWV" && n.status === "OPEN").length, closed: 14 },
   { type: "Quality", open: needs.filter(n => n.type === "QUALITY_GAP" && n.status === "OPEN").length, closed: 8 },
@@ -69,12 +77,36 @@ const riskDistribution = [
 ];
 
 export default function ManagerDashboard() {
+  const navigate = useNavigate();
+
+  const handleGapClick = (data: any) => {
+    const listId = GAP_TYPE_TO_LIST[data.type];
+    if (listId) navigate(`/lists?list=${listId}`);
+  };
+
+  const handleTocSliceClick = (data: any) => {
+    navigate("/toc");
+  };
+
+  const handleRiskClick = (tier: string) => {
+    const riskMap: Record<string, string> = { "Very High": "very_high", "High": "high", "Medium": "medium", "Low": "low" };
+    navigate(`/patients?risk=${riskMap[tier] || ""}`);
+  };
+
+  const handleKpiClick = (label: string) => {
+    if (label === "Active Patients") navigate("/patients");
+    else if (label === "Open Needs") navigate("/queues");
+    else if (label === "Gaps Closed (4w)") navigate("/lists");
+    else if (label === "Active TOCs") navigate("/toc");
+    else if (label === "Meds At Risk") navigate("/med-adherence");
+  };
+
   const kpis = [
-    { label: "Active Patients", value: totalPatients },
-    { label: "Open Needs", value: openNeeds, urgent: openNeeds > 10 },
-    { label: "Gaps Closed (4w)", value: totalGapsClosed4w },
-    { label: "Active TOCs", value: activeTOCs },
-    { label: "Meds At Risk", value: medAtRisk, urgent: true },
+    { label: "Active Patients", value: totalPatients, onClick: () => handleKpiClick("Active Patients") },
+    { label: "Open Needs", value: openNeeds, urgent: openNeeds > 10, onClick: () => handleKpiClick("Open Needs") },
+    { label: "Gaps Closed (4w)", value: totalGapsClosed4w, onClick: () => handleKpiClick("Gaps Closed (4w)") },
+    { label: "Active TOCs", value: activeTOCs, onClick: () => handleKpiClick("Active TOCs") },
+    { label: "Meds At Risk", value: medAtRisk, urgent: true, onClick: () => handleKpiClick("Meds At Risk") },
     { label: "Contact Rate", value: `${Math.round((totalContacts4w / totalCalls4w) * 100)}%` },
   ];
 
@@ -121,15 +153,15 @@ export default function ManagerDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={gapsByType} barGap={2}>
+           <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={gapsByType} barGap={2} className="cursor-pointer">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="type" className="text-xs" />
                 <YAxis className="text-xs" />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="open" fill="hsl(37, 90%, 55%)" radius={[2, 2, 0, 0]} name="Open" />
-                <Bar dataKey="closed" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Closed" />
+                <Bar dataKey="open" fill="hsl(37, 90%, 55%)" radius={[2, 2, 0, 0]} name="Open" onClick={handleGapClick} className="cursor-pointer" />
+                <Bar dataKey="closed" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Closed" onClick={handleGapClick} className="cursor-pointer" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -154,6 +186,8 @@ export default function ManagerDashboard() {
                   outerRadius={90}
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}`}
+                  className="cursor-pointer"
+                  onClick={handleTocSliceClick}
                 >
                   {slaPieData.map((entry, i) => (
                     <Cell key={i} fill={entry.fill} />
@@ -203,7 +237,7 @@ export default function ManagerDashboard() {
               {riskDistribution.map(r => {
                 const pct = Math.round((r.count / totalPatients) * 100);
                 return (
-                  <div key={r.tier}>
+                  <div key={r.tier} className="cursor-pointer hover:bg-muted/30 rounded-lg p-1 -m-1 transition-colors" onClick={() => handleRiskClick(r.tier)}>
                     <div className="flex items-center justify-between text-sm mb-1">
                       <span className="font-medium">{r.tier}</span>
                       <span className="text-muted-foreground">{r.count} patients ({pct}%)</span>
