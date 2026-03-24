@@ -77,12 +77,36 @@ const riskDistribution = [
 ];
 
 export default function ManagerDashboard() {
+  const navigate = useNavigate();
+
+  const handleGapClick = (data: any) => {
+    const listId = GAP_TYPE_TO_LIST[data.type];
+    if (listId) navigate(`/lists?list=${listId}`);
+  };
+
+  const handleTocSliceClick = (data: any) => {
+    navigate("/toc");
+  };
+
+  const handleRiskClick = (tier: string) => {
+    const riskMap: Record<string, string> = { "Very High": "very_high", "High": "high", "Medium": "medium", "Low": "low" };
+    navigate(`/patients?risk=${riskMap[tier] || ""}`);
+  };
+
+  const handleKpiClick = (label: string) => {
+    if (label === "Active Patients") navigate("/patients");
+    else if (label === "Open Needs") navigate("/queues");
+    else if (label === "Gaps Closed (4w)") navigate("/lists");
+    else if (label === "Active TOCs") navigate("/toc");
+    else if (label === "Meds At Risk") navigate("/med-adherence");
+  };
+
   const kpis = [
-    { label: "Active Patients", value: totalPatients },
-    { label: "Open Needs", value: openNeeds, urgent: openNeeds > 10 },
-    { label: "Gaps Closed (4w)", value: totalGapsClosed4w },
-    { label: "Active TOCs", value: activeTOCs },
-    { label: "Meds At Risk", value: medAtRisk, urgent: true },
+    { label: "Active Patients", value: totalPatients, onClick: () => handleKpiClick("Active Patients") },
+    { label: "Open Needs", value: openNeeds, urgent: openNeeds > 10, onClick: () => handleKpiClick("Open Needs") },
+    { label: "Gaps Closed (4w)", value: totalGapsClosed4w, onClick: () => handleKpiClick("Gaps Closed (4w)") },
+    { label: "Active TOCs", value: activeTOCs, onClick: () => handleKpiClick("Active TOCs") },
+    { label: "Meds At Risk", value: medAtRisk, urgent: true, onClick: () => handleKpiClick("Meds At Risk") },
     { label: "Contact Rate", value: `${Math.round((totalContacts4w / totalCalls4w) * 100)}%` },
   ];
 
