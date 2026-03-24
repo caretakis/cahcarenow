@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss, Plus, ShieldCheck, LogOut } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { EscalateDialog } from "@/components/EscalateDialog";
 import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
