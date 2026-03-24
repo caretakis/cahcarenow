@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Play, Phone, AlertTriangle, CheckCircle2, Ban, UserCog, Rss, Plus, ShieldCheck, LogOut } from "lucide-react";
 import { TOCReassignDialog } from "@/components/TOCReassignDialog";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
+import { EscalateDialog } from "@/components/EscalateDialog";
 import { ViewingAsSelector, getTeamMemberName } from "@/components/ViewingAsSelector";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -93,6 +94,7 @@ export default function TOCHome() {
   const [dischargeEpisodeId, setDischargeEpisodeId] = useState<string | null>(null);
   const [showAddTOC, setShowAddTOC] = useState(false);
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
+  const [escalatePatient, setEscalatePatient] = useState<Patient | null>(null);
   const [newTocPatient, setNewTocPatient] = useState("");
   const [newTocFacility, setNewTocFacility] = useState("");
   const [newTocReason, setNewTocReason] = useState("");
@@ -344,7 +346,7 @@ export default function TOCHome() {
                         </Button>
                       )}
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => ep.patient && setCallPatient(ep.patient)}><Phone className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => ep.patient && setEscalatePatient(ep.patient)}><AlertTriangle className="h-3.5 w-3.5" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -446,6 +448,7 @@ export default function TOCHome() {
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
       )}
+      <EscalateDialog patient={escalatePatient} onClose={() => setEscalatePatient(null)} />
     </div>
   );
 }
