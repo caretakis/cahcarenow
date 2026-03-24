@@ -13,6 +13,7 @@ import {
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertTriangle, Clock, Users, TrendingUp, Activity } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // Derive manager-level metrics from sample data
 const totalPatients = patients.length;
