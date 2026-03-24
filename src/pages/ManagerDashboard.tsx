@@ -186,6 +186,8 @@ export default function ManagerDashboard() {
                   outerRadius={90}
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}`}
+                  className="cursor-pointer"
+                  onClick={handleTocSliceClick}
                 >
                   {slaPieData.map((entry, i) => (
                     <Cell key={i} fill={entry.fill} />
