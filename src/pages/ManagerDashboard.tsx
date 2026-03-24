@@ -153,15 +153,15 @@ export default function ManagerDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={gapsByType} barGap={2}>
+           <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={gapsByType} barGap={2} className="cursor-pointer">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="type" className="text-xs" />
                 <YAxis className="text-xs" />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="open" fill="hsl(37, 90%, 55%)" radius={[2, 2, 0, 0]} name="Open" />
-                <Bar dataKey="closed" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Closed" />
+                <Bar dataKey="open" fill="hsl(37, 90%, 55%)" radius={[2, 2, 0, 0]} name="Open" onClick={handleGapClick} className="cursor-pointer" />
+                <Bar dataKey="closed" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Closed" onClick={handleGapClick} className="cursor-pointer" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
