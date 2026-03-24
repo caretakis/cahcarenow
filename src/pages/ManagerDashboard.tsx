@@ -44,6 +44,13 @@ const teamProductivity = [
 ];
 
 // Gap closure by type
+const GAP_TYPE_TO_LIST: Record<string, string> = {
+  "AWV": "awv-due",
+  "Quality": "quality-gaps",
+  "HCC": "hcc-recapture",
+  "Med Adh.": "med-adherence",
+};
+
 const gapsByType = [
   { type: "AWV", open: needs.filter(n => n.type === "AWV" && n.status === "OPEN").length, closed: 14 },
   { type: "Quality", open: needs.filter(n => n.type === "QUALITY_GAP" && n.status === "OPEN").length, closed: 8 },
