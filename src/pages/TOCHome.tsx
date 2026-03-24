@@ -447,7 +447,7 @@ export default function TOCHome() {
       </Dialog>
       {callPatient && (
         <CallWorkspaceModal open={!!callPatient} onOpenChange={o => !o && setCallPatient(null)} patient={callPatient} />
-      )
+      )}
       <EscalateDialog patient={escalatePatient} onClose={() => setEscalatePatient(null)} />
     </div>
   );
