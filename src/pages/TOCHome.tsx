@@ -346,7 +346,7 @@ export default function TOCHome() {
                         </Button>
                       )}
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => ep.patient && setCallPatient(ep.patient)}><Phone className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7"><AlertTriangle className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => ep.patient && setEscalatePatient(ep.patient)}><AlertTriangle className="h-3.5 w-3.5" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
