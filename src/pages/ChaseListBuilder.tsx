@@ -26,6 +26,7 @@ export default function ChaseListBuilder() {
   const [riskTiers, setRiskTiers] = useState<string[]>([]);
   const [minOpenHcc, setMinOpenHcc] = useState("");
   const [minOpenGaps, setMinOpenGaps] = useState("");
+  const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
   const [selectedPractices, setSelectedPractices] = useState<string[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
   const [selectedPartners, setSelectedPartners] = useState<string[]>([]);
