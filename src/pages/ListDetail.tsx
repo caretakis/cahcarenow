@@ -364,7 +364,7 @@ export default function ListDetail() {
                     <TableHead>Patient</TableHead>
                     <TableHead>PCP / Practice</TableHead>
                     <TableHead>Risk</TableHead>
-                    <TableHead>RAF Opp</TableHead>
+                    <TableHead>Open HCCs</TableHead>
                     <TableHead>Open Gaps</TableHead>
                     <TableHead>Assigned To</TableHead>
                     <TableHead>Attempts</TableHead>
