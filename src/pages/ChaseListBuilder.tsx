@@ -278,7 +278,14 @@ export default function ChaseListBuilder() {
         {/* Preview */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Preview ({preview.length} patients)</CardTitle>
+            <CardTitle className="text-base">
+              Preview ({previewCount ?? preview.length} patients)
+              {dataSource === "carefabric" && selectedView && (
+                <span className="text-xs font-normal text-muted-foreground ml-2">
+                  showing sample from <span className="font-mono">{selectedView.name}</span>
+                </span>
+              )}
+            </CardTitle>
             <Button size="sm" onClick={() => setShowAssignDialog(true)} disabled={preview.length === 0}>
               <Save className="h-4 w-4 mr-2" />Save & Assign
             </Button>
