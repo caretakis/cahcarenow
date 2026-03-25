@@ -64,17 +64,29 @@ export default function ChaseListBuilder() {
   // Partners: using address city as a proxy for partner/region
   const uniquePartners = useMemo(() => [...new Set(patients.map(p => p.address.split(",")[0].trim()))].sort(), []);
 
-  const preview = patients.filter(p => {
-    if (openAWV && p.lastAWV && new Date(p.lastAWV) > new Date("2025-03-01")) return false;
-    if (riskTiers.length > 0 && !riskTiers.includes(p.riskTier)) return false;
-    if (minOpenHcc && p.openHccCount < parseInt(minOpenHcc)) return false;
-    if (openQualityGaps && p.openQualityGaps < 1) return false;
-    if (selectedPayers.length > 0 && !selectedPayers.includes(p.payer)) return false;
-    if (selectedPractices.length > 0 && !selectedPractices.includes(p.practice)) return false;
-    if (selectedProviders.length > 0 && !selectedProviders.includes(p.provider)) return false;
-    if (selectedPartners.length > 0 && !selectedPartners.includes(p.address.split(",")[0].trim())) return false;
-    return true;
-  });
+  const filteredViews = MOCK_CAREFABRIC_VIEWS.filter(v =>
+    v.name.toLowerCase().includes(viewSearch.toLowerCase()) ||
+    v.description.toLowerCase().includes(viewSearch.toLowerCase()) ||
+    v.schema.toLowerCase().includes(viewSearch.toLowerCase())
+  );
+
+  const previewCount = dataSource === "carefabric" && selectedView
+    ? selectedView.rowCount
+    : null;
+
+  const preview = dataSource === "carefabric"
+    ? (selectedView ? patients.slice(0, Math.min(patients.length, 15)) : [])
+    : patients.filter(p => {
+        if (openAWV && p.lastAWV && new Date(p.lastAWV) > new Date("2025-03-01")) return false;
+        if (riskTiers.length > 0 && !riskTiers.includes(p.riskTier)) return false;
+        if (minOpenHcc && p.openHccCount < parseInt(minOpenHcc)) return false;
+        if (openQualityGaps && p.openQualityGaps < 1) return false;
+        if (selectedPayers.length > 0 && !selectedPayers.includes(p.payer)) return false;
+        if (selectedPractices.length > 0 && !selectedPractices.includes(p.practice)) return false;
+        if (selectedProviders.length > 0 && !selectedProviders.includes(p.provider)) return false;
+        if (selectedPartners.length > 0 && !selectedPartners.includes(p.address.split(",")[0].trim())) return false;
+        return true;
+      });
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
