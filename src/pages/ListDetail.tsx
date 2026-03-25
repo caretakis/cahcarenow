@@ -92,10 +92,7 @@ export default function ListDetail() {
     </div>
   );
 
-  // Activity log for this list
-  const listActivity = activityLog.filter(a => a.listId === list.id).sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
-  const getPatient = (id: string) => patients.find(p => p.id === id);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
