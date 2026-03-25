@@ -25,6 +25,7 @@ export default function ChaseListBuilder() {
   const [openAWV, setOpenAWV] = useState(false);
   const [riskTiers, setRiskTiers] = useState<string[]>([]);
   const [minOpenHcc, setMinOpenHcc] = useState("");
+  const [minOpenGaps, setMinOpenGaps] = useState("");
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
   const [selectedPractices, setSelectedPractices] = useState<string[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
@@ -44,6 +45,7 @@ export default function ChaseListBuilder() {
     if (openAWV && p.lastAWV && new Date(p.lastAWV) > new Date("2025-03-01")) return false;
     if (riskTiers.length > 0 && !riskTiers.includes(p.riskTier)) return false;
     if (minOpenHcc && p.openHccCount < parseInt(minOpenHcc)) return false;
+    if (minOpenGaps && p.openQualityGaps < parseInt(minOpenGaps)) return false;
     if (selectedPayers.length > 0 && !selectedPayers.includes(p.payer)) return false;
     if (selectedPractices.length > 0 && !selectedPractices.includes(p.practice)) return false;
     if (selectedProviders.length > 0 && !selectedProviders.includes(p.provider)) return false;
@@ -131,6 +133,10 @@ export default function ChaseListBuilder() {
               <Label className="text-sm">Min Open HCC Count</Label>
               <Input type="number" step="1" min="0" max="4" value={minOpenHcc} onChange={e => setMinOpenHcc(e.target.value)} placeholder="e.g. 2" className="mt-1.5" />
             </div>
+            <div>
+              <Label className="text-sm">Min Open Quality Gaps</Label>
+              <Input type="number" step="1" min="0" max="4" value={minOpenGaps} onChange={e => setMinOpenGaps(e.target.value)} placeholder="e.g. 1" className="mt-1.5" />
+            </div>
             <div className="pt-2 border-t space-y-2">
               <Button variant="outline" size="sm" className="w-full"><Upload className="h-4 w-4 mr-2" />Upload Cohort CSV</Button>
             </div>
@@ -152,8 +158,8 @@ export default function ChaseListBuilder() {
                   <TableHead>Patient</TableHead>
                   <TableHead>Risk</TableHead>
                   <TableHead>Open HCCs</TableHead>
+                  <TableHead>Open Gaps</TableHead>
                   <TableHead>HCCs</TableHead>
-                  <TableHead>Last AWV</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -162,6 +168,7 @@ export default function ChaseListBuilder() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell><Badge variant="outline" className="capitalize">{p.riskTier.replace("_", " ")}</Badge></TableCell>
                     <TableCell>{p.openHccCount}</TableCell>
+                    <TableCell>{p.openQualityGaps}</TableCell>
                     <TableCell>{p.hccCount}</TableCell>
                     <TableCell>{p.lastAWV || "None"}</TableCell>
                   </TableRow>

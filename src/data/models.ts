@@ -16,6 +16,7 @@ export interface Patient {
   provider: string;
   riskTier: RiskTier;
   openHccCount: number;
+  openQualityGaps: number;
   hccCount: number;
   lastAWV: string | null;
   nextAppointment: string | null;
