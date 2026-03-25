@@ -12,7 +12,7 @@ import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy } from "luc
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { ScheduleDialog } from "@/components/ScheduleDialog";
 
-type SortKey = "risk" | "raf" | "gaps";
+type SortKey = "risk" | "openHcc" | "gaps";
 type SortDir = "asc" | "desc";
 
 const riskOrder: Record<string, number> = { very_high: 4, high: 3, medium: 2, low: 1 };
@@ -42,7 +42,7 @@ export default function ChaseListRun() {
     return [...pts].sort((a, b) => {
       let diff = 0;
       if (sortKey === "risk") diff = riskOrder[a.riskTier] - riskOrder[b.riskTier];
-      else if (sortKey === "raf") diff = a.rafOpportunity - b.rafOpportunity;
+      else if (sortKey === "openHcc") diff = a.openHccCount - b.openHccCount;
       else if (sortKey === "gaps") {
         const aGaps = getPatientNeeds(a.id).filter(n => n.status !== "COMPLETED").length;
         const bGaps = getPatientNeeds(b.id).filter(n => n.status !== "COMPLETED").length;
@@ -126,7 +126,7 @@ export default function ChaseListRun() {
                 <TableHead>Patient</TableHead>
                 <TableHead>Provider</TableHead>
                 <TableHead><SortButton k="risk" label="Risk" /></TableHead>
-                <TableHead><SortButton k="raf" label="RAF Opp" /></TableHead>
+                <TableHead><SortButton k="openHcc" label="Open HCCs" /></TableHead>
                 <TableHead><SortButton k="gaps" label="Open Gaps" /></TableHead>
                 <TableHead>Last Outreach</TableHead>
                 <TableHead>Last AWV</TableHead>
@@ -143,7 +143,7 @@ export default function ChaseListRun() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="text-sm">{p.provider}</TableCell>
                     <TableCell><Badge variant="outline" className="capitalize">{p.riskTier.replace("_", " ")}</Badge></TableCell>
-                    <TableCell>+{p.rafOpportunity}</TableCell>
+                    <TableCell>{p.openHccCount}</TableCell>
                     <TableCell><Badge variant="secondary">{gapCount}</Badge></TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {lastOutreach ? (

@@ -96,11 +96,11 @@ export default function ListDetail() {
 
   const handleExport = () => {
     if (!list) return;
-    const header = "Patient,Provider,Practice,Risk,RAF Opp,Assigned To,Status,Attempts,Last Attempt,Notes\n";
+    const header = "Patient,Provider,Practice,Risk,Open HCCs,Assigned To,Status,Attempts,Last Attempt,Notes\n";
     const rows = list.patients.map(lp => {
       const pt = getPatient(lp.patientId);
       const assignee = list.assignedUsers.find(u => u.userId === lp.assignedTo);
-      return `"${pt?.name || lp.patientId}","${pt?.provider || ""}","${pt?.practice || ""}","${pt?.riskTier || ""}",${pt?.rafOpportunity || 0},"${assignee?.userName || ""}","${lp.status}",${lp.attempts},"${lp.lastAttemptDate || ""}","${lp.notes}"`;
+      return `"${pt?.name || lp.patientId}","${pt?.provider || ""}","${pt?.practice || ""}","${pt?.riskTier || ""}",${pt?.openHccCount || 0},"${assignee?.userName || ""}","${lp.status}",${lp.attempts},"${lp.lastAttemptDate || ""}","${lp.notes}"`;
     }).join("\n");
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -364,7 +364,7 @@ export default function ListDetail() {
                     <TableHead>Patient</TableHead>
                     <TableHead>PCP / Practice</TableHead>
                     <TableHead>Risk</TableHead>
-                    <TableHead>RAF Opp</TableHead>
+                    <TableHead>Open HCCs</TableHead>
                     <TableHead>Open Gaps</TableHead>
                     <TableHead>Assigned To</TableHead>
                     <TableHead>Attempts</TableHead>
@@ -398,7 +398,7 @@ export default function ListDetail() {
                           {pt.provider}<br /><span className="text-xs text-muted-foreground">{pt.practice}</span>
                         </TableCell>
                         <TableCell><Badge variant="outline" className="capitalize text-xs">{pt.riskTier.replace("_", " ")}</Badge></TableCell>
-                        <TableCell>+{pt.rafOpportunity}</TableCell>
+                        <TableCell>{pt.openHccCount}</TableCell>
                         <TableCell><Badge variant="secondary">{gapCount}</Badge></TableCell>
                         <TableCell className="text-sm">{assignedUser?.userName || "—"}</TableCell>
                         <TableCell>{lp.attempts}</TableCell>

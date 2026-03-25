@@ -24,7 +24,7 @@ type AssignStrategy = "even" | "by_payer" | "by_practice" | "by_pcp" | "by_partn
 export default function ChaseListBuilder() {
   const [openAWV, setOpenAWV] = useState(false);
   const [riskTiers, setRiskTiers] = useState<string[]>([]);
-  const [minRAF, setMinRAF] = useState("");
+  const [minOpenHcc, setMinOpenHcc] = useState("");
   const [selectedPayers, setSelectedPayers] = useState<string[]>([]);
   const [selectedPractices, setSelectedPractices] = useState<string[]>([]);
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
@@ -43,7 +43,7 @@ export default function ChaseListBuilder() {
   const preview = patients.filter(p => {
     if (openAWV && p.lastAWV && new Date(p.lastAWV) > new Date("2025-03-01")) return false;
     if (riskTiers.length > 0 && !riskTiers.includes(p.riskTier)) return false;
-    if (minRAF && p.rafOpportunity < parseFloat(minRAF)) return false;
+    if (minOpenHcc && p.openHccCount < parseInt(minOpenHcc)) return false;
     if (selectedPayers.length > 0 && !selectedPayers.includes(p.payer)) return false;
     if (selectedPractices.length > 0 && !selectedPractices.includes(p.practice)) return false;
     if (selectedProviders.length > 0 && !selectedProviders.includes(p.provider)) return false;
@@ -128,8 +128,8 @@ export default function ChaseListBuilder() {
             ))}
 
             <div>
-              <Label className="text-sm">Min RAF Opportunity</Label>
-              <Input type="number" step="0.1" value={minRAF} onChange={e => setMinRAF(e.target.value)} placeholder="e.g. 0.3" className="mt-1.5" />
+              <Label className="text-sm">Min Open HCC Count</Label>
+              <Input type="number" step="1" min="0" max="4" value={minOpenHcc} onChange={e => setMinOpenHcc(e.target.value)} placeholder="e.g. 2" className="mt-1.5" />
             </div>
             <div className="pt-2 border-t space-y-2">
               <Button variant="outline" size="sm" className="w-full"><Upload className="h-4 w-4 mr-2" />Upload Cohort CSV</Button>
@@ -151,7 +151,7 @@ export default function ChaseListBuilder() {
                 <TableRow>
                   <TableHead>Patient</TableHead>
                   <TableHead>Risk</TableHead>
-                  <TableHead>RAF Opp</TableHead>
+                  <TableHead>Open HCCs</TableHead>
                   <TableHead>HCCs</TableHead>
                   <TableHead>Last AWV</TableHead>
                 </TableRow>
@@ -161,7 +161,7 @@ export default function ChaseListBuilder() {
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell><Badge variant="outline" className="capitalize">{p.riskTier.replace("_", " ")}</Badge></TableCell>
-                    <TableCell>+{p.rafOpportunity}</TableCell>
+                    <TableCell>{p.openHccCount}</TableCell>
                     <TableCell>{p.hccCount}</TableCell>
                     <TableCell>{p.lastAWV || "None"}</TableCell>
                   </TableRow>
