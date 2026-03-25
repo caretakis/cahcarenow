@@ -159,7 +159,8 @@ export default function ChaseListBuilder() {
                   <TableHead>Risk</TableHead>
                   <TableHead>Open HCCs</TableHead>
                   <TableHead>Open Gaps</TableHead>
-                  <TableHead>HCCs</TableHead>
+                  <TableHead>Open Gaps</TableHead>
+                  <TableHead>Last AWV</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
