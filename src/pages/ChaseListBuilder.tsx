@@ -98,83 +98,180 @@ export default function ChaseListBuilder() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Criteria */}
         <Card className="lg:col-span-1">
-          <CardHeader><CardTitle className="text-base">Criteria</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-base">Data Source</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-5">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={openAWV} onCheckedChange={() => setOpenAWV(!openAWV)} />
-              <span>Open AWV (no AWV in 12 months)</span>
-            </label>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={openQualityGaps} onCheckedChange={() => setOpenQualityGaps(!openQualityGaps)} />
-              <span>Open Quality Gaps (≥ 1 gap)</span>
-            </label>
-            <div>
-              <Label className="text-sm">Risk Tier</Label>
-              <div className="space-y-1.5 mt-1.5">
-                {["very_high", "high", "medium", "low"].map(t => (
-                  <label key={t} className="flex items-center gap-2 text-sm cursor-pointer">
-                    <Checkbox checked={riskTiers.includes(t)} onCheckedChange={() => setRiskTiers(prev => toggleItem(prev, t))} />
-                    <span className="capitalize">{t.replace("_", " ")}</span>
-                  </label>
-                ))}
-              </div>
+            {/* Source toggle */}
+            <div className="flex rounded-lg border border-border overflow-hidden">
+              <button
+                onClick={() => { setDataSource("criteria"); setSelectedView(null); }}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  dataSource === "criteria"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:bg-accent"
+                }`}
+              >
+                <Split className="h-3.5 w-3.5" />
+                Criteria
+              </button>
+              <button
+                onClick={() => setDataSource("carefabric")}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  dataSource === "carefabric"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-background text-muted-foreground hover:bg-accent"
+                }`}
+              >
+                <Database className="h-3.5 w-3.5" />
+                CareFabric
+              </button>
             </div>
 
-            {/* Multi-select filters */}
-            {([
-              { label: "Payer", options: uniquePayers, selected: selectedPayers, setSelected: setSelectedPayers },
-              { label: "Practice", options: uniquePractices, selected: selectedPractices, setSelected: setSelectedPractices },
-              { label: "PCP", options: uniqueProviders, selected: selectedProviders, setSelected: setSelectedProviders },
-              { label: "Partner / Region", options: uniquePartners, selected: selectedPartners, setSelected: setSelectedPartners },
-            ] as const).map(filter => (
-              <div key={filter.label}>
-                <Label className="text-sm">{filter.label}</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full mt-1.5 justify-between font-normal">
-                      {filter.selected.length === 0
-                        ? <span className="text-muted-foreground">All</span>
-                        : <span className="truncate">{filter.selected.length} selected</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-56 p-2" align="start">
-                    <div className="space-y-1 max-h-48 overflow-y-auto">
-                      {filter.options.map(opt => (
-                        <label key={opt} className="flex items-center gap-2 text-sm cursor-pointer px-1 py-0.5 rounded hover:bg-accent">
-                          <Checkbox
-                            checked={filter.selected.includes(opt)}
-                            onCheckedChange={() => filter.setSelected(prev => toggleItem(prev, opt))}
-                          />
-                          <span>{opt}</span>
-                        </label>
-                      ))}
+            {dataSource === "carefabric" ? (
+              <div className="space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search views…"
+                    value={viewSearch}
+                    onChange={e => setViewSearch(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+
+                <div className="space-y-1.5 max-h-[420px] overflow-y-auto">
+                  {filteredViews.map(view => (
+                    <button
+                      key={view.id}
+                      onClick={() => setSelectedView(selectedView?.id === view.id ? null : view)}
+                      className={`w-full text-left rounded-md border p-3 transition-colors ${
+                        selectedView?.id === view.id
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:bg-accent/50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        <Table2 className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-muted-foreground font-mono">{view.schema}.</span>
+                            <span className="text-sm font-medium font-mono truncate">{view.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{view.description}</p>
+                          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Users className="h-3 w-3" />
+                              {view.rowCount.toLocaleString()} rows
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {view.lastUpdated}
+                            </span>
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">{view.createdBy}</div>
+                        </div>
+                        {selectedView?.id === view.id && (
+                          <Check className="h-4 w-4 text-primary shrink-0" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                  {filteredViews.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">No views match your search</p>
+                  )}
+                </div>
+
+                {selectedView && (
+                  <div className="rounded-md border border-primary/30 bg-primary/5 p-3">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Database className="h-4 w-4 text-primary" />
+                      Selected: <span className="font-mono">{selectedView.name}</span>
                     </div>
-                    {filter.selected.length > 0 && (
-                      <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => filter.setSelected([])}>
-                        <X className="h-3 w-3 mr-1" />Clear
-                      </Button>
-                    )}
-                  </PopoverContent>
-                </Popover>
-                {filter.selected.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {filter.selected.map(v => (
-                      <Badge key={v} variant="secondary" className="text-xs cursor-pointer" onClick={() => filter.setSelected(prev => prev.filter(x => x !== v))}>
-                        {v} <X className="h-3 w-3 ml-1" />
-                      </Badge>
-                    ))}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {selectedView.rowCount.toLocaleString()} patients will be imported
+                    </p>
                   </div>
                 )}
               </div>
-            ))}
+            ) : (
+              <>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox checked={openAWV} onCheckedChange={() => setOpenAWV(!openAWV)} />
+                  <span>Open AWV (no AWV in 12 months)</span>
+                </label>
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox checked={openQualityGaps} onCheckedChange={() => setOpenQualityGaps(!openQualityGaps)} />
+                  <span>Open Quality Gaps (≥ 1 gap)</span>
+                </label>
+                <div>
+                  <Label className="text-sm">Risk Tier</Label>
+                  <div className="space-y-1.5 mt-1.5">
+                    {["very_high", "high", "medium", "low"].map(t => (
+                      <label key={t} className="flex items-center gap-2 text-sm cursor-pointer">
+                        <Checkbox checked={riskTiers.includes(t)} onCheckedChange={() => setRiskTiers(prev => toggleItem(prev, t))} />
+                        <span className="capitalize">{t.replace("_", " ")}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-            <div>
-              <Label className="text-sm">Min Open HCC Count</Label>
-              <Input type="number" step="1" min="0" max="4" value={minOpenHcc} onChange={e => setMinOpenHcc(e.target.value)} placeholder="e.g. 2" className="mt-1.5" />
-            </div>
-            <div className="pt-2 border-t space-y-2">
-              <Button variant="outline" size="sm" className="w-full"><Upload className="h-4 w-4 mr-2" />Upload Cohort CSV</Button>
-            </div>
+                {([
+                  { label: "Payer", options: uniquePayers, selected: selectedPayers, setSelected: setSelectedPayers },
+                  { label: "Practice", options: uniquePractices, selected: selectedPractices, setSelected: setSelectedPractices },
+                  { label: "PCP", options: uniqueProviders, selected: selectedProviders, setSelected: setSelectedProviders },
+                  { label: "Partner / Region", options: uniquePartners, selected: selectedPartners, setSelected: setSelectedPartners },
+                ] as const).map(filter => (
+                  <div key={filter.label}>
+                    <Label className="text-sm">{filter.label}</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="w-full mt-1.5 justify-between font-normal">
+                          {filter.selected.length === 0
+                            ? <span className="text-muted-foreground">All</span>
+                            : <span className="truncate">{filter.selected.length} selected</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-2" align="start">
+                        <div className="space-y-1 max-h-48 overflow-y-auto">
+                          {filter.options.map(opt => (
+                            <label key={opt} className="flex items-center gap-2 text-sm cursor-pointer px-1 py-0.5 rounded hover:bg-accent">
+                              <Checkbox
+                                checked={filter.selected.includes(opt)}
+                                onCheckedChange={() => filter.setSelected(prev => toggleItem(prev, opt))}
+                              />
+                              <span>{opt}</span>
+                            </label>
+                          ))}
+                        </div>
+                        {filter.selected.length > 0 && (
+                          <Button variant="ghost" size="sm" className="w-full mt-2 text-xs" onClick={() => filter.setSelected([])}>
+                            <X className="h-3 w-3 mr-1" />Clear
+                          </Button>
+                        )}
+                      </PopoverContent>
+                    </Popover>
+                    {filter.selected.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {filter.selected.map(v => (
+                          <Badge key={v} variant="secondary" className="text-xs cursor-pointer" onClick={() => filter.setSelected(prev => prev.filter(x => x !== v))}>
+                            {v} <X className="h-3 w-3 ml-1" />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <div>
+                  <Label className="text-sm">Min Open HCC Count</Label>
+                  <Input type="number" step="1" min="0" max="4" value={minOpenHcc} onChange={e => setMinOpenHcc(e.target.value)} placeholder="e.g. 2" className="mt-1.5" />
+                </div>
+                <div className="pt-2 border-t space-y-2">
+                  <Button variant="outline" size="sm" className="w-full"><Upload className="h-4 w-4 mr-2" />Upload Cohort CSV</Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
