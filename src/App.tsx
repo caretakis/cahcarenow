@@ -19,6 +19,9 @@ import PatientPage from "@/pages/PatientPage";
 import SiteDashboard from "@/pages/SiteDashboard";
 import CentralDashboard from "@/pages/CentralDashboard";
 import ManagerDashboard from "@/pages/ManagerDashboard";
+import ListManagement from "@/pages/ListManagement";
+import ListDetail from "@/pages/ListDetail";
+import TeamProductivity from "@/pages/TeamProductivity";
 import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 
@@ -48,6 +51,9 @@ const App = () => (
               <Route path="/dashboards/manager" element={<ManagerDashboard />} />
               <Route path="/dashboards/site" element={<SiteDashboard />} />
               <Route path="/dashboards/central" element={<CentralDashboard />} />
+              <Route path="/manager/lists" element={<ListManagement />} />
+              <Route path="/manager/lists/:listId" element={<ListDetail />} />
+              <Route path="/manager/productivity" element={<TeamProductivity />} />
               <Route path="/admin" element={<Admin />} />
             </Route>
             <Route path="*" element={<NotFound />} />
