@@ -11,10 +11,13 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Search, MoreHorizontal, Download, Archive, Users, ArrowUpDown, Pencil, Copy, UserPlus } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, Archive, ArrowUpDown, Pencil, Copy, UserPlus } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ReassignPatientsDialog } from "@/components/ReassignPatientsDialog";
+import { EditListDialog } from "@/components/EditListDialog";
 
 type StatusTab = "all" | "active" | "draft" | "completed" | "archived";
 type SortKey = "name" | "dueDate" | "progress" | "scheduled";
@@ -48,6 +51,12 @@ export default function ListManagement() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [sortKey, setSortKey] = useState<SortKey>("dueDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+
+  // Dialog state
+  const [reassignList, setReassignList] = useState<ManagedChaseList | null>(null);
+  const [editList, setEditList] = useState<ManagedChaseList | null>(null);
+  const [archiveConfirm, setArchiveConfirm] = useState<{ ids: string[]; names: string[] } | null>(null);
+  const [duplicateConfirm, setDuplicateConfirm] = useState<ManagedChaseList | null>(null);
 
   const tabs: { key: StatusTab; label: string; count: number }[] = [
     { key: "all", label: "All", count: managedChaseLists.length },
@@ -89,6 +98,36 @@ export default function ListManagement() {
   };
 
   const isDuePast = (date: string) => new Date(date) < new Date();
+
+  const handleExportSelected = () => {
+    const selectedLists = managedChaseLists.filter(l => selectedIds.includes(l.id));
+    const header = "List Name,Campaign,Status,Due Date,Total Patients,Scheduled\n";
+    const rows = selectedLists.map(l => {
+      const counts = getListStatusCounts(l);
+      return `"${l.name}","${l.campaignType}","${l.status}","${l.dueDate}",${l.patients.length},${counts.scheduled}`;
+    }).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "chase_lists_export.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${selectedLists.length} list(s) exported as CSV`);
+  };
+
+  const handleBulkReassign = () => {
+    // Collect all patient IDs from selected lists
+    const allPatientIds = managedChaseLists
+      .filter(l => selectedIds.includes(l.id))
+      .flatMap(l => l.patients.map(p => p.patientId));
+    const uniqueIds = [...new Set(allPatientIds)];
+    // Use the first selected list for context
+    const firstList = managedChaseLists.find(l => selectedIds.includes(l.id));
+    if (firstList) {
+      setReassignList({ ...firstList, patients: firstList.patients.filter(p => uniqueIds.includes(p.patientId)) } as any);
+    }
+  };
 
   const SortBtn = ({ k, label }: { k: SortKey; label: string }) => (
     <Button variant="ghost" size="sm" className="h-auto p-0 font-medium text-muted-foreground hover:text-foreground"
@@ -146,13 +185,16 @@ export default function ListManagement() {
         {selectedIds.length > 0 && (
           <div className="flex items-center gap-2 ml-auto">
             <span className="text-sm text-muted-foreground">{selectedIds.length} selected</span>
-            <Button variant="outline" size="sm" onClick={() => toast.success("Bulk reassignment would open here")}>
+            <Button variant="outline" size="sm" onClick={handleBulkReassign}>
               <UserPlus className="h-3.5 w-3.5 mr-1" />Reassign
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("Selected lists archived")}>
+            <Button variant="outline" size="sm" onClick={() => {
+              const names = managedChaseLists.filter(l => selectedIds.includes(l.id)).map(l => l.name);
+              setArchiveConfirm({ ids: selectedIds, names });
+            }}>
               <Archive className="h-3.5 w-3.5 mr-1" />Archive
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("Export started")}>
+            <Button variant="outline" size="sm" onClick={handleExportSelected}>
               <Download className="h-3.5 w-3.5 mr-1" />Export
             </Button>
           </div>
@@ -238,10 +280,18 @@ export default function ListManagement() {
                           <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => navigate(`/manager/lists/${list.id}`)}><Pencil className="h-3.5 w-3.5 mr-2" />Edit</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.success("Reassignment dialog would open")}><UserPlus className="h-3.5 w-3.5 mr-2" />Reassign</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.success("List duplicated")}><Copy className="h-3.5 w-3.5 mr-2" />Duplicate</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.success("List archived")}><Archive className="h-3.5 w-3.5 mr-2" />Archive</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setEditList(list)}>
+                            <Pencil className="h-3.5 w-3.5 mr-2" />Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setReassignList(list)}>
+                            <UserPlus className="h-3.5 w-3.5 mr-2" />Reassign
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setDuplicateConfirm(list)}>
+                            <Copy className="h-3.5 w-3.5 mr-2" />Duplicate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setArchiveConfirm({ ids: [list.id], names: [list.name] })}>
+                            <Archive className="h-3.5 w-3.5 mr-2" />Archive
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -259,6 +309,70 @@ export default function ListManagement() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Reassign Dialog */}
+      <ReassignPatientsDialog
+        open={!!reassignList}
+        onClose={() => setReassignList(null)}
+        patientIds={reassignList?.patients.map(p => p.patientId) || []}
+        currentAssignees={reassignList?.assignedUsers.map(u => ({ userId: u.userId, userName: u.userName })) || []}
+        contextLabel={reassignList?.name}
+      />
+
+      {/* Edit Dialog */}
+      <EditListDialog
+        open={!!editList}
+        onClose={() => setEditList(null)}
+        list={editList}
+      />
+
+      {/* Archive Confirm Dialog */}
+      <Dialog open={!!archiveConfirm} onOpenChange={o => !o && setArchiveConfirm(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Archive className="h-5 w-5 text-muted-foreground" />
+              Archive {archiveConfirm?.ids.length === 1 ? "List" : `${archiveConfirm?.ids.length} Lists`}
+            </DialogTitle>
+            <DialogDescription>
+              {archiveConfirm?.ids.length === 1
+                ? `Are you sure you want to archive "${archiveConfirm?.names[0]}"? Archived lists can be restored later.`
+                : `Are you sure you want to archive ${archiveConfirm?.ids.length} lists? Archived lists can be restored later.`
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setArchiveConfirm(null)}>Cancel</Button>
+            <Button onClick={() => {
+              toast.success(`${archiveConfirm?.ids.length} list(s) archived`);
+              setSelectedIds(prev => prev.filter(id => !archiveConfirm?.ids.includes(id)));
+              setArchiveConfirm(null);
+            }}>Archive</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Duplicate Confirm Dialog */}
+      <Dialog open={!!duplicateConfirm} onOpenChange={o => !o && setDuplicateConfirm(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Copy className="h-5 w-5 text-primary" />
+              Duplicate List
+            </DialogTitle>
+            <DialogDescription>
+              Create a copy of "{duplicateConfirm?.name}" with the same criteria and settings? The new list will be saved as a draft.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDuplicateConfirm(null)}>Cancel</Button>
+            <Button onClick={() => {
+              toast.success(`"${duplicateConfirm?.name} (Copy)" created as draft`);
+              setDuplicateConfirm(null);
+            }}>Duplicate</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
