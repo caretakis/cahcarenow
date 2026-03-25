@@ -20,8 +20,29 @@ const toggleItem = (list: string[], v: string) =>
 const MOCK_TEAMMATES = ["Sarah M.", "David K.", "Angela R.", "Marcus T.", "Priya S."];
 
 type AssignStrategy = "even" | "by_payer" | "by_practice" | "by_pcp" | "by_partner" | "manual";
+type DataSource = "criteria" | "carefabric";
+
+interface CareFabricView {
+  id: string;
+  name: string;
+  schema: string;
+  description: string;
+  rowCount: number;
+  lastUpdated: string;
+  createdBy: string;
+}
+
+const MOCK_CAREFABRIC_VIEWS: CareFabricView[] = [
+  { id: "v1", name: "vw_awv_outreach_q1", schema: "med_econ", description: "Patients due for AWV in Q1 2026, filtered by active attribution", rowCount: 842, lastUpdated: "2026-03-22", createdBy: "J. Martinez (Med Econ)" },
+  { id: "v2", name: "vw_high_risk_hcc_gaps", schema: "med_econ", description: "High/very-high risk patients with ≥2 open HCC recapture opportunities", rowCount: 315, lastUpdated: "2026-03-20", createdBy: "J. Martinez (Med Econ)" },
+  { id: "v3", name: "vw_quality_gaps_humana", schema: "med_econ", description: "Humana members with open HEDIS quality gaps (A1C, BCS, COL)", rowCount: 1204, lastUpdated: "2026-03-24", createdBy: "S. Patel (Med Econ)" },
+  { id: "v4", name: "vw_new_attribution_30d", schema: "med_econ", description: "Newly attributed patients in the last 30 days across all payers", rowCount: 187, lastUpdated: "2026-03-25", createdBy: "S. Patel (Med Econ)" },
+  { id: "v5", name: "vw_ed_utilizers_ytd", schema: "med_econ", description: "Patients with 2+ ED visits YTD, eligible for care coordination outreach", rowCount: 423, lastUpdated: "2026-03-18", createdBy: "R. Kim (Analytics)" },
+  { id: "v6", name: "vw_starlift_disenrollment_risk", schema: "analytics", description: "Members flagged by Starlift model as high disenrollment risk", rowCount: 96, lastUpdated: "2026-03-21", createdBy: "R. Kim (Analytics)" },
+];
 
 export default function ChaseListBuilder() {
+  const [dataSource, setDataSource] = useState<DataSource>("criteria");
   const [openAWV, setOpenAWV] = useState(false);
   const [riskTiers, setRiskTiers] = useState<string[]>([]);
   const [minOpenHcc, setMinOpenHcc] = useState("");
@@ -34,6 +55,8 @@ export default function ChaseListBuilder() {
   const [listName, setListName] = useState("");
   const [assignStrategy, setAssignStrategy] = useState<AssignStrategy>("even");
   const [selectedTeammates, setSelectedTeammates] = useState<string[]>([]);
+  const [selectedView, setSelectedView] = useState<CareFabricView | null>(null);
+  const [viewSearch, setViewSearch] = useState("");
 
   const uniquePayers = useMemo(() => [...new Set(patients.map(p => p.payer))].sort(), []);
   const uniquePractices = useMemo(() => [...new Set(patients.map(p => p.practice))].sort(), []);
