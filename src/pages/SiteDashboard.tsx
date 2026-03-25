@@ -20,7 +20,7 @@ export default function SiteDashboard() {
   const kpis = [
     { label: "AWV Progress", value: `${awvPct}%`, sublabel: `${awvCompleted}/${awvGoal}` },
     { label: "Gaps Closed (Feb)", value: 83 },
-    { label: "RAF Captured", value: "+12.4" },
+    { label: "Open HCCs", value: 18 },
     { label: "Open Needs", value: needs.filter(n => n.status === "OPEN").length * 8 },
   ];
 

@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
-type SortKey = "risk" | "raf" | "gaps";
+type SortKey = "risk" | "openHcc" | "gaps";
 type SortDir = "asc" | "desc";
 type StatusFilter = "all" | "remaining" | "attempted" | "connected" | "scheduled";
 
@@ -86,7 +86,7 @@ export default function ChaseListsPage() {
     return [...pts].sort((a, b) => {
       let diff = 0;
       if (sortKey === "risk") diff = riskOrder[a.riskTier] - riskOrder[b.riskTier];
-      else if (sortKey === "raf") diff = a.rafOpportunity - b.rafOpportunity;
+      else if (sortKey === "openHcc") diff = a.openHccCount - b.openHccCount;
       else if (sortKey === "gaps") {
         const aGaps = getPatientNeeds(a.id).filter(n => n.status !== "COMPLETED").length;
         const bGaps = getPatientNeeds(b.id).filter(n => n.status !== "COMPLETED").length;
@@ -165,11 +165,11 @@ export default function ChaseListsPage() {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => {
-                  const header = "Name,Provider,Risk,RAF Opp,Open Gaps,Status\n";
+                  const header = "Name,Provider,Risk,Open HCCs,Open Gaps,Status\n";
                   const rows = listPatients.map(p => {
                     const gapCount = getPatientNeeds(p.id).filter(n => n.status !== "COMPLETED").length;
                     const status = getPatientStatus(p.id, selectedList);
-                    return `"${p.name}","${p.provider}","${p.riskTier}",${p.rafOpportunity},${gapCount},"${status}"`;
+                    return `"${p.name}","${p.provider}","${p.riskTier}",${p.openHccCount},${gapCount},"${status}"`;
                   }).join("\n");
                   const blob = new Blob([header + rows], { type: "text/csv" });
                   const url = URL.createObjectURL(blob);
@@ -248,7 +248,7 @@ export default function ChaseListsPage() {
                   <TableHead>Patient</TableHead>
                   <TableHead>Provider</TableHead>
                   <TableHead><SortButton k="risk" label="Risk" /></TableHead>
-                  <TableHead><SortButton k="raf" label="RAF Opp" /></TableHead>
+                  <TableHead><SortButton k="openHcc" label="Open HCCs" /></TableHead>
                   <TableHead><SortButton k="gaps" label="Open Gaps" /></TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Last Outreach</TableHead>
@@ -276,7 +276,7 @@ export default function ChaseListsPage() {
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell className="text-sm">{p.provider}</TableCell>
                       <TableCell><Badge variant="outline" className="capitalize">{p.riskTier.replace("_", " ")}</Badge></TableCell>
-                      <TableCell>+{p.rafOpportunity}</TableCell>
+                      <TableCell>{p.openHccCount}</TableCell>
                       <TableCell><Badge variant="secondary">{gapCount}</Badge></TableCell>
                       <TableCell>
                         <Badge variant="outline" className={cn("capitalize text-xs", statusColors[status])}>

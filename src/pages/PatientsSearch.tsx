@@ -56,7 +56,7 @@ export default function PatientsSearch() {
                 <TableHead>Practice</TableHead>
                 <TableHead>Provider</TableHead>
                 <TableHead>Risk</TableHead>
-                <TableHead>RAF Opp</TableHead>
+                <TableHead>Open HCCs</TableHead>
                 <TableHead>HCCs</TableHead>
                 <TableHead>Open Needs</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -79,7 +79,7 @@ export default function PatientsSearch() {
                         {p.riskTier.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">+{p.rafOpportunity}</TableCell>
+                    <TableCell className="font-medium">{p.openHccCount}</TableCell>
                     <TableCell>{p.hccCount}</TableCell>
                     <TableCell><Badge variant="secondary">{needCount}</Badge></TableCell>
                     <TableCell className="text-right">

@@ -15,7 +15,7 @@ export interface Patient {
   practice: string;
   provider: string;
   riskTier: RiskTier;
-  rafOpportunity: number;
+  openHccCount: number;
   hccCount: number;
   lastAWV: string | null;
   nextAppointment: string | null;
