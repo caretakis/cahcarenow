@@ -9,11 +9,12 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, Legend, Cell
+  LineChart, Line, Legend
 } from "recharts";
 import { TrendingUp, Phone, CalendarCheck, Users, Target, ChevronDown, ChevronRight, UserPlus, Download } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ReassignPatientsDialog } from "@/components/ReassignPatientsDialog";
 
 type DateRange = "today" | "week" | "month" | "custom";
 
@@ -30,8 +31,8 @@ export default function TeamProductivity() {
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateRange>("month");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
+  const [reassignUser, setReassignUser] = useState<{ userId: string; userName: string; patientIds: string[] } | null>(null);
 
-  // Summary metrics
   const totalCalls = userProductivity.reduce((s, u) => s + u.callsMade, 0);
   const totalConnected = userProductivity.reduce((s, u) => s + u.callsConnected, 0);
   const totalScheduled = userProductivity.reduce((s, u) => s + u.scheduled, 0);
@@ -44,7 +45,6 @@ export default function TeamProductivity() {
     { label: "Conversion Rate", value: `${conversionRate}%`, goal: "60%", icon: TrendingUp, trend: "+2%" },
   ];
 
-  // List progress data for stacked bar chart
   const activeLists = managedChaseLists.filter(l => l.status === "active");
   const listProgressData = activeLists.map(l => {
     const counts = getListStatusCounts(l);
@@ -59,7 +59,6 @@ export default function TeamProductivity() {
     };
   });
 
-  // Scheduling trend (aggregate daily calls from all users)
   const allDates = [...new Set(userProductivity.flatMap(u => u.dailyCalls.map(d => d.date)))].sort();
   const schedulingTrend = allDates.map(date => {
     const entry: Record<string, any> = { date: date.slice(5) };
@@ -81,6 +80,27 @@ export default function TeamProductivity() {
     "hsl(173, 58%, 39%)",
   ];
 
+  const handleExport = () => {
+    const header = "User,Lists Active,Patients,Calls Made,Connected,Voicemails,Scheduled,Conversion Rate,Avg Attempts,Goal %\n";
+    const rows = userProductivity.map(u =>
+      `"${u.userName}",${u.listsActive},${u.patientsAssigned},${u.callsMade},${u.callsConnected},${u.voicemails},${u.scheduled},${u.conversionRate}%,${u.avgAttemptsPerPatient},${u.goalPct}%`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "team_productivity_report.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Productivity report exported as CSV");
+  };
+
+  const getPatientIdsForUser = (userId: string) => {
+    return managedChaseLists
+      .filter(l => l.status === "active")
+      .flatMap(l => l.patients.filter(p => p.assignedTo === userId).map(p => p.patientId));
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
       <div className="flex items-center justify-between">
@@ -98,7 +118,7 @@ export default function TeamProductivity() {
               <SelectItem value="custom">Custom</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={() => toast.success("Report exported")}>
+          <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="h-4 w-4 mr-1" />Export
           </Button>
         </div>
@@ -128,11 +148,8 @@ export default function TeamProductivity() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* List Progress Chart */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">List Progress</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base">List Progress</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={listProgressData} layout="vertical" barSize={20}>
@@ -152,11 +169,8 @@ export default function TeamProductivity() {
           </CardContent>
         </Card>
 
-        {/* Scheduling Trend */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Scheduling Trend</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-2"><CardTitle className="text-base">Scheduling Trend</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={schedulingTrend}>
@@ -179,8 +193,7 @@ export default function TeamProductivity() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            Individual Productivity
+            <Users className="h-4 w-4 text-primary" />Individual Productivity
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -228,7 +241,6 @@ export default function TeamProductivity() {
                       <TableRow>
                         <TableCell colSpan={11} className="bg-muted/30 p-0">
                           <div className="p-4 space-y-4">
-                            {/* Active lists for this user */}
                             <div>
                               <h4 className="text-sm font-semibold mb-2">Active List Progress</h4>
                               <div className="grid grid-cols-2 gap-3">
@@ -251,7 +263,6 @@ export default function TeamProductivity() {
                               </div>
                             </div>
 
-                            {/* Daily call volume chart */}
                             <div>
                               <h4 className="text-sm font-semibold mb-2">Daily Call Volume (Last 14 Days)</h4>
                               <ResponsiveContainer width="100%" height={160}>
@@ -267,7 +278,11 @@ export default function TeamProductivity() {
                             </div>
 
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); toast.success("Reassignment dialog would open"); }}>
+                              <Button variant="outline" size="sm" onClick={(e) => {
+                                e.stopPropagation();
+                                const patientIds = getPatientIdsForUser(u.userId);
+                                setReassignUser({ userId: u.userId, userName: u.userName, patientIds });
+                              }}>
                                 <UserPlus className="h-3.5 w-3.5 mr-1" />Reassign Patients
                               </Button>
                             </div>
@@ -282,6 +297,15 @@ export default function TeamProductivity() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Reassign Dialog */}
+      <ReassignPatientsDialog
+        open={!!reassignUser}
+        onClose={() => setReassignUser(null)}
+        patientIds={reassignUser?.patientIds || []}
+        currentAssignees={reassignUser ? [{ userId: reassignUser.userId, userName: reassignUser.userName }] : []}
+        contextLabel={reassignUser ? `${reassignUser.userName}'s patients` : undefined}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { managedChaseLists, getListStatusCounts, getUserStatsForList, activityLog, managerTeam } from "@/data/managerData";
+import { managedChaseLists, getListStatusCounts, getUserStatsForList, activityLog } from "@/data/managerData";
 import type { ListPatientStatus } from "@/data/managerData";
 import { patients, getPatientNeeds } from "@/data/sampleData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Download, Pencil, UserPlus, ChevronDown, ChevronRight, Users, CalendarCheck, Phone, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ReassignPatientsDialog } from "@/components/ReassignPatientsDialog";
+import { EditListDialog } from "@/components/EditListDialog";
+import { MarkNotEligibleDialog } from "@/components/MarkNotEligibleDialog";
 
 const statusColors: Record<ListPatientStatus, string> = {
   untouched: "bg-muted text-muted-foreground",
@@ -41,6 +44,12 @@ export default function ListDetail() {
   const [patientUserFilter, setPatientUserFilter] = useState<string>("all");
   const [patientStatusFilter, setPatientStatusFilter] = useState<string>("all");
   const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
+
+  // Dialog state
+  const [showReassign, setShowReassign] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showNotEligible, setShowNotEligible] = useState(false);
+  const [reassignPatientIds, setReassignPatientIds] = useState<string[]>([]);
 
   const counts = list ? getListStatusCounts(list) : { untouched: 0, in_progress: 0, scheduled: 0, callback: 0, declined: 0, not_eligible: 0 };
   const total = list ? list.patients.length : 0;
@@ -85,14 +94,56 @@ export default function ListDetail() {
 
   const getPatient = (id: string) => patients.find(p => p.id === id);
 
+  const handleExport = () => {
+    if (!list) return;
+    const header = "Patient,Provider,Practice,Risk,RAF Opp,Assigned To,Status,Attempts,Last Attempt,Notes\n";
+    const rows = list.patients.map(lp => {
+      const pt = getPatient(lp.patientId);
+      const assignee = list.assignedUsers.find(u => u.userId === lp.assignedTo);
+      return `"${pt?.name || lp.patientId}","${pt?.provider || ""}","${pt?.practice || ""}","${pt?.riskTier || ""}",${pt?.rafOpportunity || 0},"${assignee?.userName || ""}","${lp.status}",${lp.attempts},"${lp.lastAttemptDate || ""}","${lp.notes}"`;
+    }).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${list.name.replace(/\s+/g, "_")}_patients.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Patient list exported as CSV");
+  };
+
+  const handleExportActivity = () => {
+    const header = "Timestamp,User,Patient,Action,Details\n";
+    const rows = listActivity.map(e =>
+      `"${e.timestamp}","${e.userName}","${e.patientName || ""}","${e.action}","${e.details}"`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${list?.name.replace(/\s+/g, "_")}_activity_log.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Activity log exported as CSV");
+  };
+
+  const openReassignAll = () => {
+    if (!list) return;
+    setReassignPatientIds(list.patients.map(p => p.patientId));
+    setShowReassign(true);
+  };
+
+  const openReassignSelected = () => {
+    setReassignPatientIds([...selectedPatientIds]);
+    setShowReassign(true);
+  };
+
   if (!list) return (
     <div className="p-8 text-center text-muted-foreground">
       <p>List not found</p>
       <Button variant="link" onClick={() => navigate("/manager/lists")}>Back to List Management</Button>
     </div>
   );
-
-
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-[1400px] mx-auto">
@@ -111,13 +162,13 @@ export default function ListDetail() {
           <p className="text-xs text-muted-foreground mt-0.5">Created {list.createdAt} · Due {list.dueDate}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => toast.success("Reassignment dialog would open")}>
+          <Button variant="outline" size="sm" onClick={openReassignAll}>
             <UserPlus className="h-4 w-4 mr-1" />Reassign
           </Button>
-          <Button variant="outline" size="sm" onClick={() => toast.success("Export started")}>
+          <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="h-4 w-4 mr-1" />Export
           </Button>
-          <Button variant="outline" size="sm" onClick={() => toast.success("Edit mode opened")}>
+          <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
             <Pencil className="h-4 w-4 mr-1" />Edit
           </Button>
         </div>
@@ -132,7 +183,6 @@ export default function ListDetail() {
 
         {/* ── Tab 1: Overview ── */}
         <TabsContent value="overview" className="space-y-6 mt-4">
-          {/* Metric Cards */}
           <div className="grid grid-cols-4 gap-4">
             {metrics.map(m => (
               <Card key={m.label}>
@@ -149,17 +199,11 @@ export default function ListDetail() {
             ))}
           </div>
 
-          {/* Progress Segment Bar */}
           <Card>
             <CardContent className="p-4">
               <div className="flex h-4 rounded-full overflow-hidden">
                 {segments.filter(s => s.count > 0).map(s => (
-                  <div
-                    key={s.key}
-                    className={cn("h-full transition-all", segmentColors[s.key])}
-                    style={{ width: `${(s.count / total) * 100}%` }}
-                    title={`${s.label}: ${s.count}`}
-                  />
+                  <div key={s.key} className={cn("h-full transition-all", segmentColors[s.key])} style={{ width: `${(s.count / total) * 100}%` }} title={`${s.label}: ${s.count}`} />
                 ))}
               </div>
               <div className="flex items-center gap-4 mt-3 flex-wrap">
@@ -173,11 +217,8 @@ export default function ListDetail() {
             </CardContent>
           </Card>
 
-          {/* Per-User Breakdown */}
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Per-User Breakdown</CardTitle>
-            </CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Per-User Breakdown</CardTitle></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
@@ -197,14 +238,8 @@ export default function ListDetail() {
                 <TableBody>
                   {userBreakdown.map(u => (
                     <>
-                      <TableRow
-                        key={u.userId}
-                        className="cursor-pointer hover:bg-muted/50"
-                        onClick={() => setExpandedUser(expandedUser === u.userId ? null : u.userId)}
-                      >
-                        <TableCell>
-                          {expandedUser === u.userId ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                        </TableCell>
+                      <TableRow key={u.userId} className="cursor-pointer hover:bg-muted/50" onClick={() => setExpandedUser(expandedUser === u.userId ? null : u.userId)}>
+                        <TableCell>{expandedUser === u.userId ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}</TableCell>
                         <TableCell className="font-medium">{u.userName}</TableCell>
                         <TableCell className="text-right">{u.stats.assigned}</TableCell>
                         <TableCell className="text-right">{u.stats.called}</TableCell>
@@ -236,10 +271,10 @@ export default function ListDetail() {
                                     const pt = getPatient(lp.patientId);
                                     return (
                                       <TableRow key={lp.patientId}>
-                                        <TableCell className="font-medium">{pt?.name || lp.patientId}</TableCell>
                                         <TableCell>
-                                          <Badge variant="outline" className={cn("capitalize text-xs", statusColors[lp.status])}>{lp.status.replace("_", " ")}</Badge>
+                                          <button className="font-medium text-primary hover:underline" onClick={() => pt && navigate(`/patients/${pt.id}`)}>{pt?.name || lp.patientId}</button>
                                         </TableCell>
+                                        <TableCell><Badge variant="outline" className={cn("capitalize text-xs", statusColors[lp.status])}>{lp.status.replace("_", " ")}</Badge></TableCell>
                                         <TableCell>{lp.attempts}</TableCell>
                                         <TableCell className="text-sm text-muted-foreground">{lp.lastAttemptDate || "—"}</TableCell>
                                         <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">{lp.notes || "—"}</TableCell>
@@ -254,7 +289,6 @@ export default function ListDetail() {
                       )}
                     </>
                   ))}
-                  {/* Totals row */}
                   <TableRow className="font-semibold border-t-2">
                     <TableCell></TableCell>
                     <TableCell>Total</TableCell>
@@ -303,10 +337,10 @@ export default function ListDetail() {
             {selectedPatientIds.length > 0 && (
               <div className="flex items-center gap-2 ml-auto">
                 <span className="text-sm text-muted-foreground">{selectedPatientIds.length} selected</span>
-                <Button variant="outline" size="sm" onClick={() => toast.success("Reassignment dialog would open")}>
+                <Button variant="outline" size="sm" onClick={openReassignSelected}>
                   <UserPlus className="h-3.5 w-3.5 mr-1" />Reassign
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => toast.success("Marked as not eligible")}>
+                <Button variant="outline" size="sm" onClick={() => setShowNotEligible(true)}>
                   Mark Not Eligible
                 </Button>
               </div>
@@ -358,9 +392,7 @@ export default function ListDetail() {
                           />
                         </TableCell>
                         <TableCell>
-                          <button className="font-medium text-primary hover:underline" onClick={() => navigate(`/patients/${pt.id}`)}>
-                            {pt.name}
-                          </button>
+                          <button className="font-medium text-primary hover:underline" onClick={() => navigate(`/patients/${pt.id}`)}>{pt.name}</button>
                         </TableCell>
                         <TableCell className="text-sm">
                           {pt.provider}<br /><span className="text-xs text-muted-foreground">{pt.practice}</span>
@@ -398,7 +430,7 @@ export default function ListDetail() {
         <TabsContent value="activity" className="space-y-4 mt-4">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">{listActivity.length} activities recorded</p>
-            <Button variant="outline" size="sm" onClick={() => toast.success("Activity log exported")}>
+            <Button variant="outline" size="sm" onClick={handleExportActivity}>
               <Download className="h-4 w-4 mr-1" />Export
             </Button>
           </div>
@@ -436,6 +468,17 @@ export default function ListDetail() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Dialogs */}
+      <ReassignPatientsDialog
+        open={showReassign}
+        onClose={() => { setShowReassign(false); setReassignPatientIds([]); }}
+        patientIds={reassignPatientIds}
+        currentAssignees={list.assignedUsers.map(u => ({ userId: u.userId, userName: u.userName }))}
+        contextLabel={list.name}
+      />
+      <EditListDialog open={showEdit} onClose={() => setShowEdit(false)} list={list} />
+      <MarkNotEligibleDialog open={showNotEligible} onClose={() => { setShowNotEligible(false); setSelectedPatientIds([]); }} patientIds={selectedPatientIds} />
     </div>
   );
 }
