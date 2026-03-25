@@ -42,19 +42,11 @@ export default function ListDetail() {
   const [patientStatusFilter, setPatientStatusFilter] = useState<string>("all");
   const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
 
-  if (!list) return (
-    <div className="p-8 text-center text-muted-foreground">
-      <p>List not found</p>
-      <Button variant="link" onClick={() => navigate("/manager/lists")}>Back to List Management</Button>
-    </div>
-  );
-
-  const counts = getListStatusCounts(list);
-  const total = list.patients.length;
+  const counts = list ? getListStatusCounts(list) : { untouched: 0, in_progress: 0, scheduled: 0, callback: 0, declined: 0, not_eligible: 0 };
+  const total = list ? list.patients.length : 0;
   const completed = counts.scheduled + counts.declined + counts.not_eligible;
   const remaining = total - completed;
 
-  // Overview metrics
   const metrics = [
     { label: "Total Patients", value: total, icon: Users },
     { label: "Completed", value: completed, icon: Phone },
@@ -62,17 +54,15 @@ export default function ListDetail() {
     { label: "Remaining", value: remaining, icon: Clock },
   ];
 
-  // Per-user breakdown
-  const userBreakdown = list.assignedUsers.map(u => ({
+  const userBreakdown = list ? list.assignedUsers.map(u => ({
     ...u,
     stats: getUserStatsForList(list, u.userId),
     conversionRate: (() => {
       const s = getUserStatsForList(list, u.userId);
       return s.connected > 0 ? Math.round((s.scheduled / s.connected) * 100) : 0;
     })(),
-  }));
+  })) : [];
 
-  // Segment bar data
   const segments = [
     { key: "scheduled", label: "Scheduled", count: counts.scheduled },
     { key: "callback", label: "Callback", count: counts.callback },
@@ -82,14 +72,25 @@ export default function ListDetail() {
     { key: "untouched", label: "Untouched", count: counts.untouched },
   ];
 
-  // Patient detail filtering
   const filteredPatients = useMemo(() => {
+    if (!list) return [];
     return list.patients.filter(p => {
       if (patientUserFilter !== "all" && p.assignedTo !== patientUserFilter) return false;
       if (patientStatusFilter !== "all" && p.status !== patientStatusFilter) return false;
       return true;
     });
-  }, [list.patients, patientUserFilter, patientStatusFilter]);
+  }, [list?.patients, patientUserFilter, patientStatusFilter]);
+
+  const listActivity = list ? activityLog.filter(a => a.listId === list.id).sort((a, b) => b.timestamp.localeCompare(a.timestamp)) : [];
+
+  const getPatient = (id: string) => patients.find(p => p.id === id);
+
+  if (!list) return (
+    <div className="p-8 text-center text-muted-foreground">
+      <p>List not found</p>
+      <Button variant="link" onClick={() => navigate("/manager/lists")}>Back to List Management</Button>
+    </div>
+  );
 
   // Activity log for this list
   const listActivity = activityLog.filter(a => a.listId === list.id).sort((a, b) => b.timestamp.localeCompare(a.timestamp));
