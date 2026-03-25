@@ -8,7 +8,7 @@ import { useState, useMemo } from "react";
 import { patients } from "@/data/sampleData";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, Save, X, Users, Split, Building2, UserCheck, Check } from "lucide-react";
+import { Upload, Save, X, Users, Split, Building2, UserCheck, Check, Database, Search, Table2, Clock, ChevronRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
