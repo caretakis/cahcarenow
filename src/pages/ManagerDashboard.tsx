@@ -132,10 +132,10 @@ export default function ManagerDashboard() {
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={teamProductivity} barGap={2}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="name" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="name" tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <YAxis tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
                 <Bar dataKey="calls" fill="hsl(210, 80%, 55%)" radius={[2, 2, 0, 0]} name="Calls" />
                 <Bar dataKey="contacts" fill="hsl(173, 58%, 39%)" radius={[2, 2, 0, 0]} name="Contacts" />
                 <Bar dataKey="scheduled" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Scheduled" />
@@ -156,10 +156,10 @@ export default function ManagerDashboard() {
            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={gapsByType} barGap={2} className="cursor-pointer">
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="type" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="type" tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <YAxis tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
                 <Bar dataKey="open" fill="hsl(37, 90%, 55%)" radius={[2, 2, 0, 0]} name="Open" onClick={handleGapClick} className="cursor-pointer" />
                 <Bar dataKey="closed" fill="hsl(152, 60%, 40%)" radius={[2, 2, 0, 0]} name="Closed" onClick={handleGapClick} className="cursor-pointer" />
               </BarChart>
@@ -186,6 +186,7 @@ export default function ManagerDashboard() {
                   outerRadius={90}
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}`}
+                  labelLine={{ stroke: "hsl(var(--foreground))" }}
                   className="cursor-pointer"
                   onClick={handleTocSliceClick}
                 >
@@ -193,8 +194,8 @@ export default function ManagerDashboard() {
                     <Cell key={i} fill={entry.fill} />
                   ))}
                 </Pie>
-                <Tooltip />
-                <Legend />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -212,10 +213,10 @@ export default function ManagerDashboard() {
             <ResponsiveContainer width="100%" height={240}>
               <LineChart data={weeklyTrend}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="week" className="text-xs" />
-                <YAxis className="text-xs" />
-                <Tooltip />
-                <Legend />
+                <XAxis dataKey="week" tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <YAxis tick={{ fill: "hsl(var(--foreground))", fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }} />
+                <Legend wrapperStyle={{ color: "hsl(var(--foreground))" }} />
                 <Line type="monotone" dataKey="gapsClosed" stroke="hsl(152, 60%, 40%)" strokeWidth={2} name="Gaps Closed" />
                 <Line type="monotone" dataKey="awvCompleted" stroke="hsl(173, 58%, 39%)" strokeWidth={2} name="AWVs" />
                 <Line type="monotone" dataKey="scheduled" stroke="hsl(210, 80%, 55%)" strokeWidth={2} name="Scheduled" />
