@@ -185,7 +185,7 @@ export default function ManagerDashboard() {
                   innerRadius={55}
                   outerRadius={90}
                   dataKey="value"
-                  label={({ name, value }) => `${name}: ${value}`}
+                  label={({ name, value, x, y }) => <text x={x} y={y} fill="hsl(var(--foreground))" fontSize={12} textAnchor="middle">{`${name}: ${value}`}</text>}
                   labelLine={{ stroke: "hsl(var(--foreground))" }}
                   className="cursor-pointer"
                   onClick={handleTocSliceClick}
