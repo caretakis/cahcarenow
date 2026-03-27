@@ -227,90 +227,151 @@ export default function ChaseListsPage() {
       </div>
 
       {/* Main Content */}
-      {selectedList ? (
+      {(selectedList || selectedCampaign) ? (
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
           <div className="p-5 pb-3 space-y-4 border-b">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold">{selectedList.name}</h1>
-                <p className="text-sm text-muted-foreground">Created by {selectedList.createdBy} · {selectedList.createdAt}</p>
+                <div className="flex items-center gap-2">
+                  {selectedCampaign && <Zap className="h-4 w-4 text-chart-4" />}
+                  <h1 className="text-xl font-bold">{selectedList?.name || selectedCampaign?.name}</h1>
+                  {selectedCampaign && (
+                    <Badge variant="outline" className="text-xs bg-chart-4/10 text-chart-4 border-chart-4/30">Campaign</Badge>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {selectedList
+                    ? `Created by ${selectedList.createdBy} · ${selectedList.createdAt}`
+                    : `Event-driven · ${selectedCampaign!.slaDays}-day SLA · ${selectedCampaign!.description}`
+                  }
+                </p>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => {
-                  const header = "Name,Provider,Risk,Open HCCs,Open Gaps,Status\n";
+                  const name = selectedList?.name || selectedCampaign?.name || "export";
+                  const header = selectedCampaign
+                    ? "Name,Provider,Risk,Attribution Date,SLA Due,SLA Status\n"
+                    : "Name,Provider,Risk,Open HCCs,Open Gaps,Status\n";
                   const rows = listPatients.map(p => {
+                    if (selectedCampaign) {
+                      const cp = getCampaignPatient(p.id);
+                      return `"${p.name}","${p.provider}","${p.riskTier}","${cp?.triggeredAt || ""}","${cp?.slaDueDate || ""}","${cp?.slaStatus || ""}"`;
+                    }
                     const gapCount = getPatientNeeds(p.id).filter(n => n.status !== "COMPLETED").length;
-                    const status = getPatientStatus(p.id, selectedList);
+                    const status = getPatientStatus(p.id, selectedList!);
                     return `"${p.name}","${p.provider}","${p.riskTier}",${p.openHccCount},${gapCount},"${status}"`;
                   }).join("\n");
                   const blob = new Blob([header + rows], { type: "text/csv" });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");
                   a.href = url;
-                  a.download = `${selectedList.name.replace(/\s+/g, "_")}.csv`;
+                  a.download = `${name.replace(/\s+/g, "_")}.csv`;
                   a.click();
                   URL.revokeObjectURL(url);
-                  toast.success("Chase list exported as CSV");
+                  toast.success("Exported as CSV");
                 }}><Download className="h-4 w-4 mr-1" />Export</Button>
               </div>
             </div>
 
             {/* Progress */}
-            <div className="rounded-lg border bg-card p-4">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Trophy className="h-4 w-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">Your Progress</p>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedList.stats.total - selectedList.stats.remaining} of {selectedList.stats.total} patients worked · {selectedList.stats.scheduled} scheduled
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-2xl font-bold text-primary">{selectedList.stats.total - selectedList.stats.remaining}</span>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">of {selectedList.stats.total} worked</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-16">Worked</span>
-                  <Progress value={selectedList.stats.total > 0 ? Math.round(((selectedList.stats.total - selectedList.stats.remaining) / selectedList.stats.total) * 100) : 0} className="h-2 flex-1" />
-                  <span className="text-xs font-medium w-20 text-right">{selectedList.stats.total - selectedList.stats.remaining} / {selectedList.stats.total}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-muted-foreground w-16">Scheduled</span>
-                  <Progress value={selectedList.stats.total > 0 ? Math.round((selectedList.stats.scheduled / selectedList.stats.total) * 100) : 0} className="h-2 flex-1 [&>div]:bg-chart-2" />
-                  <span className="text-xs font-medium w-20 text-right">{selectedList.stats.scheduled} / {selectedList.stats.total}</span>
-                </div>
-              </div>
-            </div>
+            {(() => {
+              const stats = selectedList?.stats || selectedCampaign?.stats;
+              if (!stats) return null;
+              const worked = stats.total - stats.remaining;
+              return (
+                <div className="rounded-lg border bg-card p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+                      {selectedCampaign ? <Zap className="h-4 w-4 text-primary" /> : <Trophy className="h-4 w-4 text-primary" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold">Your Progress</p>
+                      <p className="text-xs text-muted-foreground">
+                        {worked} of {stats.total} patients worked · {stats.scheduled} scheduled
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-2xl font-bold text-primary">{worked}</span>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">of {stats.total} worked</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-16">Worked</span>
+                      <Progress value={stats.total > 0 ? Math.round((worked / stats.total) * 100) : 0} className="h-2 flex-1" />
+                      <span className="text-xs font-medium w-20 text-right">{worked} / {stats.total}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-16">Scheduled</span>
+                      <Progress value={stats.total > 0 ? Math.round((stats.scheduled / stats.total) * 100) : 0} className="h-2 flex-1 [&>div]:bg-chart-2" />
+                      <span className="text-xs font-medium w-20 text-right">{stats.scheduled} / {stats.total}</span>
+                    </div>
+                  </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-3">
+                  {/* Campaign SLA breakdown */}
+                  {selectedCampaign && (
+                    <div className="flex items-center gap-4 mt-3 pt-3 border-t">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-chart-2" />
+                        <span className="text-muted-foreground">On Track</span>
+                        <span className="font-semibold">{selectedCampaign.stats.onTrack}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-warning" />
+                        <span className="text-muted-foreground">At Risk</span>
+                        <span className="font-semibold">{selectedCampaign.stats.atRisk}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <div className="h-2 w-2 rounded-full bg-destructive" />
+                        <span className="text-muted-foreground">Overdue</span>
+                        <span className="font-semibold">{selectedCampaign.stats.overdue}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* KPIs and Filter (lists only) */}
+            {selectedList && (
+              <>
+                <div className="flex items-center gap-3">
+                  <TopKPIBar items={[
+                    { label: "Total", value: selectedList.stats.total },
+                    { label: "Remaining", value: selectedList.stats.remaining },
+                    { label: "Attempted", value: selectedList.stats.attempted },
+                    { label: "Connected", value: selectedList.stats.connected },
+                    { label: "Scheduled", value: selectedList.stats.scheduled },
+                  ]} />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Filter:</span>
+                  {(["all", "remaining", "attempted", "connected", "scheduled"] as StatusFilter[]).map(s => (
+                    <Button
+                      key={s}
+                      variant={statusFilter === s ? "default" : "outline"}
+                      size="sm"
+                      className="h-7 text-xs capitalize"
+                      onClick={() => setStatusFilter(s)}
+                    >
+                      {s}
+                    </Button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Campaign KPIs */}
+            {selectedCampaign && (
               <TopKPIBar items={[
-                { label: "Total", value: selectedList.stats.total },
-                { label: "Remaining", value: selectedList.stats.remaining },
-                { label: "Attempted", value: selectedList.stats.attempted },
-                { label: "Connected", value: selectedList.stats.connected },
-                { label: "Scheduled", value: selectedList.stats.scheduled },
+                { label: "Total", value: selectedCampaign.stats.total },
+                { label: "Remaining", value: selectedCampaign.stats.remaining },
+                { label: "On Track", value: selectedCampaign.stats.onTrack },
+                { label: "At Risk", value: selectedCampaign.stats.atRisk },
+                { label: "Overdue", value: selectedCampaign.stats.overdue },
               ]} />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Filter:</span>
-              {(["all", "remaining", "attempted", "connected", "scheduled"] as StatusFilter[]).map(s => (
-                <Button
-                  key={s}
-                  variant={statusFilter === s ? "default" : "outline"}
-                  size="sm"
-                  className="h-7 text-xs capitalize"
-                  onClick={() => setStatusFilter(s)}
-                >
-                  {s}
-                </Button>
-              ))}
-            </div>
+            )}
           </div>
 
           {/* Table */}
@@ -321,9 +382,12 @@ export default function ChaseListsPage() {
                   <TableHead>Patient</TableHead>
                   <TableHead>Provider</TableHead>
                   <TableHead><SortButton k="risk" label="Risk" /></TableHead>
-                  <TableHead><SortButton k="openHcc" label="Open HCCs" /></TableHead>
-                  <TableHead><SortButton k="gaps" label="Open Gaps" /></TableHead>
-                  <TableHead>Status</TableHead>
+                  {selectedCampaign && <TableHead>Attribution Date</TableHead>}
+                  {selectedCampaign && <TableHead>SLA Due</TableHead>}
+                  {selectedCampaign && <TableHead>SLA Status</TableHead>}
+                  {selectedList && <TableHead><SortButton k="openHcc" label="Open HCCs" /></TableHead>}
+                  {selectedList && <TableHead><SortButton k="gaps" label="Open Gaps" /></TableHead>}
+                  {selectedList && <TableHead>Status</TableHead>}
                   <TableHead>Last Outreach</TableHead>
                   <TableHead>Last AWV</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -333,7 +397,20 @@ export default function ChaseListsPage() {
                 {listPatients.map(p => {
                   const gapCount = getPatientNeeds(p.id).filter(n => n.status !== "COMPLETED").length;
                   const lastOutreach = getPatientOutreach(p.id)[0];
-                  const status = getPatientStatus(p.id, selectedList);
+                  const cp = selectedCampaign ? getCampaignPatient(p.id) : null;
+
+                  // SLA styling
+                  const slaColors: Record<string, string> = {
+                    on_track: "bg-chart-2/10 text-chart-2 border-chart-2/30",
+                    at_risk: "bg-warning/10 text-warning border-warning/30",
+                    overdue: "bg-destructive/10 text-destructive border-destructive/30",
+                    completed: "bg-success/10 text-success border-success/30",
+                  };
+
+                  // Days remaining for SLA
+                  const daysLeft = cp ? differenceInDays(parseISO(cp.slaDueDate), new Date()) : null;
+
+                  const status = selectedList ? getPatientStatus(p.id, selectedList) : null;
                   const statusColors: Record<string, string> = {
                     remaining: "bg-muted text-muted-foreground",
                     attempted: "bg-warning/10 text-warning border-warning/30",
@@ -349,13 +426,45 @@ export default function ChaseListsPage() {
                       <TableCell className="font-medium">{p.name}</TableCell>
                       <TableCell className="text-sm">{p.provider}</TableCell>
                       <TableCell><Badge variant="outline" className="capitalize">{p.riskTier.replace("_", " ")}</Badge></TableCell>
-                      <TableCell>{p.openHccCount}</TableCell>
-                      <TableCell><Badge variant="secondary">{gapCount}</Badge></TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={cn("capitalize text-xs", statusColors[status])}>
-                          {status}
-                        </Badge>
-                      </TableCell>
+
+                      {/* Campaign-specific columns */}
+                      {selectedCampaign && cp && (
+                        <>
+                          <TableCell className="text-sm">{cp.triggeredAt}</TableCell>
+                          <TableCell className="text-sm">
+                            <span className={cn(
+                              daysLeft !== null && daysLeft < 0 && "text-destructive font-medium",
+                              daysLeft !== null && daysLeft >= 0 && daysLeft <= 5 && "text-warning font-medium"
+                            )}>
+                              {cp.slaDueDate}
+                              {daysLeft !== null && (
+                                <span className="ml-1 text-xs">
+                                  ({daysLeft < 0 ? `${Math.abs(daysLeft)}d overdue` : `${daysLeft}d left`})
+                                </span>
+                              )}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={cn("capitalize text-xs", slaColors[cp.slaStatus])}>
+                              {cp.slaStatus.replace("_", " ")}
+                            </Badge>
+                          </TableCell>
+                        </>
+                      )}
+
+                      {/* List-specific columns */}
+                      {selectedList && (
+                        <>
+                          <TableCell>{p.openHccCount}</TableCell>
+                          <TableCell><Badge variant="secondary">{gapCount}</Badge></TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={cn("capitalize text-xs", statusColors[status || ""])}>
+                              {status}
+                            </Badge>
+                          </TableCell>
+                        </>
+                      )}
+
                       <TableCell className="text-sm text-muted-foreground">
                         {lastOutreach ? (
                           <span title={lastOutreach.outcome}>{lastOutreach.timestamp.slice(0, 10)}</span>
@@ -377,7 +486,7 @@ export default function ChaseListsPage() {
                 })}
                 {listPatients.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={selectedCampaign ? 9 : 9} className="text-center py-8 text-muted-foreground">
                       No patients match the selected filter
                     </TableCell>
                   </TableRow>
@@ -390,7 +499,7 @@ export default function ChaseListsPage() {
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center space-y-2">
             <List className="h-10 w-10 mx-auto opacity-40" />
-            <p>Select a chase list to get started</p>
+            <p>Select a chase list or campaign to get started</p>
           </div>
         </div>
       )}
