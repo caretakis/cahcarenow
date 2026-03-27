@@ -37,18 +37,22 @@ function getPatientStatus(patientId: string, list: ChaseList): StatusFilter {
   return "remaining";
 }
 
+type SelectedItem = { type: "list"; id: string } | { type: "campaign"; id: string };
+
 export default function ChaseListsPage() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialList = searchParams.get("list") || chaseLists[0]?.id || null;
-  const [selectedListId, setSelectedListId] = useState<string | null>(initialList);
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(
+    initialList ? { type: "list", id: initialList } : null
+  );
 
   useEffect(() => {
     const paramList = searchParams.get("list");
-    if (paramList && paramList !== selectedListId) {
-      setSelectedListId(paramList);
+    if (paramList && (selectedItem?.type !== "list" || selectedItem?.id !== paramList)) {
+      setSelectedItem({ type: "list", id: paramList });
       setSearchParams({}, { replace: true });
     }
   }, [searchParams]);
@@ -61,7 +65,8 @@ export default function ChaseListsPage() {
   const [scheduleVisitType, setScheduleVisitType] = useState("");
   const [scheduleNotes, setScheduleNotes] = useState("");
 
-  const selectedList = chaseLists.find(l => l.id === selectedListId) ?? null;
+  const selectedList = selectedItem?.type === "list" ? chaseLists.find(l => l.id === selectedItem.id) ?? null : null;
+  const selectedCampaign = selectedItem?.type === "campaign" ? campaigns.find(c => c.id === selectedItem.id) ?? null : null;
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
