@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { chaseLists, patients, getPatientNeeds, getPatientOutreach } from "@/data/sampleData";
-import type { Patient, ChaseList } from "@/data/models";
+import { chaseLists, campaigns, patients, getPatientNeeds, getPatientOutreach } from "@/data/sampleData";
+import type { Patient, ChaseList, Campaign, CampaignPatient } from "@/data/models";
 import { PatientDrawer } from "@/components/PatientDrawer";
 import { TopKPIBar } from "@/components/TopKPIBar";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List, CalendarIcon } from "lucide-react";
+import { Phone, Calendar, Download, CheckCircle, ArrowUpDown, Trophy, Plus, List, CalendarIcon, Zap, Clock, AlertTriangle } from "lucide-react";
 import { CallWorkspaceModal } from "@/components/CallWorkspaceModal";
 import { useNavigate } from "react-router-dom";
 import { ViewingAsSelector } from "@/components/ViewingAsSelector";
@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { differenceInDays, parseISO } from "date-fns";
 
 type SortKey = "risk" | "openHcc" | "gaps";
 type SortDir = "asc" | "desc";
