@@ -159,7 +159,7 @@ export interface ChaseList {
   stats: { total: number; remaining: number; attempted: number; connected: number; scheduled: number };
 }
 
-export type CampaignTrigger = "newly_attributed" | "ed_visit" | "hospital_discharge" | "gap_opened";
+export type CampaignTrigger = "newly_attributed" | "ed_visit" | "hospital_discharge" | "gap_opened" | "missed_appointment" | "quality_gap" | "no_awv";
 
 export interface CampaignPatient {
   patientId: string;
