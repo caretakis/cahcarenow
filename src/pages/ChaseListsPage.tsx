@@ -139,41 +139,8 @@ export default function ChaseListsPage() {
           <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
         </div>
         <div className="flex-1 overflow-auto">
-          {/* Chase Lists Section */}
-          <div className="px-4 pt-3 pb-1">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chase Lists</p>
-          </div>
-          {chaseLists.map(list => {
-            const isActive = selectedItem?.type === "list" && selectedItem.id === list.id;
-            const worked = list.stats.total - list.stats.remaining;
-            const pct = list.stats.total > 0 ? Math.round((worked / list.stats.total) * 100) : 0;
-            return (
-              <button
-                key={list.id}
-                onClick={() => {
-                  setSelectedItem({ type: "list", id: list.id });
-                  setSelectedPatient(null);
-                  setStatusFilter("all");
-                }}
-                className={cn(
-                  "w-full text-left px-4 py-3 border-b transition-colors",
-                  isActive
-                    ? "bg-primary/5 border-l-2 border-l-primary"
-                    : "hover:bg-muted/50 border-l-2 border-l-transparent"
-                )}
-              >
-                <p className={cn("text-sm font-medium truncate", isActive && "text-primary")}>{list.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{list.createdBy} · {list.stats.total} patients</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Progress value={pct} className="h-1.5 flex-1" />
-                  <span className="text-[10px] text-muted-foreground font-medium">{worked}/{list.stats.total}</span>
-                </div>
-              </button>
-            );
-          })}
-
           {/* Campaigns Section */}
-          <div className="px-4 pt-4 pb-1">
+          <div className="px-4 pt-3 pb-1">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
               <Zap className="h-3 w-3" /> Campaigns
             </p>
@@ -220,6 +187,39 @@ export default function ChaseListsPage() {
                     )}
                   </div>
                 )}
+              </button>
+            );
+          })}
+
+          {/* Chase Lists Section */}
+          <div className="px-4 pt-4 pb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chase Lists</p>
+          </div>
+          {chaseLists.map(list => {
+            const isActive = selectedItem?.type === "list" && selectedItem.id === list.id;
+            const worked = list.stats.total - list.stats.remaining;
+            const pct = list.stats.total > 0 ? Math.round((worked / list.stats.total) * 100) : 0;
+            return (
+              <button
+                key={list.id}
+                onClick={() => {
+                  setSelectedItem({ type: "list", id: list.id });
+                  setSelectedPatient(null);
+                  setStatusFilter("all");
+                }}
+                className={cn(
+                  "w-full text-left px-4 py-3 border-b transition-colors",
+                  isActive
+                    ? "bg-primary/5 border-l-2 border-l-primary"
+                    : "hover:bg-muted/50 border-l-2 border-l-transparent"
+                )}
+              >
+                <p className={cn("text-sm font-medium truncate", isActive && "text-primary")}>{list.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{list.createdBy} · {list.stats.total} patients</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Progress value={pct} className="h-1.5 flex-1" />
+                  <span className="text-[10px] text-muted-foreground font-medium">{worked}/{list.stats.total}</span>
+                </div>
               </button>
             );
           })}
