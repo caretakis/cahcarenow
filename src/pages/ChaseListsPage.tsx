@@ -139,15 +139,19 @@ export default function ChaseListsPage() {
           <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
         </div>
         <div className="flex-1 overflow-auto">
+          {/* Chase Lists Section */}
+          <div className="px-4 pt-3 pb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Chase Lists</p>
+          </div>
           {chaseLists.map(list => {
-            const isActive = list.id === selectedListId;
+            const isActive = selectedItem?.type === "list" && selectedItem.id === list.id;
             const worked = list.stats.total - list.stats.remaining;
             const pct = list.stats.total > 0 ? Math.round((worked / list.stats.total) * 100) : 0;
             return (
               <button
                 key={list.id}
                 onClick={() => {
-                  setSelectedListId(list.id);
+                  setSelectedItem({ type: "list", id: list.id });
                   setSelectedPatient(null);
                   setStatusFilter("all");
                 }}
@@ -164,6 +168,58 @@ export default function ChaseListsPage() {
                   <Progress value={pct} className="h-1.5 flex-1" />
                   <span className="text-[10px] text-muted-foreground font-medium">{worked}/{list.stats.total}</span>
                 </div>
+              </button>
+            );
+          })}
+
+          {/* Campaigns Section */}
+          <div className="px-4 pt-4 pb-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+              <Zap className="h-3 w-3" /> Campaigns
+            </p>
+          </div>
+          {campaigns.map(camp => {
+            const isActive = selectedItem?.type === "campaign" && selectedItem.id === camp.id;
+            const worked = camp.stats.total - camp.stats.remaining;
+            const pct = camp.stats.total > 0 ? Math.round((worked / camp.stats.total) * 100) : 0;
+            return (
+              <button
+                key={camp.id}
+                onClick={() => {
+                  setSelectedItem({ type: "campaign", id: camp.id });
+                  setSelectedPatient(null);
+                  setStatusFilter("all");
+                }}
+                className={cn(
+                  "w-full text-left px-4 py-3 border-b transition-colors",
+                  isActive
+                    ? "bg-primary/5 border-l-2 border-l-primary"
+                    : "hover:bg-muted/50 border-l-2 border-l-transparent"
+                )}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Zap className="h-3 w-3 text-chart-4 shrink-0" />
+                  <p className={cn("text-sm font-medium truncate", isActive && "text-primary")}>{camp.name}</p>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Event-driven · {camp.stats.total} patients</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Progress value={pct} className="h-1.5 flex-1" />
+                  <span className="text-[10px] text-muted-foreground font-medium">{worked}/{camp.stats.total}</span>
+                </div>
+                {(camp.stats.atRisk > 0 || camp.stats.overdue > 0) && (
+                  <div className="flex items-center gap-2 mt-1.5">
+                    {camp.stats.atRisk > 0 && (
+                      <span className="text-[10px] text-warning flex items-center gap-0.5">
+                        <Clock className="h-2.5 w-2.5" /> {camp.stats.atRisk} at risk
+                      </span>
+                    )}
+                    {camp.stats.overdue > 0 && (
+                      <span className="text-[10px] text-destructive flex items-center gap-0.5">
+                        <AlertTriangle className="h-2.5 w-2.5" /> {camp.stats.overdue} overdue
+                      </span>
+                    )}
+                  </div>
+                )}
               </button>
             );
           })}
