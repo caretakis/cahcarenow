@@ -19,7 +19,7 @@ export const roleDescriptions: Record<UserRole, string> = {
 // Which nav modules each role can access
 export const roleModules: Record<UserRole, string[]> = {
   coordinator: ["/queues", "/lists", "/patients"],
-  advanced_coordinator: ["/queues", "/lists", "/toc", "/patients"],
+  advanced_coordinator: ["/queues", "/lists", "/toc", "/med-adherence", "/patients"],
   care_manager: ["/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients"],
   manager: ["/dashboards", "/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients", "/manager", "/admin"],
 };
