@@ -18,6 +18,7 @@ const iconMap: Record<string, any> = {
   clock: Clock,
   pill: Pill,
   clipboard: ClipboardList,
+  usercheck: UserCheck,
 };
 
 // Which queue cards each role sees
@@ -127,9 +128,13 @@ export default function WorkQueuesHome() {
     return allQueues.filter(q => visibleIds.includes(q.id));
   }, [role]);
 
-  const totalOpen = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
-  const totalOverdue = needs.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
-  const totalCompleted = needs.filter(n => n.status === "COMPLETED").length;
+  // Filter needs relevant to this role's scope
+  const allowedNeedTypes = roleNeedTypes[role];
+  const relevantNeeds = needs.filter(n => allowedNeedTypes.includes(n.type));
+
+  const totalOpen = relevantNeeds.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
+  const totalOverdue = relevantNeeds.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
+  const totalCompleted = relevantNeeds.filter(n => n.status === "COMPLETED").length;
   const totalAll = totalOpen + totalCompleted;
   const overallPct = totalAll > 0 ? Math.round((totalCompleted / totalAll) * 100) : 0;
 
@@ -140,9 +145,9 @@ export default function WorkQueuesHome() {
     { label: "Overall Progress", value: `${overallPct}%`, sublabel: `${totalCompleted}/${totalAll} gaps closed` },
   ];
 
-  // Priority actions: open needs sorted by urgency then impact
+  // Priority actions: open needs sorted by urgency then impact, filtered by role
   const priorityActions = useMemo(() => {
-    const openNeeds = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
+    const openNeeds = relevantNeeds.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
     return openNeeds
       .map(n => {
         const patient = patients.find(p => p.id === n.patientId);
