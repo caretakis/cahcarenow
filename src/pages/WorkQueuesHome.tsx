@@ -162,7 +162,7 @@ export default function WorkQueuesHome() {
         if (!a.isDueSoon && b.isDueSoon) return 1;
         return b.impactScore - a.impactScore;
       });
-  }, []);
+  }, [role]);
 
   const [showAll, setShowAll] = useState(false);
   const visibleActions = showAll ? priorityActions : priorityActions.slice(0, 8);
@@ -189,7 +189,7 @@ export default function WorkQueuesHome() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
-          <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+          <p className="text-muted-foreground mt-1">{roleSubtitles[role]}</p>
         </div>
         <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
