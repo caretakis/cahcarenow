@@ -20,36 +20,56 @@ const iconMap: Record<string, any> = {
   clipboard: ClipboardList,
 };
 
+// Which queue cards each role sees
+const roleQueueIds: Record<UserRole, string[]> = {
+  coordinator: ["scheduling_awv_quality"],
+  advanced_coordinator: ["toc_discharged_uncontacted", "med_adherence_at_risk", "scheduling_awv_quality"],
+  care_manager: ["program_overdue", "toc_escalations", "med_adherence_at_risk"],
+  manager: ["scheduling_awv_quality", "toc_discharged_uncontacted", "med_adherence_at_risk", "program_overdue"],
+};
+
+// Which need types show in priority actions per role
+const roleNeedTypes: Record<UserRole, NeedType[]> = {
+  coordinator: ["AWV", "QUALITY_GAP"],
+  advanced_coordinator: ["AWV", "QUALITY_GAP", "TOC_STEP", "MED_ADHERENCE"],
+  care_manager: ["PROGRAM_CHECKPOINT", "TOC_STEP", "MED_ADHERENCE", "HCC_RECAPTURE"],
+  manager: ["AWV", "QUALITY_GAP", "HCC_RECAPTURE", "TOC_STEP", "MED_ADHERENCE", "PROGRAM_CHECKPOINT", "SUPP_DOC"],
+};
+
+const roleSubtitles: Record<UserRole, string> = {
+  coordinator: "Your scheduling and outreach tasks for today",
+  advanced_coordinator: "Transitions, navigation, and med adherence tasks",
+  care_manager: "Clinical care management and program tasks",
+  manager: "Overview of what needs to be done across all queues",
+};
+
 export default function WorkQueuesHome() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
+  const { role } = useUserRole();
 
-  // Derive real queue stats from data
   const queueStats = useMemo(() => {
-    // AWV + Quality: needs of type AWV or QUALITY_GAP
     const awvQualityOpen = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && (n.status === "OPEN" || n.status === "IN_PROGRESS"));
     const awvQualityCompleted = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && n.status === "COMPLETED");
     const awvQualityOverdue = awvQualityOpen.filter(n => n.dueDate && n.dueDate < TODAY);
     const awvQualityTotal = awvQualityOpen.length + awvQualityCompleted.length;
 
-    // TOC: discharged + not yet contacted
     const tocActive = episodes.filter(e => e.status === "ACTIVE" && (e.currentStage === "discharged" || e.currentStage === "interactive_contact"));
     const tocOverdue = tocActive.filter(e => e.sla48hDue < TODAY + "T00:00:00");
 
-    // Med Adherence: at_risk or overdue
+    const tocEscalated = episodes.filter(e => e.status === "ACTIVE" && e.followUpTasks.some(t => t.category === "clinical" && t.status === "OPEN"));
+
     const medAtRisk = medAdherenceRecords.filter(r => r.riskLevel === "at_risk" || r.riskLevel === "overdue");
     const medOverdue = medAdherenceRecords.filter(r => r.riskLevel === "overdue");
 
-    // Programs: overdue checkpoints
     const progOverdue = programEnrollments.filter(e => e.status === "active" && e.checkpointStatuses.some(c => c.status === "OPEN" && c.nextDue && c.nextDue < TODAY));
     const progTotal = programEnrollments.filter(e => e.status === "active");
 
-    return [
+    const allQueues = [
       {
         id: "scheduling_awv_quality",
         title: "Scheduling: AWV + Quality",
         description: "Patients due for AWV or with open quality gaps, ranked by impact",
-        roles: ["office_staff", "central_non_clinical"],
         icon: "calendar",
         count: [...new Set(awvQualityOpen.map(n => n.patientId))].length,
         urgentCount: awvQualityOverdue.length,
@@ -61,7 +81,6 @@ export default function WorkQueuesHome() {
         id: "toc_discharged_uncontacted",
         title: "TOC: Discharged (Uncontacted)",
         description: "Recently discharged patients needing 48h interactive contact",
-        roles: ["central_clinical"],
         icon: "clock",
         count: tocActive.length,
         urgentCount: tocOverdue.length,
@@ -70,10 +89,20 @@ export default function WorkQueuesHome() {
         path: "/toc?tab=needs_contact",
       },
       {
+        id: "toc_escalations",
+        title: "TOC: Clinical Escalations",
+        description: "Escalated TOC episodes requiring clinical assessment",
+        icon: "usercheck",
+        count: tocEscalated.length,
+        urgentCount: tocEscalated.length,
+        overdueCount: 0,
+        completionPct: 0,
+        path: "/toc",
+      },
+      {
         id: "med_adherence_at_risk",
         title: "Med Adherence: At Risk",
         description: "Patients with medication adherence gaps or overdue refills",
-        roles: ["central_non_clinical", "central_clinical"],
         icon: "pill",
         count: medAtRisk.length,
         urgentCount: medOverdue.length,
@@ -85,7 +114,6 @@ export default function WorkQueuesHome() {
         id: "program_overdue",
         title: "Programs: Overdue Checkpoints",
         description: "Patients with overdue program checkpoints needing attention",
-        roles: ["central_clinical"],
         icon: "clipboard",
         count: progOverdue.length,
         urgentCount: progOverdue.length,
@@ -94,7 +122,10 @@ export default function WorkQueuesHome() {
         path: "/programs",
       },
     ];
-  }, []);
+
+    const visibleIds = roleQueueIds[role];
+    return allQueues.filter(q => visibleIds.includes(q.id));
+  }, [role]);
 
   const totalOpen = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
   const totalOverdue = needs.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
