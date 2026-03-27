@@ -158,3 +158,24 @@ export interface ChaseList {
   patientIds: string[];
   stats: { total: number; remaining: number; attempted: number; connected: number; scheduled: number };
 }
+
+export type CampaignTrigger = "newly_attributed" | "ed_visit" | "hospital_discharge" | "gap_opened";
+
+export interface CampaignPatient {
+  patientId: string;
+  triggeredAt: string;       // date the event fired
+  slaDueDate: string;        // date the SLA expires
+  slaStatus: "on_track" | "at_risk" | "overdue" | "completed";
+  scheduledDate: string | null;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  trigger: CampaignTrigger;
+  description: string;
+  slaDays: number;           // SLA window in days from trigger
+  isActive: boolean;
+  patients: CampaignPatient[];
+  stats: { total: number; remaining: number; attempted: number; connected: number; scheduled: number; onTrack: number; atRisk: number; overdue: number };
+}
