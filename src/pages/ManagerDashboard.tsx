@@ -182,11 +182,21 @@ export default function ManagerDashboard() {
                   data={slaPieData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={55}
-                  outerRadius={90}
+                  innerRadius={50}
+                  outerRadius={80}
                   dataKey="value"
-                  label={({ name, value, x, y }) => <text x={x} y={y} fill="hsl(var(--foreground))" fontSize={12} textAnchor="middle">{`${name}: ${value}`}</text>}
-                  labelLine={{ stroke: "hsl(var(--foreground))" }}
+                  label={({ name, value, cx: centerX, cy: centerY, midAngle, outerRadius: oR }) => {
+                    const RADIAN = Math.PI / 180;
+                    const radius = (oR as number) + 28;
+                    const x = (centerX as number) + radius * Math.cos(-midAngle * RADIAN);
+                    const y = (centerY as number) + radius * Math.sin(-midAngle * RADIAN);
+                    return (
+                      <text x={x} y={y} fill="hsl(var(--foreground))" fontSize={11} textAnchor={x > (centerX as number) ? "start" : "end"} dominantBaseline="central">
+                        {`${name}: ${value}`}
+                      </text>
+                    );
+                  }}
+                  labelLine={{ stroke: "hsl(var(--muted-foreground))", strokeWidth: 1 }}
                   className="cursor-pointer"
                   onClick={handleTocSliceClick}
                 >
