@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, Zap } from "lucide-react";
-import type { Patient } from "@/data/models";
+import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, Zap, UserCheck } from "lucide-react";
+import type { Patient, NeedType } from "@/data/models";
+import { useUserRole, type UserRole } from "@/contexts/UserRoleContext";
 
 const TODAY = "2026-03-19";
 
