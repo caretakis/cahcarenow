@@ -1,6 +1,6 @@
 import type {
   Patient, Need, Outreach, Episode, Program, ProgramEnrollment,
-  MedAdherenceRecord, QueueDefinition, ChaseList
+  MedAdherenceRecord, QueueDefinition, ChaseList, Campaign
 } from "./models";
 
 // ── Patients ──
@@ -362,6 +362,49 @@ export const chaseLists: ChaseList[] = [
     criteria: { flags: "newly_attributed", lastAWV: null },
     patientIds: ["p_1002", "p_1009"],
     stats: { total: 2, remaining: 2, attempted: 0, connected: 0, scheduled: 0 },
+  },
+];
+
+// ── Campaigns ──
+export const campaigns: Campaign[] = [
+  {
+    id: "camp_1",
+    name: "Newly Attributed Patients",
+    trigger: "newly_attributed",
+    description: "Automatically adds patients when they are newly attributed. SLA: call and schedule within 30 days of attribution.",
+    slaDays: 30,
+    isActive: true,
+    patients: [
+      {
+        patientId: "p_1002",
+        triggeredAt: "2026-03-01",
+        slaDueDate: "2026-03-31",
+        slaStatus: "on_track",
+        scheduledDate: null,
+      },
+      {
+        patientId: "p_1009",
+        triggeredAt: "2026-03-10",
+        slaDueDate: "2026-04-09",
+        slaStatus: "on_track",
+        scheduledDate: null,
+      },
+      {
+        patientId: "p_1005",
+        triggeredAt: "2026-02-20",
+        slaDueDate: "2026-03-22",
+        slaStatus: "at_risk",
+        scheduledDate: null,
+      },
+      {
+        patientId: "p_1010",
+        triggeredAt: "2026-02-10",
+        slaDueDate: "2026-03-12",
+        slaStatus: "overdue",
+        scheduledDate: null,
+      },
+    ],
+    stats: { total: 4, remaining: 3, attempted: 1, connected: 0, scheduled: 0, onTrack: 2, atRisk: 1, overdue: 1 },
   },
 ];
 
