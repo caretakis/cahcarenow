@@ -77,14 +77,25 @@ export default function ChaseListsPage() {
     }
   };
 
+  // Helper to get campaign patient record
+  const getCampaignPatient = (patientId: string): CampaignPatient | undefined => {
+    return selectedCampaign?.patients.find(cp => cp.patientId === patientId);
+  };
+
   const listPatients = useMemo(() => {
-    if (!selectedList) return [];
-    let pts = selectedList.patientIds
-      .map(id => patients.find(p => p.id === id))
-      .filter(Boolean) as Patient[];
+    let pts: Patient[] = [];
+    if (selectedList) {
+      pts = selectedList.patientIds
+        .map(id => patients.find(p => p.id === id))
+        .filter(Boolean) as Patient[];
+    } else if (selectedCampaign) {
+      pts = selectedCampaign.patients
+        .map(cp => patients.find(p => p.id === cp.patientId))
+        .filter(Boolean) as Patient[];
+    }
 
     // Status filter
-    if (statusFilter !== "all") {
+    if (statusFilter !== "all" && selectedList) {
       pts = pts.filter(p => getPatientStatus(p.id, selectedList) === statusFilter);
     }
 
@@ -100,7 +111,7 @@ export default function ChaseListsPage() {
       }
       return sortDir === "desc" ? -diff : diff;
     });
-  }, [selectedList, sortKey, sortDir, statusFilter]);
+  }, [selectedList, selectedCampaign, sortKey, sortDir, statusFilter]);
 
   const SortButton = ({ k, label }: { k: SortKey; label: string }) => (
     <Button
