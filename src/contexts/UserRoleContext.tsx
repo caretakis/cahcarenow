@@ -20,7 +20,7 @@ export const roleDescriptions: Record<UserRole, string> = {
 export const roleModules: Record<UserRole, string[]> = {
   coordinator: ["/queues", "/lists", "/patients"],
   advanced_coordinator: ["/queues", "/lists", "/toc", "/med-adherence", "/patients"],
-  care_manager: ["/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients"],
+  care_manager: ["/queues", "/toc", "/programs", "/med-adherence", "/patients"],
   manager: ["/dashboards", "/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients", "/manager", "/admin"],
 };
 
