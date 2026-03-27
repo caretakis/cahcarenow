@@ -406,6 +406,49 @@ export const campaigns: Campaign[] = [
     ],
     stats: { total: 4, remaining: 3, attempted: 1, connected: 0, scheduled: 0, onTrack: 2, atRisk: 1, overdue: 1 },
   },
+  {
+    id: "camp_2",
+    name: "Missed Appointments",
+    trigger: "missed_appointment",
+    description: "Triggered when a patient no-shows or cancels. SLA: reschedule within 7 days.",
+    slaDays: 7,
+    isActive: true,
+    patients: [
+      { patientId: "p_1001", triggeredAt: "2026-03-20", slaDueDate: "2026-03-27", slaStatus: "on_track", scheduledDate: null },
+      { patientId: "p_1006", triggeredAt: "2026-03-18", slaDueDate: "2026-03-25", slaStatus: "at_risk", scheduledDate: null },
+      { patientId: "p_1008", triggeredAt: "2026-03-10", slaDueDate: "2026-03-17", slaStatus: "overdue", scheduledDate: null },
+    ],
+    stats: { total: 3, remaining: 2, attempted: 1, connected: 0, scheduled: 0, onTrack: 1, atRisk: 1, overdue: 1 },
+  },
+  {
+    id: "camp_3",
+    name: "Quality Gaps",
+    trigger: "quality_gap",
+    description: "Triggered when a new quality gap is identified. SLA: outreach and schedule within 14 days.",
+    slaDays: 14,
+    isActive: true,
+    patients: [
+      { patientId: "p_1001", triggeredAt: "2026-03-15", slaDueDate: "2026-03-29", slaStatus: "on_track", scheduledDate: null },
+      { patientId: "p_1003", triggeredAt: "2026-03-12", slaDueDate: "2026-03-26", slaStatus: "on_track", scheduledDate: null },
+      { patientId: "p_1006", triggeredAt: "2026-03-05", slaDueDate: "2026-03-19", slaStatus: "overdue", scheduledDate: null },
+      { patientId: "p_1008", triggeredAt: "2026-03-08", slaDueDate: "2026-03-22", slaStatus: "at_risk", scheduledDate: null },
+      { patientId: "p_1010", triggeredAt: "2026-03-01", slaDueDate: "2026-03-15", slaStatus: "overdue", scheduledDate: null },
+    ],
+    stats: { total: 5, remaining: 3, attempted: 2, connected: 1, scheduled: 0, onTrack: 2, atRisk: 1, overdue: 2 },
+  },
+  {
+    id: "camp_4",
+    name: "No AWV on File",
+    trigger: "no_awv",
+    description: "Patients with no Annual Wellness Visit in the past 12 months. SLA: schedule AWV within 30 days of identification.",
+    slaDays: 30,
+    isActive: true,
+    patients: [
+      { patientId: "p_1002", triggeredAt: "2026-03-01", slaDueDate: "2026-03-31", slaStatus: "on_track", scheduledDate: null },
+      { patientId: "p_1010", triggeredAt: "2026-03-01", slaDueDate: "2026-03-31", slaStatus: "on_track", scheduledDate: null },
+    ],
+    stats: { total: 2, remaining: 2, attempted: 0, connected: 0, scheduled: 0, onTrack: 2, atRisk: 0, overdue: 0 },
+  },
 ];
 
 // ── KPI helper data ──
