@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableHeader, TableHead, TableRow, TableBody, TableCell } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, Zap } from "lucide-react";
-import type { Patient } from "@/data/models";
+import { Calendar, Clock, Pill, ClipboardList, ArrowRight, AlertTriangle, Zap, UserCheck } from "lucide-react";
+import type { Patient, NeedType } from "@/data/models";
+import { useUserRole, type UserRole } from "@/contexts/UserRoleContext";
 
 const TODAY = "2026-03-19";
 
@@ -17,38 +18,59 @@ const iconMap: Record<string, any> = {
   clock: Clock,
   pill: Pill,
   clipboard: ClipboardList,
+  usercheck: UserCheck,
+};
+
+// Which queue cards each role sees
+const roleQueueIds: Record<UserRole, string[]> = {
+  coordinator: ["scheduling_awv_quality"],
+  advanced_coordinator: ["toc_discharged_uncontacted", "med_adherence_at_risk", "scheduling_awv_quality"],
+  care_manager: ["program_overdue", "toc_escalations", "med_adherence_at_risk"],
+  manager: ["scheduling_awv_quality", "toc_discharged_uncontacted", "med_adherence_at_risk", "program_overdue"],
+};
+
+// Which need types show in priority actions per role
+const roleNeedTypes: Record<UserRole, NeedType[]> = {
+  coordinator: ["AWV", "QUALITY_GAP"],
+  advanced_coordinator: ["AWV", "QUALITY_GAP", "TOC_STEP", "MED_ADHERENCE"],
+  care_manager: ["PROGRAM_CHECKPOINT", "TOC_STEP", "MED_ADHERENCE", "HCC_RECAPTURE"],
+  manager: ["AWV", "QUALITY_GAP", "HCC_RECAPTURE", "TOC_STEP", "MED_ADHERENCE", "PROGRAM_CHECKPOINT", "SUPP_DOC"],
+};
+
+const roleSubtitles: Record<UserRole, string> = {
+  coordinator: "Your scheduling and outreach tasks for today",
+  advanced_coordinator: "Transitions, navigation, and med adherence tasks",
+  care_manager: "Clinical care management and program tasks",
+  manager: "Overview of what needs to be done across all queues",
 };
 
 export default function WorkQueuesHome() {
   const navigate = useNavigate();
   const [viewingAs, setViewingAs] = useState("me");
+  const { role } = useUserRole();
 
-  // Derive real queue stats from data
   const queueStats = useMemo(() => {
-    // AWV + Quality: needs of type AWV or QUALITY_GAP
     const awvQualityOpen = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && (n.status === "OPEN" || n.status === "IN_PROGRESS"));
     const awvQualityCompleted = needs.filter(n => (n.type === "AWV" || n.type === "QUALITY_GAP") && n.status === "COMPLETED");
     const awvQualityOverdue = awvQualityOpen.filter(n => n.dueDate && n.dueDate < TODAY);
     const awvQualityTotal = awvQualityOpen.length + awvQualityCompleted.length;
 
-    // TOC: discharged + not yet contacted
     const tocActive = episodes.filter(e => e.status === "ACTIVE" && (e.currentStage === "discharged" || e.currentStage === "interactive_contact"));
     const tocOverdue = tocActive.filter(e => e.sla48hDue < TODAY + "T00:00:00");
 
-    // Med Adherence: at_risk or overdue
+    const tocEscalated = episodes.filter(e => e.status === "ACTIVE" && e.followUpTasks.some(t => t.category === "clinical" && t.status === "OPEN"));
+
     const medAtRisk = medAdherenceRecords.filter(r => r.riskLevel === "at_risk" || r.riskLevel === "overdue");
     const medOverdue = medAdherenceRecords.filter(r => r.riskLevel === "overdue");
 
-    // Programs: overdue checkpoints
     const progOverdue = programEnrollments.filter(e => e.status === "active" && e.checkpointStatuses.some(c => c.status === "OPEN" && c.nextDue && c.nextDue < TODAY));
     const progTotal = programEnrollments.filter(e => e.status === "active");
 
-    return [
+    const allQueues = [
       {
         id: "scheduling_awv_quality",
         title: "Scheduling: AWV + Quality",
         description: "Patients due for AWV or with open quality gaps, ranked by impact",
-        roles: ["office_staff", "central_non_clinical"],
         icon: "calendar",
         count: [...new Set(awvQualityOpen.map(n => n.patientId))].length,
         urgentCount: awvQualityOverdue.length,
@@ -60,7 +82,6 @@ export default function WorkQueuesHome() {
         id: "toc_discharged_uncontacted",
         title: "TOC: Discharged (Uncontacted)",
         description: "Recently discharged patients needing 48h interactive contact",
-        roles: ["central_clinical"],
         icon: "clock",
         count: tocActive.length,
         urgentCount: tocOverdue.length,
@@ -69,10 +90,20 @@ export default function WorkQueuesHome() {
         path: "/toc?tab=needs_contact",
       },
       {
+        id: "toc_escalations",
+        title: "TOC: Clinical Escalations",
+        description: "Escalated TOC episodes requiring clinical assessment",
+        icon: "usercheck",
+        count: tocEscalated.length,
+        urgentCount: tocEscalated.length,
+        overdueCount: 0,
+        completionPct: 0,
+        path: "/toc",
+      },
+      {
         id: "med_adherence_at_risk",
         title: "Med Adherence: At Risk",
         description: "Patients with medication adherence gaps or overdue refills",
-        roles: ["central_non_clinical", "central_clinical"],
         icon: "pill",
         count: medAtRisk.length,
         urgentCount: medOverdue.length,
@@ -84,7 +115,6 @@ export default function WorkQueuesHome() {
         id: "program_overdue",
         title: "Programs: Overdue Checkpoints",
         description: "Patients with overdue program checkpoints needing attention",
-        roles: ["central_clinical"],
         icon: "clipboard",
         count: progOverdue.length,
         urgentCount: progOverdue.length,
@@ -93,11 +123,18 @@ export default function WorkQueuesHome() {
         path: "/programs",
       },
     ];
-  }, []);
 
-  const totalOpen = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
-  const totalOverdue = needs.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
-  const totalCompleted = needs.filter(n => n.status === "COMPLETED").length;
+    const visibleIds = roleQueueIds[role];
+    return allQueues.filter(q => visibleIds.includes(q.id));
+  }, [role]);
+
+  // Filter needs relevant to this role's scope
+  const allowedNeedTypes = roleNeedTypes[role];
+  const relevantNeeds = needs.filter(n => allowedNeedTypes.includes(n.type));
+
+  const totalOpen = relevantNeeds.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS").length;
+  const totalOverdue = relevantNeeds.filter(n => n.dueDate && n.dueDate < TODAY && (n.status === "OPEN" || n.status === "IN_PROGRESS")).length;
+  const totalCompleted = relevantNeeds.filter(n => n.status === "COMPLETED").length;
   const totalAll = totalOpen + totalCompleted;
   const overallPct = totalAll > 0 ? Math.round((totalCompleted / totalAll) * 100) : 0;
 
@@ -108,9 +145,9 @@ export default function WorkQueuesHome() {
     { label: "Overall Progress", value: `${overallPct}%`, sublabel: `${totalCompleted}/${totalAll} gaps closed` },
   ];
 
-  // Priority actions: open needs sorted by urgency then impact
+  // Priority actions: open needs sorted by urgency then impact, filtered by role
   const priorityActions = useMemo(() => {
-    const openNeeds = needs.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
+    const openNeeds = relevantNeeds.filter(n => n.status === "OPEN" || n.status === "IN_PROGRESS");
     return openNeeds
       .map(n => {
         const patient = patients.find(p => p.id === n.patientId);
@@ -125,7 +162,7 @@ export default function WorkQueuesHome() {
         if (!a.isDueSoon && b.isDueSoon) return 1;
         return b.impactScore - a.impactScore;
       });
-  }, []);
+  }, [role]);
 
   const [showAll, setShowAll] = useState(false);
   const visibleActions = showAll ? priorityActions : priorityActions.slice(0, 8);
@@ -152,7 +189,7 @@ export default function WorkQueuesHome() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Work Queues</h1>
-          <p className="text-muted-foreground mt-1">Overview of what needs to be done across all queues</p>
+          <p className="text-muted-foreground mt-1">{roleSubtitles[role]}</p>
         </div>
         <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
