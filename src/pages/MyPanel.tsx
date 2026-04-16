@@ -67,7 +67,10 @@ export default function MyPanel() {
 
       {/* Priority cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <Card className="border-destructive/30">
+        <Card
+          className={`border-destructive/30 cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "overdue" ? "ring-2 ring-destructive bg-destructive/5" : ""}`}
+          onClick={() => setCardFilter(cardFilter === "overdue" ? null : "overdue")}
+        >
           <CardContent className="p-4 flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
               <AlertCircle className="h-5 w-5 text-destructive" />
@@ -78,7 +81,10 @@ export default function MyPanel() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-amber-500/30">
+        <Card
+          className={`border-amber-500/30 cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "toc" ? "ring-2 ring-amber-500 bg-amber-500/5" : ""}`}
+          onClick={() => setCardFilter(cardFilter === "toc" ? null : "toc")}
+        >
           <CardContent className="p-4 flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
               <Clock className="h-5 w-5 text-amber-500" />
@@ -89,7 +95,10 @@ export default function MyPanel() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "no_contact" ? "ring-2 ring-primary bg-primary/5" : ""}`}
+          onClick={() => setCardFilter(cardFilter === "no_contact" ? null : "no_contact")}
+        >
           <CardContent className="p-4 flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
               <Phone className="h-5 w-5 text-primary" />
@@ -100,7 +109,10 @@ export default function MyPanel() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "today" ? "ring-2 ring-emerald-500 bg-emerald-500/5" : ""}`}
+          onClick={() => setCardFilter(cardFilter === "today" ? null : "today")}
+        >
           <CardContent className="p-4 flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
               <CalendarCheck className="h-5 w-5 text-emerald-500" />
