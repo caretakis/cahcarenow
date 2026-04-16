@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence, getPatientEpisodes, needs as allNeeds, programs } from "@/data/sampleData";
 import { buildPopulationRecords, tierLabels, tierColors, getPatientInteractionHistory, type CareTier } from "@/data/populationData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,7 @@ const needCategoryIcons: Record<string, string> = {
 
 export default function PatientPage() {
   const { patientId } = useParams();
+  const navigate = useNavigate();
   const [callModalOpen, setCallModalOpen] = useState(false);
   const patient = patientId ? getPatientById(patientId) : undefined;
   const patientNeeds = patient ? getPatientNeeds(patient.id) : [];
@@ -183,7 +184,7 @@ export default function PatientPage() {
                   const completedSteps = ep.steps.filter(s => s.status === "DONE").length;
                   const totalSteps = ep.steps.length;
                   return (
-                    <div key={ep.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                    <div key={ep.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => navigate(`/toc?episode=${ep.id}`)}>
                       <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0 text-sm">🏥</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -215,7 +216,7 @@ export default function PatientPage() {
                   const nextDue = enr.checkpointStatuses.find(c => c.status === "OPEN" && c.nextDue);
                   const isOverdue = nextDue?.nextDue && nextDue.nextDue < new Date().toISOString().split("T")[0];
                   return (
-                    <div key={enr.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                    <div key={enr.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => navigate("/programs")}>
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-sm">📋</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -248,7 +249,7 @@ export default function PatientPage() {
                     no_data: "bg-muted text-muted-foreground border-border",
                   };
                   return (
-                    <div key={med.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                    <div key={med.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => navigate("/med-adherence")}>
                       <div className="h-8 w-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0 text-sm">💊</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
