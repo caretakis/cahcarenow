@@ -82,8 +82,8 @@ export default function PopulationView() {
   };
 
   const fitIcon = (fit: TierFitStatus) => {
-    if (fit === "appropriate") return <Check className="h-3.5 w-3.5 text-emerald-500" />;
-    return <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />;
+    if (fit === "appropriate") return <Check className="h-3.5 w-3.5 text-success" />;
+    return <AlertTriangle className="h-3.5 w-3.5 text-warning" />;
   };
 
   return (
@@ -93,19 +93,19 @@ export default function PopulationView() {
         <p className="text-muted-foreground text-sm">Attributed population stratified by care tier</p>
       </div>
 
-      {/* Tier summary cards */}
+      {/* Tier summary cards - softer colors */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {tierOrder.map(tier => (
           <Card
             key={tier}
-            className={`cursor-pointer transition-shadow hover:shadow-md ${tierFilter === String(tier) ? "ring-2 ring-primary" : ""}`}
+            className={`cursor-pointer transition-shadow hover:shadow-md ${tierFilter === String(tier) ? "ring-2 ring-primary/50" : ""}`}
             onClick={() => setTierFilter(tierFilter === String(tier) ? "all" : String(tier))}
           >
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-1">
-                <Badge className={`${tierColors[tier]} text-xs font-bold`}>Tier {tier}</Badge>
+                <Badge variant="outline" className={`${tierColors[tier]} text-xs font-bold`}>Tier {tier}</Badge>
                 {tierCounts[tier].flagged > 0 && (
-                  <span className="text-xs text-amber-500 font-medium flex items-center gap-1">
+                  <span className="text-xs text-warning font-medium flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3" />{tierCounts[tier].flagged}
                   </span>
                 )}
@@ -147,7 +147,7 @@ export default function PopulationView() {
       {grouped.map(({ tier, records }) => (
         <div key={tier}>
           <div className="flex items-center gap-2 mb-2">
-            <Badge className={`${tierColors[tier]} text-xs font-bold`}>Tier {tier}</Badge>
+            <Badge variant="outline" className={`${tierColors[tier]} text-xs font-bold`}>Tier {tier}</Badge>
             <span className="text-sm font-medium text-muted-foreground">{tierLabels[tier]}</span>
             <span className="text-xs text-muted-foreground">({records.length})</span>
           </div>
@@ -177,7 +177,7 @@ export default function PopulationView() {
                   <TableRow key={r.patient.id} className="cursor-pointer hover:bg-muted/20" onClick={() => navigate(`/patients/${r.patient.id}`)}>
                     <TableCell className="font-medium">{r.patient.name}</TableCell>
                     <TableCell>
-                      <Badge className={`${tierColors[r.careTier]} text-[10px] px-1.5`}>T{r.careTier}</Badge>
+                      <Badge variant="outline" className={`${tierColors[r.careTier]} text-[10px] px-1.5`}>T{r.careTier}</Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

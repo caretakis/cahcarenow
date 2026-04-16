@@ -11,18 +11,19 @@ export const tierLabels: Record<CareTier, string> = {
   1: "Preventive",
 };
 
+// Gentler, muted tier colors matching workflow aesthetic
 export const tierColors: Record<CareTier, string> = {
-  4: "bg-red-600 text-white",
-  3: "bg-amber-500 text-white",
-  2: "bg-teal-500 text-white",
-  1: "bg-gray-400 text-white",
+  4: "bg-destructive/20 text-destructive border-destructive/30",
+  3: "bg-warning/20 text-warning border-warning/30",
+  2: "bg-info/20 text-info border-info/30",
+  1: "bg-muted text-muted-foreground border-border",
 };
 
 export const tierBorderColors: Record<CareTier, string> = {
-  4: "border-red-600",
-  3: "border-amber-500",
-  2: "border-teal-500",
-  1: "border-gray-400",
+  4: "border-destructive/30",
+  3: "border-warning/30",
+  2: "border-info/30",
+  1: "border-border",
 };
 
 export const tierOwnerRole: Record<CareTier, string> = {
