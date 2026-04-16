@@ -193,7 +193,7 @@ export default function CareTiers() {
                     <Check className="h-4 w-4 mr-2" /> Confirm current tier (dismiss flag)
                   </Button>
                   <div className="flex gap-2">
-                    <Select>
+                    <Select value={selectedNewTier} onValueChange={setSelectedNewTier}>
                       <SelectTrigger className="flex-1"><SelectValue placeholder="Move to tier…" /></SelectTrigger>
                       <SelectContent>
                         {tierOrder.filter(t => t !== reviewRecord.careTier).map(t => (
@@ -201,7 +201,19 @@ export default function CareTiers() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button onClick={() => setReviewPatientId(null)}>Apply</Button>
+                    <Button
+                      disabled={!selectedNewTier}
+                      onClick={() => {
+                        if (selectedNewTier && reviewRecord) {
+                          setTierChangeTarget({
+                            patientId: reviewRecord.patient.id,
+                            patientName: reviewRecord.patient.name,
+                            currentTier: reviewRecord.careTier,
+                            newTier: Number(selectedNewTier) as CareTier,
+                          });
+                        }
+                      }}
+                    >Apply</Button>
                   </div>
                 </div>
                 <Button variant="link" className="text-xs px-0" onClick={() => { setReviewPatientId(null); navigate(`/patients/${reviewRecord.patient.id}`); }}>
@@ -212,6 +224,19 @@ export default function CareTiers() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Tier change justification dialog */}
+      {tierChangeTarget && (
+        <TierChangeDialog
+          open={!!tierChangeTarget}
+          onOpenChange={(open) => !open && setTierChangeTarget(null)}
+          patientId={tierChangeTarget.patientId}
+          patientName={tierChangeTarget.patientName}
+          currentTier={tierChangeTarget.currentTier}
+          newTier={tierChangeTarget.newTier}
+          onComplete={() => { setReviewPatientId(null); setSelectedNewTier(""); }}
+        />
+      )}
     </div>
   );
 }
