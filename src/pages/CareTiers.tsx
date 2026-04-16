@@ -46,13 +46,13 @@ export default function CareTiers() {
         <p className="text-muted-foreground text-sm">Tier health across the attributed population — review flagged patients</p>
       </div>
 
-      {/* Tier health cards */}
+      {/* Tier health cards - softer colors */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {tierStats.map(ts => (
           <Card key={ts.tier}>
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <Badge className={`${tierColors[ts.tier]} text-xs font-bold`}>Tier {ts.tier}</Badge>
+                <Badge variant="outline" className={`${tierColors[ts.tier]} text-xs font-bold`}>Tier {ts.tier}</Badge>
                 <span className="text-xs text-muted-foreground">{tierLabels[ts.tier]}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-center">
@@ -65,8 +65,8 @@ export default function CareTiers() {
                 </div>
                 <div>
                   <div className="flex items-center justify-center gap-1">
-                    <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="text-lg font-bold text-amber-500">{ts.flagged}</span>
+                    <AlertTriangle className="h-3.5 w-3.5 text-warning" />
+                    <span className="text-lg font-bold text-warning">{ts.flagged}</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground">Flagged</p>
                 </div>
@@ -94,7 +94,7 @@ export default function CareTiers() {
       {/* Flagged patients table */}
       <div>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-500" />
+          <AlertTriangle className="h-4 w-4 text-warning" />
           Flagged for Tier Review ({flaggedRecords.length})
         </h2>
         <div className="rounded-lg border overflow-hidden">
@@ -118,8 +118,8 @@ export default function CareTiers() {
                 return (
                   <TableRow key={r.patient.id}>
                     <TableCell className="font-medium">{r.patient.name}</TableCell>
-                    <TableCell><Badge className={`${tierColors[r.careTier]} text-[10px]`}>Tier {r.careTier}</Badge></TableCell>
-                    <TableCell><Badge variant="outline" className="text-[10px]">Tier {suggestedTier}</Badge></TableCell>
+                    <TableCell><Badge variant="outline" className={`${tierColors[r.careTier]} text-[10px]`}>Tier {r.careTier}</Badge></TableCell>
+                    <TableCell><Badge variant="outline" className="text-[10px] bg-muted text-muted-foreground border-border">Tier {suggestedTier}</Badge></TableCell>
                     <TableCell className="text-sm text-muted-foreground max-w-[250px]">{r.tierFitReason}</TableCell>
                     <TableCell className="text-sm">{r.assignedOwner}</TableCell>
                     <TableCell>
@@ -136,7 +136,7 @@ export default function CareTiers() {
               {flaggedRecords.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    <Check className="h-5 w-5 mx-auto mb-2 text-emerald-500" />
+                    <Check className="h-5 w-5 mx-auto mb-2 text-success" />
                     All patients appropriately tiered
                   </TableCell>
                 </TableRow>
@@ -159,7 +159,7 @@ export default function CareTiers() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Current Tier</p>
-                    <Badge className={`${tierColors[reviewRecord.careTier]} text-sm`}>Tier {reviewRecord.careTier} — {tierLabels[reviewRecord.careTier]}</Badge>
+                    <Badge variant="outline" className={`${tierColors[reviewRecord.careTier]} text-sm`}>Tier {reviewRecord.careTier} — {tierLabels[reviewRecord.careTier]}</Badge>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Acuity Score</p>
@@ -177,8 +177,8 @@ export default function CareTiers() {
                     <div>Open Needs: <span className="font-medium">{reviewRecord.openNeedsCount}</span></div>
                   </div>
                 </div>
-                <div className="border rounded-lg p-4 bg-amber-500/5">
-                  <p className="text-sm font-medium flex items-center gap-1.5"><AlertTriangle className="h-4 w-4 text-amber-500" /> Reason Flagged</p>
+                <div className="border rounded-lg p-4 bg-warning/5 border-warning/20">
+                  <p className="text-sm font-medium flex items-center gap-1.5"><AlertTriangle className="h-4 w-4 text-warning" /> Reason Flagged</p>
                   <p className="text-sm text-muted-foreground mt-1">{reviewRecord.tierFitReason}</p>
                 </div>
                 <div>

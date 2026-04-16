@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { buildPopulationRecords, tierColors, type CareTier } from "@/data/populationData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertCircle, Clock, Phone, CalendarCheck, CheckCircle2 } from "lucide-react";
@@ -53,9 +53,9 @@ export default function MyPanel() {
   };
 
   const statusBadge = (status: string) => {
-    if (status === "overdue") return <Badge variant="destructive" className="text-[10px]">Overdue</Badge>;
-    if (status === "attention") return <Badge className="bg-amber-500 text-white text-[10px]">Needs attention</Badge>;
-    return <Badge variant="secondary" className="text-[10px]">On track</Badge>;
+    if (status === "overdue") return <Badge variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/20">Overdue</Badge>;
+    if (status === "attention") return <Badge variant="outline" className="text-xs bg-warning/10 text-warning border-warning/20">Needs attention</Badge>;
+    return <Badge variant="outline" className="text-xs bg-muted text-muted-foreground border-border">On track</Badge>;
   };
 
   return (
@@ -65,10 +65,10 @@ export default function MyPanel() {
         <p className="text-muted-foreground text-sm">Your patients, sorted by urgency — what needs attention today</p>
       </div>
 
-      {/* Priority cards */}
+      {/* Priority cards - softer colors matching workflow aesthetic */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Card
-          className={`border-destructive/30 cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "overdue" ? "ring-2 ring-destructive bg-destructive/5" : ""}`}
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "overdue" ? "ring-2 ring-destructive/50 bg-destructive/5" : ""}`}
           onClick={() => setCardFilter(cardFilter === "overdue" ? null : "overdue")}
         >
           <CardContent className="p-4 flex items-start gap-3">
@@ -76,18 +76,18 @@ export default function MyPanel() {
               <AlertCircle className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-destructive">{overduePts.length}</p>
+              <p className="text-2xl font-bold">{overduePts.length}</p>
               <p className="text-xs text-muted-foreground">Overdue tasks</p>
             </div>
           </CardContent>
         </Card>
         <Card
-          className={`border-amber-500/30 cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "toc" ? "ring-2 ring-amber-500 bg-amber-500/5" : ""}`}
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "toc" ? "ring-2 ring-warning/50 bg-warning/5" : ""}`}
           onClick={() => setCardFilter(cardFilter === "toc" ? null : "toc")}
         >
           <CardContent className="p-4 flex items-start gap-3">
-            <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-              <Clock className="h-5 w-5 text-amber-500" />
+            <div className="h-9 w-9 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
+              <Clock className="h-5 w-5 text-warning" />
             </div>
             <div>
               <p className="text-2xl font-bold">{tocDuePts.length}</p>
@@ -96,7 +96,7 @@ export default function MyPanel() {
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "no_contact" ? "ring-2 ring-primary bg-primary/5" : ""}`}
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "no_contact" ? "ring-2 ring-primary/50 bg-primary/5" : ""}`}
           onClick={() => setCardFilter(cardFilter === "no_contact" ? null : "no_contact")}
         >
           <CardContent className="p-4 flex items-start gap-3">
@@ -110,12 +110,12 @@ export default function MyPanel() {
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "today" ? "ring-2 ring-emerald-500 bg-emerald-500/5" : ""}`}
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "today" ? "ring-2 ring-success/50 bg-success/5" : ""}`}
           onClick={() => setCardFilter(cardFilter === "today" ? null : "today")}
         >
           <CardContent className="p-4 flex items-start gap-3">
-            <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-              <CalendarCheck className="h-5 w-5 text-emerald-500" />
+            <div className="h-9 w-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+              <CalendarCheck className="h-5 w-5 text-success" />
             </div>
             <div>
               <p className="text-2xl font-bold">{scheduledToday.length}</p>
@@ -170,7 +170,7 @@ export default function MyPanel() {
                 <TableRow key={r.patient.id} className="cursor-pointer hover:bg-muted/20" onClick={() => navigate(`/patients/${r.patient.id}`)}>
                   <TableCell className="font-medium">{r.patient.name}</TableCell>
                   <TableCell>
-                    <Badge className={`${tierColors[r.careTier]} text-[10px] px-1.5`}>T{r.careTier}</Badge>
+                    <Badge variant="outline" className={`${tierColors[r.careTier]} text-[10px] px-1.5`}>T{r.careTier}</Badge>
                   </TableCell>
                   <TableCell className="text-sm max-w-[250px]">
                     <span className={status === "overdue" ? "text-destructive font-medium" : ""}>
