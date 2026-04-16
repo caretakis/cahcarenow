@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertCircle, Clock, Phone, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { AlertCircle, ShieldAlert, Phone, CalendarCheck, CheckCircle2 } from "lucide-react";
 
 export default function MyPanel() {
   const navigate = useNavigate();
@@ -28,13 +28,18 @@ export default function MyPanel() {
     const days = Math.floor((Date.now() - new Date(r.lastTouched).getTime()) / 86400000);
     return (r.careTier === 4 && days > 30) || (r.careTier === 3 && days > 90);
   });
-  const tocDuePts = myRecords.filter(r => r.nextAction?.includes("TOC") || r.nextAction?.includes("Interactive Contact") || r.nextAction?.includes("Discharged"));
+  const criticalPts = myRecords.filter(r => {
+    const action = r.nextAction?.toLowerCase() || "";
+    return action.includes("toc") || action.includes("interactive contact") || action.includes("discharged") ||
+      action.includes("med") || action.includes("adherence") || action.includes("refill") ||
+      action.includes("disease") || action.includes("dm ") || (r.careTier >= 3 && r.nextActionDue && r.nextActionDue <= "2026-04-20");
+  });
   const scheduledToday = myRecords.filter(r => r.nextActionDue === "2026-04-16");
 
   const filtered = useMemo(() => {
     let result = myRecords;
     if (cardFilter === "overdue") result = overduePts;
-    else if (cardFilter === "toc") result = tocDuePts;
+    else if (cardFilter === "critical") result = criticalPts;
     else if (cardFilter === "no_contact") result = noContactPts;
     else if (cardFilter === "today") result = scheduledToday;
     
@@ -42,7 +47,7 @@ export default function MyPanel() {
     if (statusFilter === "overdue") result = result.filter(r => r.nextActionDue && r.nextActionDue < "2026-04-16");
     if (statusFilter === "on_track") result = result.filter(r => !r.nextActionDue || r.nextActionDue >= "2026-04-16");
     return result;
-  }, [myRecords, tierFilter, statusFilter, cardFilter, overduePts, tocDuePts, noContactPts, scheduledToday]);
+  }, [myRecords, tierFilter, statusFilter, cardFilter, overduePts, criticalPts, noContactPts, scheduledToday]);
 
 
 
@@ -82,16 +87,16 @@ export default function MyPanel() {
           </CardContent>
         </Card>
         <Card
-          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "toc" ? "ring-2 ring-warning/50 bg-warning/5" : ""}`}
-          onClick={() => setCardFilter(cardFilter === "toc" ? null : "toc")}
+          className={`cursor-pointer transition-colors hover:bg-muted/50 ${cardFilter === "critical" ? "ring-2 ring-warning/50 bg-warning/5" : ""}`}
+          onClick={() => setCardFilter(cardFilter === "critical" ? null : "critical")}
         >
           <CardContent className="p-4 flex items-start gap-3">
             <div className="h-9 w-9 rounded-lg bg-warning/10 flex items-center justify-center shrink-0">
-              <Clock className="h-5 w-5 text-warning" />
+              <ShieldAlert className="h-5 w-5 text-warning" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{tocDuePts.length}</p>
-              <p className="text-xs text-muted-foreground">TOC actions due</p>
+              <p className="text-2xl font-bold">{criticalPts.length}</p>
+              <p className="text-xs text-muted-foreground">Critical tasks</p>
             </div>
           </CardContent>
         </Card>
