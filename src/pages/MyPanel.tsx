@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { buildPopulationRecords, tierColors, type CareTier } from "@/data/populationData";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { AlertCircle, ShieldAlert, Phone, CalendarCheck, CheckCircle2 } from "lu
 
 export default function MyPanel() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
   const allRecords = useMemo(() => buildPopulationRecords(), []);
 
   // Simulate "my" patients — for demo, show patients assigned to current role's likely owner
@@ -65,9 +67,12 @@ export default function MyPanel() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">My Panel</h1>
-        <p className="text-muted-foreground text-sm">Your patients, sorted by urgency — what needs attention today</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">My Panel</h1>
+          <p className="text-muted-foreground text-sm">Your patients, sorted by urgency — what needs attention today</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       {/* Priority cards - softer colors matching workflow aesthetic */}
