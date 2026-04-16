@@ -216,7 +216,7 @@ export default function PatientPage() {
                   const nextDue = enr.checkpointStatuses.find(c => c.status === "OPEN" && c.nextDue);
                   const isOverdue = nextDue?.nextDue && nextDue.nextDue < new Date().toISOString().split("T")[0];
                   return (
-                    <div key={enr.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => navigate("/programs")}>
+                    <div key={enr.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20 cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => navigate(`/programs/enrollment/${enr.id}`)}>
                       <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-sm">📋</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
