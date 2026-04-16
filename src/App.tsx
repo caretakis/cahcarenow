@@ -6,6 +6,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/AppLayout";
 import { UserRoleProvider } from "@/contexts/UserRoleContext";
+import PopulationView from "@/pages/PopulationView";
+import MyPanel from "@/pages/MyPanel";
+import CareTiers from "@/pages/CareTiers";
 import WorkQueuesHome from "@/pages/WorkQueuesHome";
 import WorkQueue from "@/pages/WorkQueue";
 import ChaseListsPage from "@/pages/ChaseListsPage";
@@ -38,7 +41,10 @@ const App = () => (
           <UserRoleProvider>
             <Routes>
               <Route element={<AppLayout />}>
-                <Route path="/" element={<ManagerDashboard />} />
+                <Route path="/" element={<Navigate to="/population" replace />} />
+                <Route path="/population" element={<PopulationView />} />
+                <Route path="/panel" element={<MyPanel />} />
+                <Route path="/care-tiers" element={<CareTiers />} />
                 <Route path="/queues" element={<WorkQueuesHome />} />
                 <Route path="/queues/:queueId" element={<WorkQueue />} />
                 <Route path="/lists" element={<ChaseListsPage />} />
