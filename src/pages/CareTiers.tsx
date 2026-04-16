@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TierChangeDialog } from "@/components/TierChangeDialog";
 import { AlertTriangle, Check, Users, Activity, Clock } from "lucide-react";
 
 const tierOrder: CareTier[] = [4, 3, 2, 1];
@@ -17,6 +18,8 @@ export default function CareTiers() {
   const allRecords = useMemo(() => buildPopulationRecords(), []);
 
   const [reviewPatientId, setReviewPatientId] = useState<string | null>(null);
+  const [selectedNewTier, setSelectedNewTier] = useState<string>("");
+  const [tierChangeTarget, setTierChangeTarget] = useState<{ patientId: string; patientName: string; currentTier: CareTier; newTier: CareTier } | null>(null);
   const reviewRecord = allRecords.find(r => r.patient.id === reviewPatientId);
 
   // Tier summary cards
@@ -190,7 +193,7 @@ export default function CareTiers() {
                     <Check className="h-4 w-4 mr-2" /> Confirm current tier (dismiss flag)
                   </Button>
                   <div className="flex gap-2">
-                    <Select>
+                    <Select value={selectedNewTier} onValueChange={setSelectedNewTier}>
                       <SelectTrigger className="flex-1"><SelectValue placeholder="Move to tier…" /></SelectTrigger>
                       <SelectContent>
                         {tierOrder.filter(t => t !== reviewRecord.careTier).map(t => (
@@ -198,7 +201,19 @@ export default function CareTiers() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button onClick={() => setReviewPatientId(null)}>Apply</Button>
+                    <Button
+                      disabled={!selectedNewTier}
+                      onClick={() => {
+                        if (selectedNewTier && reviewRecord) {
+                          setTierChangeTarget({
+                            patientId: reviewRecord.patient.id,
+                            patientName: reviewRecord.patient.name,
+                            currentTier: reviewRecord.careTier,
+                            newTier: Number(selectedNewTier) as CareTier,
+                          });
+                        }
+                      }}
+                    >Apply</Button>
                   </div>
                 </div>
                 <Button variant="link" className="text-xs px-0" onClick={() => { setReviewPatientId(null); navigate(`/patients/${reviewRecord.patient.id}`); }}>
@@ -209,6 +224,19 @@ export default function CareTiers() {
           )}
         </SheetContent>
       </Sheet>
+
+      {/* Tier change justification dialog */}
+      {tierChangeTarget && (
+        <TierChangeDialog
+          open={!!tierChangeTarget}
+          onOpenChange={(open) => !open && setTierChangeTarget(null)}
+          patientId={tierChangeTarget.patientId}
+          patientName={tierChangeTarget.patientName}
+          currentTier={tierChangeTarget.currentTier}
+          newTier={tierChangeTarget.newTier}
+          onComplete={() => { setReviewPatientId(null); setSelectedNewTier(""); }}
+        />
+      )}
     </div>
   );
 }

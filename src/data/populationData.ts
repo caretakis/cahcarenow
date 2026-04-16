@@ -193,10 +193,29 @@ export interface InteractionEntry {
   id: string;
   date: string;
   owner: string;
-  type: "call" | "assessment" | "toc_step" | "program_touchpoint" | "note";
+  type: "call" | "assessment" | "toc_step" | "program_touchpoint" | "note" | "tier_change";
   description: string;
   outcome: string;
   notes: string;
+}
+
+// In-memory store for tier changes (persists within session)
+const tierChangeLog: InteractionEntry[] = [];
+
+export function recordTierChange(patientId: string, fromTier: CareTier, toTier: CareTier, justification: string, owner: string = "Current User") {
+  tierChangeLog.push({
+    id: `tier_${patientId}_${Date.now()}`,
+    date: new Date().toISOString(),
+    owner,
+    type: "tier_change",
+    description: `Tier changed: ${tierLabels[fromTier]} (T${fromTier}) → ${tierLabels[toTier]} (T${toTier})`,
+    outcome: `Moved to Tier ${toTier}`,
+    notes: justification,
+  });
+}
+
+export function getTierChangesForPatient(patientId: string): InteractionEntry[] {
+  return tierChangeLog.filter(e => e.id.startsWith(`tier_${patientId}_`));
 }
 
 export function getPatientInteractionHistory(patientId: string): InteractionEntry[] {
@@ -240,6 +259,10 @@ export function getPatientInteractionHistory(patientId: string): InteractionEntr
       });
     });
   });
+
+  // Tier changes from session
+  const patientTierChanges = tierChangeLog.filter(e => e.id.includes(`_${patientId}_`));
+  entries.push(...patientTierChanges);
 
   return entries.sort((a, b) => b.date.localeCompare(a.date));
 }

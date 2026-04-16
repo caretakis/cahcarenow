@@ -7,8 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { TierChangeDialog } from "@/components/TierChangeDialog";
 import { Search, Users, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { toast } from "sonner";
 
 const tierOrder: CareTier[] = [4, 3, 2, 1];
 
@@ -21,6 +21,9 @@ export default function PopulationView() {
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<"acuity" | "needs" | "lastTouched">("acuity");
   const [sortAsc, setSortAsc] = useState(false);
+
+  // Tier change dialog state
+  const [tierChangeTarget, setTierChangeTarget] = useState<{ patientId: string; patientName: string; currentTier: CareTier; newTier: CareTier } | null>(null);
 
   const owners = useMemo(() => [...new Set(allRecords.map(r => r.assignedOwner))].sort(), [allRecords]);
 
@@ -67,10 +70,6 @@ export default function PopulationView() {
   const handleSort = (field: typeof sortField) => {
     if (sortField === field) setSortAsc(!sortAsc);
     else { setSortField(field); setSortAsc(false); }
-  };
-
-  const handleMoveTier = (patientName: string, newTier: CareTier) => {
-    toast.success(`${patientName} moved to Tier ${newTier} — ${tierLabels[newTier]}`);
   };
 
   return (
@@ -173,13 +172,13 @@ export default function PopulationView() {
                       <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
                         {r.careTier < 4 && (
                           <Button size="sm" variant="ghost" className="px-1.5 h-7" title={`Move up to Tier ${r.careTier + 1}`}
-                            onClick={() => handleMoveTier(r.patient.name, (r.careTier + 1) as CareTier)}>
+                            onClick={() => setTierChangeTarget({ patientId: r.patient.id, patientName: r.patient.name, currentTier: r.careTier, newTier: (r.careTier + 1) as CareTier })}>
                             <ArrowUp className="h-3.5 w-3.5" />
                           </Button>
                         )}
                         {r.careTier > 1 && (
                           <Button size="sm" variant="ghost" className="px-1.5 h-7" title={`Move down to Tier ${r.careTier - 1}`}
-                            onClick={() => handleMoveTier(r.patient.name, (r.careTier - 1) as CareTier)}>
+                            onClick={() => setTierChangeTarget({ patientId: r.patient.id, patientName: r.patient.name, currentTier: r.careTier, newTier: (r.careTier - 1) as CareTier })}>
                             <ArrowDown className="h-3.5 w-3.5" />
                           </Button>
                         )}
@@ -192,6 +191,18 @@ export default function PopulationView() {
           </div>
         </div>
       ))}
+
+      {/* Tier change justification dialog */}
+      {tierChangeTarget && (
+        <TierChangeDialog
+          open={!!tierChangeTarget}
+          onOpenChange={(open) => !open && setTierChangeTarget(null)}
+          patientId={tierChangeTarget.patientId}
+          patientName={tierChangeTarget.patientName}
+          currentTier={tierChangeTarget.currentTier}
+          newTier={tierChangeTarget.newTier}
+        />
+      )}
     </div>
   );
 }
