@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence, getPatientEpisodes, needs as allNeeds } from "@/data/sampleData";
+import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence, getPatientEpisodes, needs as allNeeds, programs } from "@/data/sampleData";
 import { buildPopulationRecords, tierLabels, tierColors, getPatientInteractionHistory, type CareTier } from "@/data/populationData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -159,6 +159,115 @@ export default function PatientPage() {
                     <p className="text-xs text-muted-foreground">Open Gaps</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Active Protocols */}
+          {(patientEpisodes.filter(e => e.status === "ACTIVE").length > 0 ||
+            enrollments.filter(e => e.status === "active").length > 0 ||
+            medAdherence.length > 0) && (
+            <Card>
+              <CardHeader className="pb-3"><CardTitle className="text-base">Active Protocols</CardTitle></CardHeader>
+              <CardContent className="space-y-3">
+                {/* TOC Episodes */}
+                {patientEpisodes.filter(e => e.status === "ACTIVE").map(ep => {
+                  const stageLabels: Record<string, string> = {
+                    admitted: "Admitted",
+                    discharged: "Discharged — Awaiting Contact",
+                    interactive_contact: "Interactive Contact",
+                    pcp_visit: "PCP Visit Scheduling",
+                    follow_ups: "Weekly Follow-Ups",
+                    closed: "Closed",
+                  };
+                  const completedSteps = ep.steps.filter(s => s.status === "DONE").length;
+                  const totalSteps = ep.steps.length;
+                  return (
+                    <div key={ep.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                      <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center shrink-0 text-sm">🏥</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">Transition of Care</span>
+                          <Badge variant="outline" className="text-[10px] bg-warning/10 text-warning border-warning/20">
+                            {stageLabels[ep.currentStage] || ep.currentStage}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {ep.facility} · Admitted {ep.startDate.split("T")[0]} · Discharged {ep.dischargeDate.split("T")[0]}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <span>{completedSteps}/{totalSteps} steps complete</span>
+                          <span>·</span>
+                          <span>48h SLA: {new Date(ep.sla48hDue) < new Date() ? <span className="text-destructive font-medium">Overdue</span> : ep.sla48hDue.split("T")[0]}</span>
+                          <span>·</span>
+                          <span>Nurse: {ep.assignedNurse}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Program Enrollments */}
+                {enrollments.filter(e => e.status === "active").map(enr => {
+                  const prog = programs.find(p => p.id === enr.programId);
+                  const completedCheckpoints = enr.checkpointStatuses.filter(c => c.status === "DONE").length;
+                  const totalCheckpoints = enr.checkpointStatuses.length;
+                  const nextDue = enr.checkpointStatuses.find(c => c.status === "OPEN" && c.nextDue);
+                  const isOverdue = nextDue?.nextDue && nextDue.nextDue < new Date().toISOString().split("T")[0];
+                  return (
+                    <div key={enr.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 text-sm">📋</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">{prog?.name || enr.programId}</span>
+                          <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">Active</Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Enrolled {enr.enrollDate}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <span>{completedCheckpoints}/{totalCheckpoints} checkpoints</span>
+                          {nextDue && (
+                            <>
+                              <span>·</span>
+                              <span>Next due: {isOverdue ? <span className="text-destructive font-medium">{nextDue.nextDue} (overdue)</span> : nextDue.nextDue}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Med Adherence Measures */}
+                {medAdherence.map(med => {
+                  const riskBadge: Record<string, string> = {
+                    on_track: "bg-success/10 text-success border-success/20",
+                    at_risk: "bg-warning/10 text-warning border-warning/20",
+                    overdue: "bg-destructive/10 text-destructive border-destructive/20",
+                    no_data: "bg-muted text-muted-foreground border-border",
+                  };
+                  return (
+                    <div key={med.id} className="flex items-start gap-3 p-3 rounded-lg border bg-muted/20">
+                      <div className="h-8 w-8 rounded-lg bg-info/10 flex items-center justify-center shrink-0 text-sm">💊</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-sm font-medium">{med.metric}</span>
+                          <Badge variant="outline" className={`text-[10px] ${riskBadge[med.riskLevel]}`}>
+                            {med.riskLevel.replace("_", " ")}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                          <span>Last fill: {med.lastFill}</span>
+                          <span>·</span>
+                          <span>Refill due: {med.refillDue}</span>
+                          <span>·</span>
+                          <span>Pickup: {med.pickupStatus.replace("_", " ")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
           )}
