@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { buildPopulationRecords, tierLabels, tierColors, tierOwnerRole, tierCadence, type CareTier } from "@/data/populationData";
+import { ViewingAsSelector } from "@/components/ViewingAsSelector";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +16,7 @@ const noContactThreshold: Record<CareTier, number> = { 4: 30, 3: 90, 2: 180, 1: 
 
 export default function CareTiers() {
   const navigate = useNavigate();
+  const [viewingAs, setViewingAs] = useState("me");
   const allRecords = useMemo(() => buildPopulationRecords(), []);
 
   const [reviewPatientId, setReviewPatientId] = useState<string | null>(null);
@@ -44,9 +46,12 @@ export default function CareTiers() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Care Tiers</h1>
-        <p className="text-muted-foreground text-sm">Tier health across the attributed population — review flagged patients</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Care Tiers</h1>
+          <p className="text-muted-foreground text-sm">Tier health across the attributed population — review flagged patients</p>
+        </div>
+        <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
       </div>
 
       {/* Tier health cards - softer colors */}
