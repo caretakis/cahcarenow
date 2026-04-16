@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { TierChangeDialog } from "@/components/TierChangeDialog";
 import { AlertTriangle, Check, Users, Activity, Clock } from "lucide-react";
 
 const tierOrder: CareTier[] = [4, 3, 2, 1];
@@ -17,6 +18,8 @@ export default function CareTiers() {
   const allRecords = useMemo(() => buildPopulationRecords(), []);
 
   const [reviewPatientId, setReviewPatientId] = useState<string | null>(null);
+  const [selectedNewTier, setSelectedNewTier] = useState<string>("");
+  const [tierChangeTarget, setTierChangeTarget] = useState<{ patientId: string; patientName: string; currentTier: CareTier; newTier: CareTier } | null>(null);
   const reviewRecord = allRecords.find(r => r.patient.id === reviewPatientId);
 
   // Tier summary cards
