@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getPatientById, getPatientNeeds, getPatientOutreach, getPatientEnrollments, getPatientMedAdherence, getPatientEpisodes, needs as allNeeds, programs } from "@/data/sampleData";
 import { buildPopulationRecords, tierLabels, tierColors, getPatientInteractionHistory, type CareTier } from "@/data/populationData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
