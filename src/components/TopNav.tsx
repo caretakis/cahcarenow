@@ -24,7 +24,6 @@ const workflowItems = [
 ];
 
 const utilityItems = [
-  { label: "Patients", path: "/patients", modulePrefix: "/patients", icon: Users },
   { label: "Dashboards", path: "/dashboards/manager", modulePrefix: "/dashboards", icon: BarChart3 },
 ];
 

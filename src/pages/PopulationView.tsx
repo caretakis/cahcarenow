@@ -19,6 +19,8 @@ export default function PopulationView() {
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
+  const [practiceFilter, setPracticeFilter] = useState<string>("all");
+  const [providerFilter, setProviderFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<"acuity" | "needs" | "lastTouched">("acuity");
   const [sortAsc, setSortAsc] = useState(false);
 
@@ -26,6 +28,12 @@ export default function PopulationView() {
   const [tierChangeTarget, setTierChangeTarget] = useState<{ patientId: string; patientName: string; currentTier: CareTier; newTier: CareTier } | null>(null);
 
   const owners = useMemo(() => [...new Set(allRecords.map(r => r.assignedOwner))].sort(), [allRecords]);
+  const practices = useMemo(() => [...new Set(allRecords.map(r => r.patient.practice))].sort(), [allRecords]);
+  const providers = useMemo(() => {
+    let records = allRecords;
+    if (practiceFilter !== "all") records = records.filter(r => r.patient.practice === practiceFilter);
+    return [...new Set(records.map(r => r.patient.provider))].sort();
+  }, [allRecords, practiceFilter]);
 
   const filtered = useMemo(() => {
     let result = allRecords;
@@ -39,6 +47,12 @@ export default function PopulationView() {
     if (ownerFilter !== "all") {
       result = result.filter(r => r.assignedOwner === ownerFilter);
     }
+    if (practiceFilter !== "all") {
+      result = result.filter(r => r.patient.practice === practiceFilter);
+    }
+    if (providerFilter !== "all") {
+      result = result.filter(r => r.patient.provider === providerFilter);
+    }
     result = [...result].sort((a, b) => {
       let cmp = 0;
       if (sortField === "acuity") cmp = b.acuityScore - a.acuityScore;
@@ -51,7 +65,7 @@ export default function PopulationView() {
       return sortAsc ? -cmp : cmp;
     });
     return result;
-  }, [allRecords, search, tierFilter, ownerFilter, sortField, sortAsc]);
+  }, [allRecords, search, tierFilter, ownerFilter, practiceFilter, providerFilter, sortField, sortAsc]);
 
   const grouped = useMemo(() => {
     if (tierFilter !== "all") return [{ tier: Number(tierFilter) as CareTier, records: filtered }];
@@ -104,6 +118,20 @@ export default function PopulationView() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search patients…" value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
+        <Select value={practiceFilter} onValueChange={(v) => { setPracticeFilter(v); setProviderFilter("all"); }}>
+          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Practice" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All practices</SelectItem>
+            {practices.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={providerFilter} onValueChange={setProviderFilter}>
+          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Provider" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All providers</SelectItem>
+            {providers.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <Select value={ownerFilter} onValueChange={setOwnerFilter}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Assigned owner" /></SelectTrigger>
           <SelectContent>
