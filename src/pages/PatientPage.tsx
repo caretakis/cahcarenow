@@ -29,6 +29,7 @@ const needCategoryIcons: Record<string, string> = {
 
 export default function PatientPage() {
   const { patientId } = useParams();
+  const navigate = useNavigate();
   const [callModalOpen, setCallModalOpen] = useState(false);
   const patient = patientId ? getPatientById(patientId) : undefined;
   const patientNeeds = patient ? getPatientNeeds(patient.id) : [];
