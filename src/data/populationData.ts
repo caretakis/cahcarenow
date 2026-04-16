@@ -16,14 +16,14 @@ export const tierColors: Record<CareTier, string> = {
   4: "bg-destructive/20 text-destructive border-destructive/30",
   3: "bg-warning/20 text-warning border-warning/30",
   2: "bg-info/20 text-info border-info/30",
-  1: "bg-muted text-muted-foreground border-border",
+  1: "bg-success/20 text-success border-success/30",
 };
 
 export const tierBorderColors: Record<CareTier, string> = {
   4: "border-destructive/30",
   3: "border-warning/30",
   2: "border-info/30",
-  1: "border-border",
+  1: "border-success/30",
 };
 
 export const tierOwnerRole: Record<CareTier, string> = {
