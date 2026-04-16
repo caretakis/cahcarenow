@@ -1,18 +1,31 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, List, ArrowRightLeft, Layers, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog } from "lucide-react";
+import { Globe, UserSquare2, Layers, LayoutGrid, List, ArrowRightLeft, Layers as LayersIcon, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUserRole, roleLabels, roleDescriptions, roleDefaultRoute, type UserRole } from "@/contexts/UserRoleContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
-const allNavItems = [
-  { label: "Dashboards", path: "/dashboards/manager", modulePrefix: "/dashboards", icon: BarChart3 },
+// Primary nav items — patient-first
+const primaryNavItems = [
+  { label: "Population", path: "/population", modulePrefix: "/population", icon: Globe },
+  { label: "My Panel", path: "/panel", modulePrefix: "/panel", icon: UserSquare2 },
+  { label: "Care Tiers", path: "/care-tiers", modulePrefix: "/care-tiers", icon: Layers },
+];
+
+// Workflow items — grouped
+const workflowItems = [
   { label: "Work Queues", path: "/queues", modulePrefix: "/queues", icon: LayoutGrid },
   { label: "Chase Lists", path: "/lists", modulePrefix: "/lists", icon: List },
   { label: "TOC", path: "/toc", modulePrefix: "/toc", icon: ArrowRightLeft },
-  { label: "Programs", path: "/programs", modulePrefix: "/programs", icon: Layers },
+  { label: "Programs", path: "/programs", modulePrefix: "/programs", icon: LayersIcon },
   { label: "Med Adherence", path: "/med-adherence", modulePrefix: "/med-adherence", icon: Pill },
+];
+
+const utilityItems = [
   { label: "Patients", path: "/patients", modulePrefix: "/patients", icon: Users },
+  { label: "Dashboards", path: "/dashboards/manager", modulePrefix: "/dashboards", icon: BarChart3 },
 ];
 
 const managerItems = [
@@ -20,11 +33,33 @@ const managerItems = [
   { label: "Productivity", path: "/manager/productivity", modulePrefix: "/manager", icon: TrendingUp },
 ];
 
+function NavItem({ item, end }: { item: typeof primaryNavItems[0]; end?: boolean }) {
+  return (
+    <NavLink
+      to={item.path}
+      end={end}
+      className={({ isActive }) =>
+        cn(
+          "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+        )
+      }
+    >
+      <item.icon className="h-4 w-4" />
+      <span className="hidden lg:inline">{item.label}</span>
+    </NavLink>
+  );
+}
+
 export function TopNav() {
   const { role, setRole, hasAccess } = useUserRole();
   const navigate = useNavigate();
 
-  const visibleNavItems = allNavItems.filter(item => hasAccess(item.modulePrefix));
+  const visiblePrimary = primaryNavItems.filter(item => hasAccess(item.modulePrefix));
+  const visibleWorkflows = workflowItems.filter(item => hasAccess(item.modulePrefix));
+  const visibleUtility = utilityItems.filter(item => hasAccess(item.modulePrefix));
   const showManagerSection = hasAccess("/manager");
   const showAdmin = hasAccess("/admin");
 
@@ -38,44 +73,45 @@ export function TopNav() {
       <span className="text-lg font-bold tracking-tight text-primary mr-4 shrink-0">CareCatalyst</span>
 
       <nav className="flex items-center gap-0.5">
-        {visibleNavItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            end={item.path === "/"}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )
-            }
-          >
-            <item.icon className="h-4 w-4" />
-            <span className="hidden lg:inline">{item.label}</span>
-          </NavLink>
+        {/* Primary: Population, My Panel, Care Tiers */}
+        {visiblePrimary.map(item => (
+          <NavItem key={item.path} item={item} />
+        ))}
+
+        {/* Workflows dropdown + inline */}
+        {visibleWorkflows.length > 0 && (
+          <>
+            <div className="w-px h-6 bg-border mx-1.5" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1 text-sm font-medium text-muted-foreground hover:text-foreground">
+                  <LayoutGrid className="h-4 w-4" />
+                  <span className="hidden lg:inline">Workflows</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {visibleWorkflows.map(item => (
+                  <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)} className="gap-2">
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
+
+        {/* Utility items */}
+        {visibleUtility.map(item => hasAccess(item.modulePrefix) && (
+          <NavItem key={item.path} item={item} />
         ))}
 
         {showManagerSection && (
           <>
             <div className="w-px h-6 bg-border mx-1.5" />
             {managerItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  )
-                }
-              >
-                <item.icon className="h-4 w-4" />
-                <span className="hidden lg:inline">{item.label}</span>
-              </NavLink>
+              <NavItem key={item.path} item={item} />
             ))}
           </>
         )}

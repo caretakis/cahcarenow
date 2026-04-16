@@ -18,18 +18,18 @@ export const roleDescriptions: Record<UserRole, string> = {
 
 // Which nav modules each role can access
 export const roleModules: Record<UserRole, string[]> = {
-  coordinator: ["/queues", "/lists", "/patients"],
-  advanced_coordinator: ["/queues", "/lists", "/toc", "/med-adherence", "/patients"],
-  care_manager: ["/queues", "/toc", "/programs", "/med-adherence", "/patients"],
-  manager: ["/dashboards", "/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients", "/manager", "/admin"],
+  coordinator: ["/population", "/panel", "/queues", "/lists", "/patients"],
+  advanced_coordinator: ["/population", "/panel", "/queues", "/lists", "/toc", "/med-adherence", "/patients"],
+  care_manager: ["/population", "/panel", "/care-tiers", "/queues", "/toc", "/programs", "/med-adherence", "/patients"],
+  manager: ["/population", "/panel", "/care-tiers", "/dashboards", "/queues", "/lists", "/toc", "/programs", "/med-adherence", "/patients", "/manager", "/admin"],
 };
 
 // Default landing page per role
 export const roleDefaultRoute: Record<UserRole, string> = {
-  coordinator: "/queues",
-  advanced_coordinator: "/toc",
-  care_manager: "/queues",
-  manager: "/dashboards/manager",
+  coordinator: "/panel",
+  advanced_coordinator: "/panel",
+  care_manager: "/panel",
+  manager: "/population",
 };
 
 interface UserRoleContextValue {
