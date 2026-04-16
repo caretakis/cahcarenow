@@ -1,13 +1,15 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { buildPopulationRecords, tierLabels, tierColors, type CareTier, type TierFitStatus } from "@/data/populationData";
+import { buildPopulationRecords, tierLabels, tierColors, type CareTier } from "@/data/populationData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { AlertTriangle, Check, Search, Users, ArrowUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Search, Users, ArrowUpDown, ArrowRightLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const tierOrder: CareTier[] = [4, 3, 2, 1];
 
@@ -17,7 +19,6 @@ export default function PopulationView() {
 
   const [search, setSearch] = useState("");
   const [tierFilter, setTierFilter] = useState<string>("all");
-  const [fitFilter, setFitFilter] = useState<string>("all");
   const [ownerFilter, setOwnerFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<"acuity" | "needs" | "lastTouched">("acuity");
   const [sortAsc, setSortAsc] = useState(false);
@@ -33,13 +34,9 @@ export default function PopulationView() {
     if (tierFilter !== "all") {
       result = result.filter(r => r.careTier === Number(tierFilter));
     }
-    if (fitFilter === "flagged") {
-      result = result.filter(r => r.tierFit !== "appropriate");
-    }
     if (ownerFilter !== "all") {
       result = result.filter(r => r.assignedOwner === ownerFilter);
     }
-    // Sort
     result = [...result].sort((a, b) => {
       let cmp = 0;
       if (sortField === "acuity") cmp = b.acuityScore - a.acuityScore;
@@ -47,14 +44,13 @@ export default function PopulationView() {
       else if (sortField === "lastTouched") {
         const aDate = a.lastTouched || "1970-01-01";
         const bDate = b.lastTouched || "1970-01-01";
-        cmp = aDate.localeCompare(bDate); // older first = needs attention
+        cmp = aDate.localeCompare(bDate);
       }
       return sortAsc ? -cmp : cmp;
     });
     return result;
-  }, [allRecords, search, tierFilter, fitFilter, ownerFilter, sortField, sortAsc]);
+  }, [allRecords, search, tierFilter, ownerFilter, sortField, sortAsc]);
 
-  // Group by tier for display
   const grouped = useMemo(() => {
     if (tierFilter !== "all") return [{ tier: Number(tierFilter) as CareTier, records: filtered }];
     return tierOrder.map(tier => ({
@@ -63,16 +59,9 @@ export default function PopulationView() {
     })).filter(g => g.records.length > 0);
   }, [filtered, tierFilter]);
 
-  // Summary stats
   const tierCounts = useMemo(() => {
-    const counts: Record<CareTier, { total: number; flagged: number }> = {
-      4: { total: 0, flagged: 0 }, 3: { total: 0, flagged: 0 },
-      2: { total: 0, flagged: 0 }, 1: { total: 0, flagged: 0 },
-    };
-    allRecords.forEach(r => {
-      counts[r.careTier].total++;
-      if (r.tierFit !== "appropriate") counts[r.careTier].flagged++;
-    });
+    const counts: Record<CareTier, number> = { 4: 0, 3: 0, 2: 0, 1: 0 };
+    allRecords.forEach(r => { counts[r.careTier]++; });
     return counts;
   }, [allRecords]);
 
@@ -81,9 +70,8 @@ export default function PopulationView() {
     else { setSortField(field); setSortAsc(false); }
   };
 
-  const fitIcon = (fit: TierFitStatus) => {
-    if (fit === "appropriate") return <Check className="h-3.5 w-3.5 text-success" />;
-    return <AlertTriangle className="h-3.5 w-3.5 text-warning" />;
+  const handleMoveTier = (patientName: string, newTier: CareTier) => {
+    toast.success(`${patientName} moved to Tier ${newTier} — ${tierLabels[newTier]}`);
   };
 
   return (
@@ -93,7 +81,7 @@ export default function PopulationView() {
         <p className="text-muted-foreground text-sm">Attributed population stratified by care tier</p>
       </div>
 
-      {/* Tier summary cards - softer colors */}
+      {/* Tier summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {tierOrder.map(tier => (
           <Card
@@ -104,13 +92,8 @@ export default function PopulationView() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-1">
                 <Badge variant="outline" className={`${tierColors[tier]} text-xs font-bold`}>Tier {tier}</Badge>
-                {tierCounts[tier].flagged > 0 && (
-                  <span className="text-xs text-warning font-medium flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" />{tierCounts[tier].flagged}
-                  </span>
-                )}
               </div>
-              <p className="text-2xl font-bold">{tierCounts[tier].total}</p>
+              <p className="text-2xl font-bold">{tierCounts[tier]}</p>
               <p className="text-xs text-muted-foreground">{tierLabels[tier]}</p>
             </CardContent>
           </Card>
@@ -123,13 +106,6 @@ export default function PopulationView() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Search patients…" value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <Select value={fitFilter} onValueChange={setFitFilter}>
-          <SelectTrigger className="w-[150px]"><SelectValue placeholder="Tier fit" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All patients</SelectItem>
-            <SelectItem value="flagged">⚠ Flagged only</SelectItem>
-          </SelectContent>
-        </Select>
         <Select value={ownerFilter} onValueChange={setOwnerFilter}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Assigned owner" /></SelectTrigger>
           <SelectContent>
@@ -168,8 +144,7 @@ export default function PopulationView() {
                   <TableHead className="cursor-pointer" onClick={() => handleSort("lastTouched")}>
                     <span className="flex items-center gap-1">Last Touched <ArrowUpDown className="h-3 w-3" /></span>
                   </TableHead>
-                  <TableHead className="w-[60px]">Fit</TableHead>
-                  <TableHead className="w-[80px]"></TableHead>
+                  <TableHead className="w-[120px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,14 +171,31 @@ export default function PopulationView() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{r.lastTouched || "Never"}</TableCell>
                     <TableCell>
-                      <span title={r.tierFitReason || "Appropriately tiered"}>
-                        {fitIcon(r.tierFit)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Button size="sm" variant="ghost" className="text-xs" onClick={e => { e.stopPropagation(); navigate(`/patients/${r.patient.id}`); }}>
-                        View
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button size="sm" variant="ghost" className="text-xs" onClick={e => { e.stopPropagation(); navigate(`/patients/${r.patient.id}`); }}>
+                          View
+                        </Button>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button size="sm" variant="ghost" className="text-xs px-2" onClick={e => e.stopPropagation()} title="Move to different tier">
+                              <ArrowRightLeft className="h-3.5 w-3.5" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48 p-2" align="end" onClick={e => e.stopPropagation()}>
+                            <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Move to tier</p>
+                            {tierOrder.filter(t => t !== r.careTier).map(t => (
+                              <button
+                                key={t}
+                                className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-muted transition-colors text-left"
+                                onClick={() => handleMoveTier(r.patient.name, t)}
+                              >
+                                <Badge variant="outline" className={`${tierColors[t]} text-[10px] px-1.5`}>T{t}</Badge>
+                                <span>{tierLabels[t]}</span>
+                              </button>
+                            ))}
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
