@@ -20,14 +20,29 @@ export default function MyPanel() {
 
   const [tierFilter, setTierFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [cardFilter, setCardFilter] = useState<string | null>(null);
+
+  const overduePts = myRecords.filter(r => r.nextActionDue && r.nextActionDue < "2026-04-16");
+  const noContactPts = myRecords.filter(r => {
+    if (!r.lastTouched) return r.careTier >= 3;
+    const days = Math.floor((Date.now() - new Date(r.lastTouched).getTime()) / 86400000);
+    return (r.careTier === 4 && days > 30) || (r.careTier === 3 && days > 90);
+  });
+  const tocDuePts = myRecords.filter(r => r.nextAction?.includes("TOC") || r.nextAction?.includes("Interactive Contact") || r.nextAction?.includes("Discharged"));
+  const scheduledToday = myRecords.filter(r => r.nextActionDue === "2026-04-16");
 
   const filtered = useMemo(() => {
     let result = myRecords;
+    if (cardFilter === "overdue") result = overduePts;
+    else if (cardFilter === "toc") result = tocDuePts;
+    else if (cardFilter === "no_contact") result = noContactPts;
+    else if (cardFilter === "today") result = scheduledToday;
+    
     if (tierFilter !== "all") result = result.filter(r => r.careTier === Number(tierFilter));
     if (statusFilter === "overdue") result = result.filter(r => r.nextActionDue && r.nextActionDue < "2026-04-16");
     if (statusFilter === "on_track") result = result.filter(r => !r.nextActionDue || r.nextActionDue >= "2026-04-16");
     return result;
-  }, [myRecords, tierFilter, statusFilter]);
+  }, [myRecords, tierFilter, statusFilter, cardFilter, overduePts, tocDuePts, noContactPts, scheduledToday]);
 
   // Priority cards
   const overduePts = myRecords.filter(r => r.nextActionDue && r.nextActionDue < "2026-04-16");
