@@ -44,15 +44,7 @@ export default function MyPanel() {
     return result;
   }, [myRecords, tierFilter, statusFilter, cardFilter, overduePts, tocDuePts, noContactPts, scheduledToday]);
 
-  // Priority cards
-  const overduePts = myRecords.filter(r => r.nextActionDue && r.nextActionDue < "2026-04-16");
-  const noContactPts = myRecords.filter(r => {
-    if (!r.lastTouched) return r.careTier >= 3;
-    const days = Math.floor((Date.now() - new Date(r.lastTouched).getTime()) / 86400000);
-    return (r.careTier === 4 && days > 30) || (r.careTier === 3 && days > 90);
-  });
-  const tocDuePts = myRecords.filter(r => r.nextAction?.includes("TOC") || r.nextAction?.includes("Interactive Contact") || r.nextAction?.includes("Discharged"));
-  const scheduledToday = myRecords.filter(r => r.nextActionDue === "2026-04-16");
+
 
   const getStatus = (r: typeof myRecords[0]) => {
     if (r.nextActionDue && r.nextActionDue < "2026-04-16") return "overdue";
