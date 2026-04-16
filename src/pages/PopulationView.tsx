@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, Users, ArrowUpDown, ArrowRightLeft } from "lucide-react";
+import { Search, Users, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 
 const tierOrder: CareTier[] = [4, 3, 2, 1];
@@ -144,7 +144,7 @@ export default function PopulationView() {
                   <TableHead className="cursor-pointer" onClick={() => handleSort("lastTouched")}>
                     <span className="flex items-center gap-1">Last Touched <ArrowUpDown className="h-3 w-3" /></span>
                   </TableHead>
-                  <TableHead className="w-[120px]"></TableHead>
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -171,30 +171,19 @@ export default function PopulationView() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{r.lastTouched || "Never"}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" className="text-xs" onClick={e => { e.stopPropagation(); navigate(`/patients/${r.patient.id}`); }}>
-                          View
-                        </Button>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button size="sm" variant="ghost" className="text-xs px-2" onClick={e => e.stopPropagation()} title="Move to different tier">
-                              <ArrowRightLeft className="h-3.5 w-3.5" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-48 p-2" align="end" onClick={e => e.stopPropagation()}>
-                            <p className="text-xs font-medium text-muted-foreground mb-2 px-2">Move to tier</p>
-                            {tierOrder.filter(t => t !== r.careTier).map(t => (
-                              <button
-                                key={t}
-                                className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-sm hover:bg-muted transition-colors text-left"
-                                onClick={() => handleMoveTier(r.patient.name, t)}
-                              >
-                                <Badge variant="outline" className={`${tierColors[t]} text-[10px] px-1.5`}>T{t}</Badge>
-                                <span>{tierLabels[t]}</span>
-                              </button>
-                            ))}
-                          </PopoverContent>
-                        </Popover>
+                      <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
+                        {r.careTier < 4 && (
+                          <Button size="sm" variant="ghost" className="px-1.5 h-7" title={`Move up to Tier ${r.careTier + 1}`}
+                            onClick={() => handleMoveTier(r.patient.name, (r.careTier + 1) as CareTier)}>
+                            <ArrowUp className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+                        {r.careTier > 1 && (
+                          <Button size="sm" variant="ghost" className="px-1.5 h-7" title={`Move down to Tier ${r.careTier - 1}`}
+                            onClick={() => handleMoveTier(r.patient.name, (r.careTier - 1) as CareTier)}>
+                            <ArrowDown className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
