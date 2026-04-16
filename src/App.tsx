@@ -17,6 +17,7 @@ import TOCHome from "@/pages/TOCHome";
 import TOCEpisode from "@/pages/TOCEpisode";
 import ProgramsHome from "@/pages/ProgramsHome";
 import ProgramPanel from "@/pages/ProgramPanel";
+import DMEpisode from "@/pages/DMEpisode";
 import MedAdherenceHome from "@/pages/MedAdherenceHome";
 import PatientsSearch from "@/pages/PatientsSearch";
 import PatientPage from "@/pages/PatientPage";
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/toc/episode/:episodeId" element={<TOCEpisode />} />
                 <Route path="/programs" element={<ProgramsHome />} />
                 <Route path="/programs/:programId" element={<ProgramPanel />} />
+                <Route path="/programs/enrollment/:enrollmentId" element={<DMEpisode />} />
                 <Route path="/med-adherence" element={<MedAdherenceHome />} />
                 <Route path="/patients" element={<PatientsSearch />} />
                 <Route path="/patients/:patientId" element={<PatientPage />} />
