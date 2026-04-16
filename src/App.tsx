@@ -56,7 +56,7 @@ const App = () => (
                 <Route path="/programs/:programId" element={<ProgramPanel />} />
                 <Route path="/programs/enrollment/:enrollmentId" element={<DMEpisode />} />
                 <Route path="/med-adherence" element={<MedAdherenceHome />} />
-                <Route path="/patients" element={<PatientsSearch />} />
+                {/* Patient search is now integrated into Population view */}
                 <Route path="/patients/:patientId" element={<PatientPage />} />
                 <Route path="/dashboards/manager" element={<ManagerDashboard />} />
                 <Route path="/dashboards/site" element={<SiteDashboard />} />
