@@ -42,6 +42,7 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
       setNotes("");
       setMuted(false);
       setElapsed(0);
+      setMinimized(false);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [open, patient.id]);
