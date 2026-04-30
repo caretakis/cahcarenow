@@ -526,10 +526,9 @@ export default function ChaseListsPage() {
           onLogAndNext={() => {
             const idx = listPatients.findIndex(p => p.id === callPatient.id);
             const next = listPatients[idx + 1];
+            setCallPatient(null);
             if (next) {
-              setCallPatient(next);
-            } else {
-              setCallPatient(null);
+              setSelectedPatient(next);
             }
           }}
         />
