@@ -12,6 +12,7 @@ import { SnoozeDialog } from "./SnoozeDialog";
 import { AssignDialog } from "./AssignDialog";
 import { EscalateDialog } from "./EscalateDialog";
 import { toast } from "sonner";
+import { useMvpMode } from "@/contexts/MvpModeContext";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
