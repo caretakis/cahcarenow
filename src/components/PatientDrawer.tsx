@@ -67,7 +67,9 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
         <div className="p-4 border-b">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-lg font-semibold">{patient.name}</h2>
+              <Link to={`/patients/${patient.id}`} className="text-lg font-semibold hover:underline hover:text-primary transition-colors">
+                {patient.name}
+              </Link>
               <p className="text-sm text-muted-foreground">
                 {age}y · {patient.payer} · {patient.practice}
               </p>
