@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { differenceInDays, parseISO } from "date-fns";
+import { useMvpMode } from "@/contexts/MvpModeContext";
 
 type SortKey = "risk" | "openHcc" | "gaps";
 type SortDir = "asc" | "desc";
@@ -41,6 +42,7 @@ type SelectedItem = { type: "list"; id: string } | { type: "campaign"; id: strin
 
 export default function ChaseListsPage() {
   const navigate = useNavigate();
+  const { mvpMode } = useMvpMode();
   const [viewingAs, setViewingAs] = useState("me");
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
