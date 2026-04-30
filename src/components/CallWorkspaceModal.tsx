@@ -88,15 +88,35 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
     }
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5 text-primary" />
-            {phase === "logging" ? "Log Call" : "Call"} — {patient.name}
-          </DialogTitle>
-        </DialogHeader>
+    <div
+      className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-lg border bg-card shadow-2xl"
+      role="dialog"
+      aria-label={`Call with ${patient.name}`}
+    >
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b bg-muted/30 rounded-t-lg">
+        <div className="flex items-center gap-2 min-w-0">
+          <Phone className="h-4 w-4 text-primary shrink-0" />
+          <span className="text-sm font-medium truncate">
+            {phase === "logging" ? "Log Call" : phase === "connected" ? "On Call" : "Calling"} — {patient.name}
+            {phase === "connected" && !minimized ? "" : phase === "connected" ? ` · ${formatTime(elapsed)}` : ""}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setMinimized(m => !m)} aria-label={minimized ? "Expand" : "Minimize"}>
+            <Minus className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onOpenChange(false)} aria-label="Close">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {!minimized && (
+      <div className="px-4 pb-4">
+
 
         <AnimatePresence mode="wait">
           {/* CALLING / CONNECTED PHASE */}
