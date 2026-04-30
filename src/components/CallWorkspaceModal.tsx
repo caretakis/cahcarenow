@@ -263,5 +263,3 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
     </div>
   );
 }
-  );
-}
