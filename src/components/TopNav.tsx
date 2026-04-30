@@ -60,14 +60,14 @@ export function TopNav() {
   const { mvpMode, setMvpMode } = useMvpMode();
   const navigate = useNavigate();
 
-  const accessFilter = (item: { modulePrefix: string }) =>
-    hasAccess(item.modulePrefix) && (!mvpMode || isMvpAllowedPath(item.modulePrefix));
+  const accessFilter = (item: { modulePrefix: string; path: string }) =>
+    hasAccess(item.modulePrefix) && (!mvpMode || isMvpAllowedPath(item.path));
 
   const visiblePrimary = primaryNavItems.filter(accessFilter);
   const visibleWorkflows = workflowItems.filter(accessFilter);
   const visibleUtility = utilityItems.filter(accessFilter);
-  const showManagerSection = hasAccess("/manager") && (!mvpMode || managerItems.some(i => isMvpAllowedPath(i.modulePrefix)));
   const visibleManager = managerItems.filter(accessFilter);
+  const showManagerSection = hasAccess("/manager") && visibleManager.length > 0;
   const showAdmin = hasAccess("/admin") && !mvpMode;
 
   const handleRoleChange = (newRole: UserRole) => {
