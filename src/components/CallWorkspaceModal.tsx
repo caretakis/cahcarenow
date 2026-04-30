@@ -23,6 +23,8 @@ type Phase = "calling" | "connected" | "logging";
 
 export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }: CallWorkspaceModalProps) {
   const [phase, setPhase] = useState<Phase>("calling");
+  const [minimized, setMinimized] = useState(false);
+  const [phase, setPhase] = useState<Phase>("calling");
   const [outcome, setOutcome] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [followUpDate, setFollowUpDate] = useState("");
