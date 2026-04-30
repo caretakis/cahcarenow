@@ -117,7 +117,7 @@ export function TopNav() {
         {showManagerSection && (
           <>
             <div className="w-px h-6 bg-border mx-1.5" />
-            {managerItems.map((item) => (
+            {visibleManager.map((item) => (
               <NavItem key={item.path} item={item} />
             ))}
           </>
