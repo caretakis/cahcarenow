@@ -1,4 +1,3 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -6,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { useState, useEffect, useRef } from "react";
 import type { Patient } from "@/data/models";
-import { Phone, PhoneOff, Mic, MicOff, Volume2 } from "lucide-react";
+import { Phone, PhoneOff, Mic, MicOff, Volume2, X, Minus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CallWorkspaceModalProps {
@@ -24,6 +23,7 @@ type Phase = "calling" | "connected" | "logging";
 
 export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }: CallWorkspaceModalProps) {
   const [phase, setPhase] = useState<Phase>("calling");
+  const [minimized, setMinimized] = useState(false);
   const [outcome, setOutcome] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [followUpDate, setFollowUpDate] = useState("");
@@ -42,6 +42,7 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
       setNotes("");
       setMuted(false);
       setElapsed(0);
+      setMinimized(false);
     }
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [open, patient.id]);
@@ -87,15 +88,35 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
     }
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Phone className="h-5 w-5 text-primary" />
-            {phase === "logging" ? "Log Call" : "Call"} — {patient.name}
-          </DialogTitle>
-        </DialogHeader>
+    <div
+      className="fixed bottom-4 right-4 z-50 w-[380px] max-w-[calc(100vw-2rem)] rounded-lg border bg-card shadow-2xl"
+      role="dialog"
+      aria-label={`Call with ${patient.name}`}
+    >
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b bg-muted/30 rounded-t-lg">
+        <div className="flex items-center gap-2 min-w-0">
+          <Phone className="h-4 w-4 text-primary shrink-0" />
+          <span className="text-sm font-medium truncate">
+            {phase === "logging" ? "Log Call" : phase === "connected" ? "On Call" : "Calling"} — {patient.name}
+            {phase === "connected" && !minimized ? "" : phase === "connected" ? ` · ${formatTime(elapsed)}` : ""}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setMinimized(m => !m)} aria-label={minimized ? "Expand" : "Minimize"}>
+            <Minus className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onOpenChange(false)} aria-label="Close">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {!minimized && (
+      <div className="px-4 pb-4">
+
 
         <AnimatePresence mode="wait">
           {/* CALLING / CONNECTED PHASE */}
@@ -229,15 +250,16 @@ export function CallWorkspaceModal({ open, onOpenChange, patient, onLogAndNext }
         </AnimatePresence>
 
         {phase === "logging" && (
-          <DialogFooter className="flex flex-row justify-end gap-2">
+          <div className="flex flex-row justify-end gap-2 pt-4 mt-2 border-t">
             <Button variant="outline" onClick={resetAndClose}>Cancel</Button>
             <Button variant="secondary" onClick={handleLogAndClose} disabled={!outcome}>Log & Close</Button>
             {onLogAndNext && (
               <Button onClick={handleLogAndNext} disabled={!outcome}>Log & Next</Button>
             )}
-          </DialogFooter>
+          </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+      )}
+    </div>
   );
 }
