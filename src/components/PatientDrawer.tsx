@@ -49,6 +49,7 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
   const [snoozeOpen, setSnoozeOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [escalateOpen, setEscalateOpen] = useState(false);
+  const { mvpMode } = useMvpMode();
   const patientNeeds = getPatientNeeds(patient.id);
   const patientOutreach = getPatientOutreach(patient.id);
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
