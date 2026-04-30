@@ -6,7 +6,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 // - List Management (/manager/lists, /manager/lists/:id)
 // Patient drawer (clicking a patient name) remains available everywhere.
 
-export const MVP_ALLOWED_PREFIXES = ["/lists", "/manager/lists"];
+export const MVP_ALLOWED_PREFIXES = ["/lists", "/manager/lists", "/dashboards"];
 
 export function isMvpAllowedPath(path: string): boolean {
   return MVP_ALLOWED_PREFIXES.some(p => path === p || path.startsWith(p + "/") || path.startsWith(p + "?"));
