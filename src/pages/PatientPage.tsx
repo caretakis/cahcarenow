@@ -194,7 +194,7 @@ export default function PatientPage() {
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {ep.facility} · Admitted {ep.startDate.split("T")[0]} · Discharged {ep.dischargeDate.split("T")[0]}
+                          {ep.facility} · Admitted {ep.startDate?.split("T")[0] ?? "—"}{ep.dischargeDate ? ` · Discharged ${ep.dischargeDate.split("T")[0]}` : ""}
                         </p>
                         <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                           <span>{completedSteps}/{totalSteps} steps complete</span>
