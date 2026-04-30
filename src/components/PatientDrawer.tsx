@@ -12,6 +12,7 @@ import { SnoozeDialog } from "./SnoozeDialog";
 import { AssignDialog } from "./AssignDialog";
 import { EscalateDialog } from "./EscalateDialog";
 import { toast } from "sonner";
+import { useMvpMode } from "@/contexts/MvpModeContext";
 
 const riskColors: Record<string, string> = {
   low: "bg-success/15 text-success border-success/30",
@@ -48,6 +49,7 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
   const [snoozeOpen, setSnoozeOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [escalateOpen, setEscalateOpen] = useState(false);
+  const { mvpMode } = useMvpMode();
   const patientNeeds = getPatientNeeds(patient.id);
   const patientOutreach = getPatientOutreach(patient.id);
   const age = new Date().getFullYear() - new Date(patient.dob).getFullYear();
@@ -161,7 +163,7 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
         </div>
 
         {/* CTA buttons */}
-        <div className="p-3 border-t bg-card grid grid-cols-5 gap-1.5">
+        <div className={`p-3 border-t bg-card grid ${mvpMode ? "grid-cols-4" : "grid-cols-5"} gap-1.5`}>
           <Button
             variant="default"
             size="sm"
@@ -170,9 +172,11 @@ export function PatientDrawer({ patient, onClose, onStartCall }: PatientDrawerPr
           >
             <Phone className="h-4 w-4" /><span className="text-[10px]">Call</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setScheduleOpen(true)}>
-            <Calendar className="h-4 w-4" /><span className="text-[10px]">Schedule</span>
-          </Button>
+          {!mvpMode && (
+            <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setScheduleOpen(true)}>
+              <Calendar className="h-4 w-4" /><span className="text-[10px]">Schedule</span>
+            </Button>
+          )}
           <Button variant="outline" size="sm" className="flex flex-col items-center gap-0.5 h-auto py-2" onClick={() => setAssignOpen(true)}>
             <UserPlus className="h-4 w-4" /><span className="text-[10px]">Assign</span>
           </Button>
