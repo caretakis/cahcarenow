@@ -1,11 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Globe, UserSquare2, Layers, LayoutGrid, List, ArrowRightLeft, Layers as LayersIcon, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog, ChevronDown } from "lucide-react";
+import { Globe, UserSquare2, Layers, LayoutGrid, List, ArrowRightLeft, Layers as LayersIcon, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog, ChevronDown, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUserRole, roleLabels, roleDescriptions, roleDefaultRoute, type UserRole } from "@/contexts/UserRoleContext";
+import { useMvpMode, isMvpAllowedPath } from "@/contexts/MvpModeContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Primary nav items — patient-first
 const primaryNavItems = [
