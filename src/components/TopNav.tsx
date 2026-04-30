@@ -144,7 +144,24 @@ export function TopNav() {
         )}
       </nav>
 
-      <div className="ml-auto flex items-center gap-2 shrink-0">
+      <div className="ml-auto flex items-center gap-3 shrink-0">
+        <div className={cn(
+          "flex items-center gap-2 px-2.5 py-1 rounded-md border border-dashed transition-colors",
+          mvpMode ? "border-primary/40 bg-primary/5" : "border-border"
+        )}>
+          <Sparkles className={cn("h-3.5 w-3.5", mvpMode ? "text-primary" : "text-muted-foreground")} />
+          <Label htmlFor="mvp-toggle" className="text-xs font-medium cursor-pointer select-none">MVP</Label>
+          <Switch
+            id="mvp-toggle"
+            checked={mvpMode}
+            onCheckedChange={(v) => {
+              setMvpMode(v);
+              if (v) navigate("/lists");
+            }}
+            className="scale-75 -mx-1"
+          />
+        </div>
+        <div className="flex items-center gap-2">
         <Select value={role} onValueChange={(v) => handleRoleChange(v as UserRole)}>
           <SelectTrigger className="h-8 w-auto gap-1.5 text-xs border-dashed">
             <UserCog className="h-3.5 w-3.5 text-muted-foreground" />
