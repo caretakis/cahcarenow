@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { AppLayout } from "@/components/AppLayout";
 import { UserRoleProvider } from "@/contexts/UserRoleContext";
+import { MvpModeProvider } from "@/contexts/MvpModeContext";
 import PopulationView from "@/pages/PopulationView";
 import MyPanel from "@/pages/MyPanel";
 import CareTiers from "@/pages/CareTiers";
@@ -40,6 +41,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <UserRoleProvider>
+            <MvpModeProvider>
             <Routes>
               <Route element={<AppLayout />}>
                 <Route path="/" element={<Navigate to="/population" replace />} />
@@ -68,6 +70,7 @@ const App = () => (
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </MvpModeProvider>
           </UserRoleProvider>
         </BrowserRouter>
       </TooltipProvider>
