@@ -57,13 +57,18 @@ function NavItem({ item, end }: { item: typeof primaryNavItems[0]; end?: boolean
 
 export function TopNav() {
   const { role, setRole, hasAccess } = useUserRole();
+  const { mvpMode, setMvpMode } = useMvpMode();
   const navigate = useNavigate();
 
-  const visiblePrimary = primaryNavItems.filter(item => hasAccess(item.modulePrefix));
-  const visibleWorkflows = workflowItems.filter(item => hasAccess(item.modulePrefix));
-  const visibleUtility = utilityItems.filter(item => hasAccess(item.modulePrefix));
-  const showManagerSection = hasAccess("/manager");
-  const showAdmin = hasAccess("/admin");
+  const accessFilter = (item: { modulePrefix: string }) =>
+    hasAccess(item.modulePrefix) && (!mvpMode || isMvpAllowedPath(item.modulePrefix));
+
+  const visiblePrimary = primaryNavItems.filter(accessFilter);
+  const visibleWorkflows = workflowItems.filter(accessFilter);
+  const visibleUtility = utilityItems.filter(accessFilter);
+  const showManagerSection = hasAccess("/manager") && (!mvpMode || managerItems.some(i => isMvpAllowedPath(i.modulePrefix)));
+  const visibleManager = managerItems.filter(accessFilter);
+  const showAdmin = hasAccess("/admin") && !mvpMode;
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
