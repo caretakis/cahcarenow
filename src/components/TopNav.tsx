@@ -1,11 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Globe, UserSquare2, Layers, LayoutGrid, List, ArrowRightLeft, Layers as LayersIcon, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog, ChevronDown } from "lucide-react";
+import { Globe, UserSquare2, Layers, LayoutGrid, List, ArrowRightLeft, Layers as LayersIcon, Pill, Users, BarChart3, Settings, ClipboardList, TrendingUp, UserCog, ChevronDown, Sparkles } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useUserRole, roleLabels, roleDescriptions, roleDefaultRoute, type UserRole } from "@/contexts/UserRoleContext";
+import { useMvpMode, isMvpAllowedPath } from "@/contexts/MvpModeContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Primary nav items — patient-first
 const primaryNavItems = [
@@ -54,13 +57,18 @@ function NavItem({ item, end }: { item: typeof primaryNavItems[0]; end?: boolean
 
 export function TopNav() {
   const { role, setRole, hasAccess } = useUserRole();
+  const { mvpMode, setMvpMode } = useMvpMode();
   const navigate = useNavigate();
 
-  const visiblePrimary = primaryNavItems.filter(item => hasAccess(item.modulePrefix));
-  const visibleWorkflows = workflowItems.filter(item => hasAccess(item.modulePrefix));
-  const visibleUtility = utilityItems.filter(item => hasAccess(item.modulePrefix));
-  const showManagerSection = hasAccess("/manager");
-  const showAdmin = hasAccess("/admin");
+  const accessFilter = (item: { modulePrefix: string }) =>
+    hasAccess(item.modulePrefix) && (!mvpMode || isMvpAllowedPath(item.modulePrefix));
+
+  const visiblePrimary = primaryNavItems.filter(accessFilter);
+  const visibleWorkflows = workflowItems.filter(accessFilter);
+  const visibleUtility = utilityItems.filter(accessFilter);
+  const showManagerSection = hasAccess("/manager") && (!mvpMode || managerItems.some(i => isMvpAllowedPath(i.modulePrefix)));
+  const visibleManager = managerItems.filter(accessFilter);
+  const showAdmin = hasAccess("/admin") && !mvpMode;
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
@@ -109,7 +117,7 @@ export function TopNav() {
         {showManagerSection && (
           <>
             <div className="w-px h-6 bg-border mx-1.5" />
-            {managerItems.map((item) => (
+            {visibleManager.map((item) => (
               <NavItem key={item.path} item={item} />
             ))}
           </>
@@ -136,7 +144,24 @@ export function TopNav() {
         )}
       </nav>
 
-      <div className="ml-auto flex items-center gap-2 shrink-0">
+      <div className="ml-auto flex items-center gap-3 shrink-0">
+        <div className={cn(
+          "flex items-center gap-2 px-2.5 py-1 rounded-md border border-dashed transition-colors",
+          mvpMode ? "border-primary/40 bg-primary/5" : "border-border"
+        )}>
+          <Sparkles className={cn("h-3.5 w-3.5", mvpMode ? "text-primary" : "text-muted-foreground")} />
+          <Label htmlFor="mvp-toggle" className="text-xs font-medium cursor-pointer select-none">MVP</Label>
+          <Switch
+            id="mvp-toggle"
+            checked={mvpMode}
+            onCheckedChange={(v) => {
+              setMvpMode(v);
+              if (v) navigate("/lists");
+            }}
+            className="scale-75 -mx-1"
+          />
+        </div>
+        
         <Select value={role} onValueChange={(v) => handleRoleChange(v as UserRole)}>
           <SelectTrigger className="h-8 w-auto gap-1.5 text-xs border-dashed">
             <UserCog className="h-3.5 w-3.5 text-muted-foreground" />

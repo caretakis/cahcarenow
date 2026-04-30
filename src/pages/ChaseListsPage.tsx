@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { differenceInDays, parseISO } from "date-fns";
+import { useMvpMode } from "@/contexts/MvpModeContext";
 
 type SortKey = "risk" | "openHcc" | "gaps";
 type SortDir = "asc" | "desc";
@@ -41,6 +42,7 @@ type SelectedItem = { type: "list"; id: string } | { type: "campaign"; id: strin
 
 export default function ChaseListsPage() {
   const navigate = useNavigate();
+  const { mvpMode } = useMvpMode();
   const [viewingAs, setViewingAs] = useState("me");
   const [callPatient, setCallPatient] = useState<Patient | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -139,13 +141,15 @@ export default function ChaseListsPage() {
           <ViewingAsSelector value={viewingAs} onChange={setViewingAs} />
         </div>
         <div className="flex-1 overflow-auto">
-          {/* Campaigns Section */}
+          {/* Campaigns Section — hidden in MVP mode */}
+          {!mvpMode && (
           <div className="px-4 pt-3 pb-1">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
               <Zap className="h-3 w-3" /> Campaigns
             </p>
           </div>
-          {campaigns.map(camp => {
+          )}
+          {!mvpMode && campaigns.map(camp => {
             const isActive = selectedItem?.type === "campaign" && selectedItem.id === camp.id;
             const worked = camp.stats.total - camp.stats.remaining;
             const pct = camp.stats.total > 0 ? Math.round((worked / camp.stats.total) * 100) : 0;
