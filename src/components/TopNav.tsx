@@ -161,7 +161,7 @@ export function TopNav() {
             className="scale-75 -mx-1"
           />
         </div>
-        <div className="flex items-center gap-2">
+        
         <Select value={role} onValueChange={(v) => handleRoleChange(v as UserRole)}>
           <SelectTrigger className="h-8 w-auto gap-1.5 text-xs border-dashed">
             <UserCog className="h-3.5 w-3.5 text-muted-foreground" />
